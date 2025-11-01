@@ -4,18 +4,7 @@ from pattern import *
 from planting import *
 from measure import *
 from sense import *
-
-def moveM(state, d):
-	if d == North:
-		state["y"] += 1
-	elif d == South:
-		state["y"] -= 1
-	if d == East:
-		state["x"] += 1
-	elif d == West:
-		state["x"] -= 1
-	move(d)
-	return state
+from move import *
 	
 def pos_to(state, d, c):
 	[x, y] = c
@@ -93,8 +82,8 @@ def emplace_cactus(state, box, path=[]):
 		ns = ordinal_neighbors(state)
 		moved = False
 		for d in ns:
-			if (d == North) or (d == East):
-				continue
+			#if (d == North) or (d == East):
+			#	continue
 			n = ns[d]
 			if n == None:
 				continue

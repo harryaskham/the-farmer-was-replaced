@@ -9,7 +9,8 @@ def sense(state, set_companion=False):
 			"entity_type": e,
 			"ground_type": get_ground_type()
 		}],
-		[when, e == E.Cactus, [measureM, "cactus_size"]]
+		[when, e == E.Cactus, [measureM, "cactus_size"]],
+		[when, e == E.Apple, [set_state, {"apple": measure()}]]
 	])
 
 		

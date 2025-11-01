@@ -3,12 +3,14 @@ from lib import *
 from cactus import *
 from cache import *
 from debug import *
+from dinosaurs import *
 from fertilizer import *
 from flags import *
 from harvest import *
 from items import *
 from loops import *
 from measure import *
+from move import *
 from planting import *
 from pumpkin import *
 from sunflower import *

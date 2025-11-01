@@ -21,4 +21,6 @@ BOOSTS = 1
 
 SCAN = False
 PURGE = False
-FARM = True
+PURGE_ALL = False
+FARM = False
+DINO = True

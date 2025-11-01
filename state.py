@@ -12,7 +12,8 @@ def mk_state():
 		"wh": wh(),
 		"grid": g,
 		"here": g[here_y][here_x],
-		"ret": []
+		"ret": [],
+		"apple": None
 	}
 	
 def set_state(state, kvs):
