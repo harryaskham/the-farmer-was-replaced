@@ -1,0 +1,37 @@
+from lib import *
+from debug import *
+from measure import *
+
+def sense(state, set_companion=False):
+	e = get_entity_type()
+	state = dos(state, [
+		[set_here, {
+			"entity_type": e,
+			"ground_type": get_ground_type()
+		}],
+		[when, e == E.Cactus, [measureM, "cactus_size"]]
+	])
+
+		
+	companion = get_companion()
+	if companion == None:
+		debug(state, "no companion")
+		return state
+	state = dos(state, [
+		[debug, "companion"],
+		[debug, companion],
+		[debug, "target"],
+		[bind, [at, companion[1]], [debug]]
+	])
+		
+	if not set_companion:
+		return state
+		
+	return dos(state, [
+		[set_at, companion[1], {
+			"companion": companion[0],
+		}],
+		[set_here, {
+			"companion_at": companion[1]
+		}],
+	])

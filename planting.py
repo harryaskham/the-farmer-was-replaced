@@ -1,0 +1,66 @@
+from lib import *
+from fertilizer import *
+from water import *
+from flags import *
+from sense import *
+
+def tillable(e):
+	return contains([
+		None,
+		E.Carrot,
+		E.Pumpkin,
+		E.Sunflower,
+		E.Cactus
+	], e)
+	
+def untillable(e):
+	return contains([
+		None,
+		E.Grass
+	], e)
+	
+def plantable(e):
+	return e != Entities.Grass
+
+def maybe_till(state, e):
+	if tillable(e) and gt(state) != G.Soil:
+		till()
+		return set_here(state, {
+			"ground_type": G.Soil
+		})
+	return state
+
+def maybe_untill(state, e=None):
+	if untillable(e) and gt(state) != G.Grassland:
+		till()
+		return set_here(state, {
+			"ground_type": G.Grassland
+		})
+	return state
+		
+def maybe_plant(state, e, water=False):
+	if plantable(e) and et(state) != e:
+		if water:
+			state = water_to(state, WATER_RANGE[0], WATER_RANGE[1], WATER_BEFORE)
+		plant(e)
+		return set_here(state, {
+			"entity_type": e
+		})
+	return state
+
+def plant_one(state, e, unused=None):
+	return dos(state, [
+		[maybe_till, e],
+		[maybe_untill, e],
+		[maybe_plant, e, True],
+		[sense]
+	])
+	
+def plantM(state, e, unused=None):
+	return dos(state, [
+		[plant_one, e],
+		[fertilize],
+		[maybe_cure]
+	])
+
+		
