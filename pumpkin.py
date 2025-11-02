@@ -26,7 +26,8 @@ def Pumpkin(state, x, y, box, otherwise):
 		[Box, x, y, box,
 			[dos, [
 				[when, [x, y] == corner(box, NE), [dos, [
-					[try_harvest, [E.Pumpkin]]
+					[try_harvest, [E.Pumpkin]],
+					[set_box_harvested, box]
 				]]],
 				[maybe_replant]
 			]],

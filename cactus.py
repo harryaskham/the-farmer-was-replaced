@@ -109,10 +109,12 @@ def emplace_cactus(state, box, path=[]):
 			state = moveM(state, d)
 			state = sense(state)
 
+
 def Cactus(state, x, y, box, otherwise):
 	def do_harvest(state):
-		if xy(state) == corner(box, SW):
-			return try_harvest(state, [E.Cactus])
+		if xy(state) == corner(box, NE):
+			state = try_harvest(state, [E.Cactus])
+			state = set_box_harvested(state, box)
 		return state
 		
 	return dos(state, [

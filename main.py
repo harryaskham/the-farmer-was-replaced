@@ -13,8 +13,9 @@ def loop(state, x, y):
 				[when, x == 0, [boost, BOOSTS]],
 				chain([
 					[Pumpkin, x, y, [0, wh(state) - 6, 6, 6]],
-					[Pumpkin, x, y, [wh(state) - 6, 0, 6, 6]],
-					[Cactus, x, y, [10, 0, 6, 6]],
+					[Pumpkin, x, y, [6, wh(state) - 6, 6, 6]],
+					[Pumpkin, x, y, [12, wh(state) - 6, 6, 6]],
+					[Cactus, x, y, [10, 0, 12, 12]],
 					[Companion],
 					[Box, x, y, [0, 1, 10, wh(state) - 7], [plant_one, E.Carrot]],
 					[Checker, x, y, [plant_one, E.Tree]],
@@ -36,7 +37,7 @@ def do_purge_all(state, x, y):
 def do_purge(state, x, y):
 	return [
 		[sense, False],
-		[try_harvest, [E.Pumpkin, E.Dead_Pumpkin, E.Tree, E.Carrot, E.Cactus]],
+		[try_harvest, [E.Pumpkin, E.Dead_Pumpkin, E.Tree, E.Carrot, E.Cactus, E.Bush]],
 		[sense, True]
 	]
 	

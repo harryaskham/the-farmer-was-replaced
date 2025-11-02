@@ -11,16 +11,17 @@ ALWAYS_HARVEST = [
 	E.Grass,
 	E.Tree,
 	E.Carrot,
+	E.Bush
 ]
 HARVEST_COMPANIONS = True
 FERTILIZE = {
 	"entities": ALWAYS_HARVEST,
 	"repeats": 0
 }
-BOOSTS = 1
+BOOSTS = 3
 
 SCAN = False
 PURGE = False
 PURGE_ALL = False
-FARM = False
-DINO = True
+FARM = True
+DINO = False
