@@ -15,7 +15,7 @@ def mk_state():
 		"ret": [],
 		"apple": None,
 		"max_drones": max_drones(),
-		"num_drones": 1
+		"child_drones": []
 	}
 	
 def set_state(state, kvs):

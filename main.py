@@ -3,6 +3,9 @@ from farmlib import *
 def loop(state, x, y):
 	return [
 		[debug, ""],
+		[when, x == 0 and y == 8, [dos, [
+			[spawnM, main]
+		]]],
 		[sense, False],
 		[bind, [here], [debug]],
 		[cleanup],
@@ -15,7 +18,7 @@ def loop(state, x, y):
 					[Pumpkin, x, y, [0, wh(state) - 6, 6, 6]],
 					[Pumpkin, x, y, [6, wh(state) - 6, 6, 6]],
 					[Pumpkin, x, y, [12, wh(state) - 6, 6, 6]],
-					[Cactus, x, y, [10, 0, 12, 12]],
+					[Cactus, x, y, [10, 0, 8, 8]],
 					[Companion],
 					[Box, x, y, [0, 1, 10, 11], [plant_one, E.Carrot]],
 					[Checker, x, y, [plant_one, E.Tree]],
@@ -26,6 +29,15 @@ def loop(state, x, y):
 		],
 		[sense, True],
 		[bind, [here], [debug]],
+	]
+	
+def harvest_loop(state, x, y):
+	return [
+		[sense, False],
+		[cleanup],
+		[when, x == 0 and y > 0, [boost, BOOSTS]],
+		[try_harvest, ALWAYS_HARVEST],
+		[sense, True],
 	]
 
 def do_purge_all(state, x, y):
@@ -55,28 +67,30 @@ def do_maze(state, x, y):
 	return [
 		[maze]
 	]
-	
-state = mk_state()
 
-dos(state, [
-	[hatM, Hats.Wizard_Hat],
-	[when, PURGE, [dos, [
-		[farmloop, do_purge, False]
-	]]],
-	[when, PURGE_ALL, [dos, [
-		[farmloop, do_purge_all, False]
-	]]],
-	[when, MAZE, [dos, [
-		[try_harvest, [E.Treasure, E.Hedge]],
-		[farmloop, do_maze]
-	]]],
-	[when, DINO, [dos, [
-		[farmloop, do_dino]
-	]]],
-	[when, SCAN, [dos, [
-		[farmloop, do_scan, False]
-	]]],
-	[when, FARM, [dos, [
-		[bind, [cache_loop, loop], [farmloop]]
-	]]]
-])
+def main():	
+	state = mk_state()
+	dos(state, [
+		[hatM, Hats.Wizard_Hat],
+		[when, PURGE, [dos, [
+			[farmloop, do_purge, False]
+		]]],
+		[when, PURGE_ALL, [dos, [
+			[farmloop, do_purge_all, False]
+		]]],
+		[when, MAZE, [dos, [
+			[try_harvest, [E.Treasure, E.Hedge]],
+			[farmloop, do_maze]
+		]]],
+		[when, DINO, [dos, [
+			[farmloop, do_dino]
+		]]],
+		[when, SCAN, [dos, [
+			[farmloop, do_scan, False]
+		]]],
+		[when, FARM, [dos, [
+			[bind, [cache_loop, loop], [farmloop]]
+		]]]
+	])
+
+main()
