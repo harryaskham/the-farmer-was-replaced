@@ -17,7 +17,7 @@ def loop(state, x, y):
 					[Pumpkin, x, y, [12, wh(state) - 6, 6, 6]],
 					[Cactus, x, y, [10, 0, 12, 12]],
 					[Companion],
-					[Box, x, y, [0, 1, 10, wh(state) - 7], [plant_one, E.Carrot]],
+					[Box, x, y, [0, 1, 10, 11], [plant_one, E.Carrot]],
 					[Checker, x, y, [plant_one, E.Tree]],
 					[plant_one, E.Grass]
 				]),

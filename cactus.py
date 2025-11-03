@@ -81,9 +81,9 @@ def emplace_cactus(state, box, path=[]):
 		this = here(state)
 		ns = ordinal_neighbors(state)
 		moved = False
-		for d in ns:
-			#if (d == North) or (d == East):
-			#	continue
+		for d in [South, West]:
+			if d not in ns:
+				continue
 			n = ns[d]
 			if n == None:
 				continue
@@ -120,10 +120,10 @@ def Cactus(state, x, y, box, otherwise):
 	return dos(state, [
 		[Box, x, y, box,
 			[dos, [
-				[do_harvest],
 				[plant_one, E.Cactus],
 				[sense, True],
-				[emplace_cactus, box]
+				[emplace_cactus, box],
+				[do_harvest]
 			]],
 			otherwise
 		]
