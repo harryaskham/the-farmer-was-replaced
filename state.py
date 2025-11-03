@@ -13,7 +13,9 @@ def mk_state():
 		"grid": g,
 		"here": g[here_y][here_x],
 		"ret": [],
-		"apple": None
+		"apple": None,
+		"max_drones": max_drones(),
+		"num_drones": 1
 	}
 	
 def set_state(state, kvs):

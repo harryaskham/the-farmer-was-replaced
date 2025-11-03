@@ -43,14 +43,7 @@ def swapM(state, d):
 	state["grid"][that["y"]][that["x"]] = that
 	state["grid"][this["y"]][this["x"]] = this	
 	return state
-	
-def opposite(d):
-	return {
-		North: South,
-		South: North,
-		East: West,
-		West: East
-	}[d]
+
 	
 def ordinal_neighbors(state):
 	[x, y] = xy(state)

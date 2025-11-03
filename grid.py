@@ -57,3 +57,19 @@ def neighbors(state, cx=None, cy=None):
 	if cy < wh() - 1:
 		ns.append([cx, cy+1])
 	return ns
+	
+def neighbors_dict(state, cx=None, cy=None):
+	if cx == None:
+		cx = x(state)
+	if cy == None:
+		cy = y(state)
+	ns = {}
+	if cx > 0:
+		ns[West] = (cx-1, cy)
+	if cx < wh() - 1:
+		ns[East] = (cx+1, cy)
+	if cy > 0:
+		ns[South] = (cx, cy-1)
+	if cy < wh() - 1:
+		ns[North] = (cx, cy+1)
+	return ns

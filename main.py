@@ -46,12 +46,16 @@ def do_scan(state, x, y):
 		[sense, True]
 	]
 	
-	
 def do_dino(state, x, y):
 	return [
 		[dino, dumb]
 	]
 
+def do_maze(state, x, y):
+	return [
+		[maze]
+	]
+	
 state = mk_state()
 
 dos(state, [
@@ -61,6 +65,10 @@ dos(state, [
 	]]],
 	[when, PURGE_ALL, [dos, [
 		[farmloop, do_purge_all, False]
+	]]],
+	[when, MAZE, [dos, [
+		[try_harvest, [E.Treasure, E.Hedge]],
+		[farmloop, do_maze]
 	]]],
 	[when, DINO, [dos, [
 		[farmloop, do_dino]

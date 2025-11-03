@@ -25,3 +25,4 @@ PURGE = False
 PURGE_ALL = False
 FARM = True
 DINO = True
+MAZE = True

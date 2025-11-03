@@ -13,5 +13,3 @@ from state import *
 from status import *
 from time import *
 from util import *
-
-from libscratch import *

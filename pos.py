@@ -58,7 +58,7 @@ def set_here(state, fields):
 	
 def go_origin():
 	while x() > 0:
-		move(East)
+		move(West)
 	while y() > 0:
 		move(South)
 
@@ -70,3 +70,11 @@ def at_col_end():
 	
 def at_end():
 	return at_row_end() and at_col_end()
+	
+def opposite(d):
+	return {
+		North: South,
+		South: North,
+		East: West,
+		West: East
+	}[d]
