@@ -24,4 +24,4 @@ SCAN = False
 PURGE = False
 PURGE_ALL = False
 FARM = True
-DINO = False
+DINO = True

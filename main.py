@@ -62,13 +62,13 @@ dos(state, [
 	[when, PURGE_ALL, [dos, [
 		[farmloop, do_purge_all, False]
 	]]],
+	[when, DINO, [dos, [
+		[farmloop, do_dino]
+	]]],
 	[when, SCAN, [dos, [
 		[farmloop, do_scan, False]
 	]]],
 	[when, FARM, [dos, [
 		[bind, [cache_loop, loop], [farmloop]]
-	]]],
-	[when, DINO, [dos, [
-		[farmloop, do_dino]
 	]]]
 ])

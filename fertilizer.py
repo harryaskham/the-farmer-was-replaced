@@ -10,7 +10,11 @@ def fertilizable(e):
 def fertilize(state, over=None, n=None):
 	if over == None or contains(over, et(state)):
 		i = 0
-		while fertilizable(et(state)) and not can_harvest() and (n == None or i < n) and num_items(I.Fertilizer) > 0:
+		while (
+			fertilizable(et(state))
+			and not can_harvest()
+			and (n == None or i < n)
+			and num_items(I.Fertilizer) > 0):
 			state = dos(state, [
 				[useM, I.Fertilizer]
 			])
