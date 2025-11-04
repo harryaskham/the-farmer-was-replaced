@@ -65,5 +65,32 @@ def mapM(state, f, xs):
 	for x in xs:
 		xss.append([f, x])
 	return dos(state, xss)
-	
-	
+			
+def runSXY(state, f):
+	f = list(f)
+	f.insert(1, state["y"])
+	f.insert(1, state["x"])
+	return dos(state, [f])
+
+def runSXY1(state, f, otherwise):
+	f = list(f)
+	f.insert(1, state["y"])
+	f.insert(1, state["x"])
+	f.append(otherwise)
+	return dos(state, [f])
+
+def runSXY2(state, f, a, b=[]):
+	f = list(f)
+	f.insert(1, state["y"])
+	f.insert(1, state["x"])
+	f.append(a)
+	f.append(b)
+	return dos(state, [f])
+
+def wrapXY(f):
+	def g(state, x, y):
+		return f(state)
+	return g
+
+def nop1(state):
+	return state

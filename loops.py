@@ -21,10 +21,10 @@ def traverse_farm(state, f, box=None):
 			state = dos(state, xss)
 	return state
 	
-def boxloop(state, box, f, loop=True, scan=False):
+def boxloop(state, box, f):
 	def g(state, x, y):
 		return [f]
-	return farmloop(state, g, loop, scan, box)
+	return farmloop(state, g, True, False, box)
 
 def farmloop(state, f, loop=True, scan=False, box=None):
 	if scan:

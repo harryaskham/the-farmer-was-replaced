@@ -22,8 +22,7 @@ BOOSTS = 3
 
 SCAN = False
 PURGE = False
-PURGE_ALL = False
-FARM = True
+FARM = False
 DINO = False
 MAZE = False
 
