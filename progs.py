@@ -26,7 +26,7 @@ def progs(state):
 			[sense, False],
 			[runSXY,
 				[Box, [12, 0, 10, 1],
-					[Sunflower, 7, 7],
+					[Sunflower, 7, 7, True, True],
 					[runSXY, [Cactus, [12, 1, 10, 9], [nop1]]]
 				]
 			],
@@ -43,7 +43,7 @@ def progs(state):
 			]),
 			[sense, True]
 		]]],
-		[boxloop, [12, 10, 10, 6], [dos, [
+		[boxloop, [18, 10, 4, 6], [dos, [
 			[hatM, Hats.Straw_Hat],
 			[try_harvest]
 		]]],
@@ -60,6 +60,10 @@ def progs(state):
 			[maze, 6]
 		]]],
 		[boxloop, [9, 13, 1, 1], [dos, [
+			[hatM, Hats.Sunflower_Hat],
+			[maze, 6]
+		]]],
+		[boxloop, [15, 13, 1, 1], [dos, [
 			[hatM, Hats.Sunflower_Hat],
 			[maze, 6]
 		]]]
