@@ -1,10 +1,66 @@
 from farmlib import *
+
+def cleanupXY(state, x, y):
+	return cleanup(state)
 			
+def runSXY(state, f):
+	f = list(f)
+	f.insert(1, state["y"])
+	f.insert(1, state["x"])
+	return dos(state, [f])
+	
+def runSXY2(state, f, g=[]):
+	f = list(f)
+	f.insert(1, state["y"])
+	f.insert(1, state["x"])
+	for x in g:
+		f.append(x)
+	return dos(state, [f])
+
+def wrapXY(f):
+	def g(state, x, y):
+		return f(state)
+	return g
+
+def nop1(state):
+	return state
+	
+def progs(state):
+	n = wh(state)
+	return [
+		[boxloop, [0, 0, n, 8], [dos, [
+			[runSXY, [Box, [10, 0, 8, 7], [nop1], [runSXY, [Checker, [plant_one, E.Tree], [plant_one, E.Carrot]]]]]
+		]]],
+		[boxloop, [0, 0, n, 8], [dos, [
+			[runSXY, [Box, [10, 0, 8, 7], [dos, [
+				[runSXY, [Box, [0, 0, 10, 1], [Sunflower, 7, 7], [runSXY, [Cactus, [10, 0, 8, 8], [nop1]]]]]
+			]]]]
+		]]],
+		[boxloop, [0, n-6, 6*3,6], [dos, [
+			chain([
+				[runSXY2, [Pumpkin, [0, n - 6, 6, 6]]],
+				[runSXY2, [Pumpkin, [6, n - 6, 6, 6]]],
+				[runSXY2, [Pumpkin, [12, n - 6, 6, 6]]],
+				[nop1]
+			])
+		]]]
+	]
+
+def run_progs(state):
+	ps = progs(state)
+	for p in ps[:-2]:
+		state = spawnM(state, p)
+	return dos(state, [p[-1]])
+	
+
+
+
+
 def loop(state, x, y):
 	return [
 		[debug, ""],
 		[when, x == 0 and y == 8, [dos, [
-			[spawnM, main]
+			[spawnM, [main]]
 		]]],
 		[sense, False],
 		[bind, [here], [debug]],
@@ -65,11 +121,10 @@ def do_dino(state, x, y):
 
 def do_maze(state, x, y):
 	return [
-		[maze]
+		[maze_many]
 	]
 
-def main():	
-	state = mk_state()
+def main(state):	
 	dos(state, [
 		[hatM, Hats.Wizard_Hat],
 		[when, PURGE, [dos, [
@@ -77,6 +132,9 @@ def main():
 		]]],
 		[when, PURGE_ALL, [dos, [
 			[farmloop, do_purge_all, False]
+		]]],
+		[when, PROGS, [dos, [
+			[run_progs]
 		]]],
 		[when, MAZE, [dos, [
 			[try_harvest, [E.Treasure, E.Hedge]],
@@ -93,4 +151,5 @@ def main():
 		]]]
 	])
 
-main()
+state = mk_state()
+main(state)

@@ -5,3 +5,6 @@ def merge(xs, ys):
 	for k in ys:
 		zs[k] = ys[k]
 	return zs
+	
+def copy(xs):
+	return merge(xs, {})

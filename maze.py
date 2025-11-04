@@ -3,6 +3,20 @@ from planting import *
 from harvest import *
 from sense import *
 from move import *
+from drones import *
+
+def maze_many(state, size=None):
+	state = move_to(state, [wh(state)-1, wh(state)-1])
+	state = spawnM(state, [maze, size], 12)
+	
+	state = move_to(state, [0, wh(state)-1])
+	state = spawnM(state, [maze, size], 8)
+	
+	state = move_to(state, [wh(state)-1, 0])
+	state = spawnM(state, [maze, size], 4)
+	
+	state = move_to(state, [0, 0])
+	return maze(state, size)
 
 def maze(state, size=None):
 	start_pos = xy(state)
@@ -15,10 +29,12 @@ def maze(state, size=None):
 			[plant_one, E.Bush],
 			[useM, I.Weird_Substance, use_n],
 		])
+	state = set_state(state, { "treasure": measure() })
 	seen = set()
 	back = []
 	while True:
 		state = sense(state, False)
+		state = set_state(state, { "treasure": measure() })
 		
 		if et(state) == E.Treasure:
 			state = try_harvest(state, [E.Treasure])
@@ -28,7 +44,22 @@ def maze(state, size=None):
 		seen.add((x, y))
 		ns = neighbors_dict(state)
 		moved = False
-		for d in ns:
+		
+		ds = []
+		if state["treasure"][0] < x:
+			ds.append(West)
+		if state["treasure"][0] > x:
+			ds.append(East)
+		if state["treasure"][1] < y:
+			ds.append(South)
+		if state["treasure"][1] > y:
+			ds.append(North)
+		for d in [North, East, South, West]:
+			ds.append(d)
+			
+		for d in ds:
+			if d not in ns:
+				continue
 			n = ns[d]
 			if n in seen:
 				continue

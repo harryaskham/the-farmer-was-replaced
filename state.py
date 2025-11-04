@@ -15,10 +15,17 @@ def mk_state():
 		"ret": [],
 		"apple": None,
 		"max_drones": max_drones(),
-		"child_drones": []
+		"child_drones": {
+		},
+		"this_drone": 0,
+		"treasure": None
 	}
 	
-def set_state(state, kvs):
+def set_state(state, kvs, children=True):
 	for k in kvs:
 		state[k] = kvs[k]
+	for child in state["child_drones"]:
+		child_state = state["child_drones"][child]
+		for k in kvs:
+			child_state[k] = kvs[k]
 	return state
