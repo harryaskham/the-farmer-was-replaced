@@ -15,7 +15,7 @@ SIDE_EFFECTS = {
 	]],
 	I.Weird_Substance: [dos, [
 		[toggle_infected],
-		[bind, [neighbors], [mapM, toggle_infected]]
+		[bind, [neighbors], [mapM, [toggle_infected]]]
 	]],
 	I.Water: [set_here, { "water": get_water() } ]
 }

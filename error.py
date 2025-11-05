@@ -17,7 +17,7 @@ def clear_error(state):
 	return set_error(None)
 	
 def has_error(state):
-	return pure(state, state["error"] != None)
+	return state["error"] != None
 
 def error(state, msgs):
 	state = set_error(state, msgs)

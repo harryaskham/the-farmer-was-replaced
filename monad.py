@@ -1,6 +1,7 @@
 from application import *
 from dict import *
 from debug import *
+from error import *
 
 def pushret(state, v):
 	state["ret"].append(v)
@@ -16,11 +17,21 @@ def when(state, p, xs):
 	return state
 	
 def whenM(state, ps, xs):
-	state_ = dos(state, [ps])
-	state__, p = popret(state_)
+	out = dos(state, [ps])
+	if out == None:
+		return error(state, [
+			"whenM condition returned None:",
+			ps
+		])
+	if len(out) != 2:
+		return error(state, [
+			"whenM condition return != 2:",
+			ps
+		])
+	state, p = out
 	if p:
-		return dos(state__, [xs])
-	return state__
+		return dos(state, [xs])
+	return state
 	
 def cond(state, c, a, b):
 	if c:
@@ -54,7 +65,7 @@ def seq(state, xss):
 	state = dos(state, [
 		[bind, xss[-1], [pushret]]
 	])
-	return popret(state)
+	return pure(state, popret(state))
 	
 def do(state, fs):
 	for xs in fs:
@@ -70,6 +81,8 @@ def pure(state, x):
 	
 def dov(state, xss):
 	out = dos(state, xss, False)
+	if len(out) == 1:
+		return pure(state, out)
 	if len(out) != 2:
 		return error(state, [
 			"final doV did not return value",
@@ -77,16 +90,27 @@ def dov(state, xss):
 		])
 	return out
 	
+ERROR = { "ERROR": "ERROR" }
+	
 def dos(state, xss, copy=False):
 	state = debug(state, xss, 3, "dos")
 	v = None
 	both = False
 	for xs in xss:
 		state = debug(state, xs, 3, "do")
+		if state["error"] != None:
+			return state
+			
 		xs = list(xs)
 		xs.insert(1, state)
 		
 		out = aps(xs)
+		if out == None:
+			state = error(state, [
+				"Do-statement returned None:",
+				xs
+			])
+			continue
 		
 		if "__state__" in out:
 			state_ = out["__state__"]
@@ -132,9 +156,9 @@ def then(state, g, f):
 def mapM(state, f, xs):
 	xss = []
 	for x in xs:
-		fxs = [f]
-		for 
-		xss.append([f, x])
+		fx = list(f)
+		fx.append(x)
+		xss.append(fx)
 	return dos(state, xss)
 			
 def runSXY(state, f):

@@ -1,6 +1,6 @@
 from aliases import *
 
-DEBUG = True
+DEBUG = False
 DEBUG_LEVEL = 3
 
 AIR_DEBUG = False
@@ -29,10 +29,9 @@ PROGS = False
 
 DINO = False
 
-PUMPKIN = True
-
+PUMPKIN = False
+ENERGY = True
 MAZE = False
-
 FILL = True
 
 

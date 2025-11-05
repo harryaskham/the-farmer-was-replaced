@@ -29,24 +29,103 @@ def filler_pumpkin(state):
 	d = wh(state)
 	state = move_to(state, [d//2, d//2])
 
-	def child(state, c=None):
-		if c == None:
-			c = xy(state)
-
+	def child(state, c, dir):
 		[x, y] = c
 		x = x % d
 		y = y % d
-		return must_spawn(state, [dos, [
+		return spawnM(state, [dos, [
 			[move_to, [x, y]],
+			[child, [(x+3)%d,(y+3)%d], East],
 			[sense, False],
 			[whileM, [eqM, [etM], [pure, E.Pumpkin]], [dos, [
 				[moveM, dir],
+				[water_to, 0.75, 1.0],
 				[sense, False]
 			]]],
-			[water_to, 0.75, 1.0],
-			[plant_pumpkin, False],
-			[child, [x,y+1], East],
-			[child, [x,y+1], West],
+	
+			[plant_pumpkin, False]
 		]])
 		
-	return mapM(state, [child, None], Dirs)
+	return mapM(state, [child, xy(state)], Dirs)
+	
+def filler_energy(state):
+	d = wh(state)
+	
+	def sunflower_at(state, c):
+		return spawnM(state, [dos, [
+			[move_to, c],
+			[Sunflower, 7, 15, False, True]
+		]])
+		
+	def boost_at(state, c):
+		return spawnM(state, [dos, [
+			[move_to, c],
+			[forever, [boost, 10, True, True, 15, 15]]
+		]])
+
+	def spaced(n=32, gap=1):
+		cs = []
+		for y in range(0, d, gap+1):
+			for x in range(0, d, gap+1):
+				cs.append([x, y])
+				if len(cs) == n:
+					break
+			if len(cs) == n:
+				break
+		return cs
+		
+	def sunflower_row(n=10):
+		cs = []
+		for x in range(n):
+			cs.append([x, d-1])
+		return cs
+		
+	def planter(state, y):
+		return dos(state, [
+			[boxloop, [0, y, d, 1], [dos, [
+				[Sunflower, 7, 15]
+			]]]
+		])
+
+	def harvester(state, y):
+		state["petal_threshold"] = 15
+		
+		def decr(state):
+			state["petal_threshold"] -= 1
+			return state
+			
+		def reset(state):
+			state["petal_threshold"] = 15
+			return state
+			
+		def do_harv(state):
+			petals = get_here(state)["petals"]
+			return pure(state, petals != None and petals >= state["petal_threshold"])
+
+		return dos(state, [
+			[boxloop, [0, y, d, 1], [dos, [
+				[sense, False],
+				[whenM, [do_harv], [dos, [
+					[try_harvest],
+					[reset]
+				]]],
+				[whenM, [bind, [xy], [eq, [d-1, y]]], [decr]]
+			]]]
+		])
+		
+	#for y in range(1, 16):
+	#	state = spawnM(state, [planter, y])
+	#	state = spawnM(state, [harvester, y])
+		
+	#state = spawnM(state, [planter, 0])
+	#state = harvester(state, 0)
+	
+	#return state
+
+
+	return dos(state, [
+		[mapM, [sunflower_at], sunflower_row()],
+		[wait_all],
+		[mapM, [boost_at], spaced()[1:]],
+		[forever, [boost]]
+	])

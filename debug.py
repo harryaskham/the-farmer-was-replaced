@@ -5,7 +5,7 @@ def debug(state, msg, level=0, prefix=None):
 		return state
 	if DEBUG:
 		quick_print("")
-		quick_print("drone #" + str(state["this_id"]))
+		quick_print("drone #" + str(state["this_id"]) + " @" + str(state["x"]) + "," + str(state["y"]))
 		if prefix == None:
 			quick_print(msg)
 		else:

@@ -4,7 +4,8 @@ from progs import *
 	
 def main(state):	
 	dos(state, [
-		[hatM, Hats.Wizard_Hat],
+		[hatM, Hats.Straw_Hat],
+		[move_to, [0, 0]],
 		[try_harvest],
 		[when, PURGE, [dos, [
 			[run_progs, purges]
@@ -12,8 +13,11 @@ def main(state):
 		[when, PROGS, [dos, [
 			[run_progs, progs]
 		]]],
-		[when, PUMPKIN, [dos, [
+		[when, PUMPKIN and FILL, [dos, [
 			[filler_pumpkin]
+		]]],
+		[when, ENERGY and FILL, [dos, [
+			[filler_energy]
 		]]],
 		[when, MAZE, [dos, [
 			[cond, FILL,

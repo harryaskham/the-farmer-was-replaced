@@ -2,31 +2,27 @@ from lib import *
 from harvest import *
 from measure import *
 
-def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=False):
-	if not force and et() == E.Sunflower and measure() >= min_petals and measure() <= max_petals:
-		return state
-		
+def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=False, do_water=True):
+	state = sense(state, False)
 	while True:
-		state = dos(state, [
-			[harvestM],
-			[plant_one, E.Sunflower],
-			[measureM, "petals"]
-		])
-		[x, y] = xy(state)
+		if force or et(state) != E.Sunflower:
+			state = dos(state, [
+				[harvestM],
+				[plant_one, E.Sunflower],
+			])
+		state = sense(state, False)
 		petals = here(state)["petals"]
-		if petals >= min_petals and petals <= max_petals:
+		if petals != None and petals >= min_petals and petals <= max_petals:
 			break
 
 	return when(state, do_fertilize, [fertilize])
 		
-def boost(state, n=10, fertilize=True, water=True):
+def boost(state, n=10, do_fertilize=True, do_water=True, min_petals=7, max_petals=15):
 	state = try_harvest(state)
-	if water:
-		state = water_to(state, 0.75, 1.0)
 	for _ in range(n):
 		state = dos(state, [
-			[Sunflower, 7, 15, True, fertilize],
-			[when, not fertilize, [wait_secsM, 3]],
+			[Sunflower, min_petals, max_petals, True, do_fertilize, do_water],
+			[when, not do_fertilize, [wait_for_harvest]],
 			[try_harvest]
 		]) 
 	return state

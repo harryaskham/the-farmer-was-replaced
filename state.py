@@ -26,7 +26,9 @@ def mk_state():
 def set_state(state, kvs, children=False):
 	for k in kvs:
 		state[k] = kvs[k]
-	for child_state in state["child_states"]:
-		for k in kvs:
-			child_state[k] = kvs[k]
+	if children:
+		for child_id in state["child_states"]:
+			child_state = state["child_states"][child_id]
+			for k in kvs:
+				child_state[k] = kvs[k]
 	return state

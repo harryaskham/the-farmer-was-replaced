@@ -1,21 +1,27 @@
 from lib import *
 
+def inc_bounded(state, key, n=1):
+	state[key] = (state[key] + n) % wh(state)
+	return state
+	
+def inc_x(state, n=1):
+	return inc_bounded(state, "x", n)
+	
+def inc_y(state, n=1):
+	return inc_bounded(state, "y", n)
+
 def moveM(state, d):
 	if not move(d):
 		return state
 
 	if d == North:
-		state["y"] += 1
+		return inc_y(state)
 	elif d == South:
-		state["y"] -= 1
+		return inc_y(state, -1)
 	elif d == East:
-		state["x"] += 1
+		return inc_x(state)
 	elif d == West:
-		state["x"] -= 1
-		
-	state["x"] = state["x"] % wh(state)
-	state["y"] = state["y"] % wh(state)
-	return state
+		return inc_x(state, -1)
 	
 def move_boundedM(state, d):
 	[x, y] = xy(state)

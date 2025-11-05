@@ -31,6 +31,11 @@ def try_harvest(state, entities=None):
 				[harvestM]
 			])
 	return state
+	
+def wait_for_harvest(state):
+	while not can_harvest():
+		pass
+	return state
 		
 def set_box_harvested(state, box):
 	[x0, y0, w, h] = box

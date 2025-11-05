@@ -11,7 +11,7 @@ def pumpkin_died(state):
 		pass
 	return dos(state, [
 		[sense],
-		[pushret, not can_harvest()]
+		[pure, not can_harvest()]
 	])
 		
 def plant_pumpkin(state, do_fertilize=True):

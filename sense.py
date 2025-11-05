@@ -10,10 +10,10 @@ def sense(state, set_companion=False):
 			"ground_type": get_ground_type()
 		}],
 		[when, e == E.Cactus, [measureM, "cactus_size"]],
+		[when, e == E.Sunflower, [measureM, "petals"]],
 		[when, e == E.Apple, [set_state, {"apple": measure()}]]
 	])
 
-		
 	companion = get_companion()
 	if companion == None:
 		debug(state, "no companion")
@@ -22,7 +22,7 @@ def sense(state, set_companion=False):
 		[debug, "companion", 5],
 		[debug, companion, 5],
 		[debug, "target", 5],
-		[bind, [at, companion[1]], [flipM, debug, 3]]
+		[bind, [at, companion[1]], [flipM, debug, 5]]
 	])
 		
 	if not set_companion:

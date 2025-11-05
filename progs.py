@@ -1,6 +1,5 @@
 from farmlib import *
 
-
 def purges(state, n_drones=None):
 	n = wh(state)
 	if n_drones == None:
