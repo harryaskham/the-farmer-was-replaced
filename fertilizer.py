@@ -21,13 +21,15 @@ def fertilize(state, over=None, n=None):
 			i += 1
 	return state
 
-def maybe_cure(state, over=None):
+def maybe_cure(state, over=None, unsafe=False):
 	if over == None or contains(over, et(state)):
 		if get_here(state, "infected"):
 			return dos(state, [
 				[useM, I.Weird_Substance],
-				[useM, I.Fertilizer],
-				[useM, I.Weird_Substance],
+				[unless, unsafe, [dos, [
+					[useM, I.Fertilizer],
+					[useM, I.Weird_Substance]
+				]]]
 			])
 	return state
 

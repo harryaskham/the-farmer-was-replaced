@@ -1,7 +1,8 @@
 from lib import *
 from items import *
+from flags import *
 
-def water_to(state, min=0, max=None, over=None):
+def water_to(state, min=WATER_RANGE[0], max=WATER_RANGE[1], over=None):
 	if over == None or contains(over, et(state)):
 		if max == None:
 			max = min

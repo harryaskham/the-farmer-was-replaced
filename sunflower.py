@@ -4,6 +4,7 @@ from measure import *
 
 def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=False, do_water=True):
 	state = sense(state, False)
+	state = when(state,do_water, [water_to])
 	while True:
 		if force or et(state) != E.Sunflower:
 			state = dos(state, [
@@ -17,13 +18,12 @@ def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=Fals
 
 	return when(state, do_fertilize, [fertilize])
 		
-def boost(state, n=10, do_fertilize=True, do_water=True, min_petals=7, max_petals=15):
-	state = try_harvest(state)
+def boost(state, n=1, do_fertilize=True, do_water=True, min_petals=7, max_petals=15, cure=True, unsafe=False):
 	for _ in range(n):
 		state = dos(state, [
 			[Sunflower, min_petals, max_petals, True, do_fertilize, do_water],
-			[when, not do_fertilize, [wait_for_harvest]],
-			[try_harvest]
+			[wait_for_harvest],
+			[try_harvest, [E.Sunflower], cure, unsafe]
 		]) 
 	return state
 	

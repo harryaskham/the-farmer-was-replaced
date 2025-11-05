@@ -60,7 +60,7 @@ def filler_energy(state):
 	def boost_at(state, c):
 		return spawnM(state, [dos, [
 			[move_to, c],
-			[forever, [boost, 10, True, True, 15, 15]]
+			[forever, [boost, 10, True, True, 15, 15, True, True]]
 		]])
 
 	def spaced(n=32, gap=1):
@@ -121,7 +121,6 @@ def filler_energy(state):
 	#state = harvester(state, 0)
 	
 	#return state
-
 
 	return dos(state, [
 		[mapM, [sunflower_at], sunflower_row()],

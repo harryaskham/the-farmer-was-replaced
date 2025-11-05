@@ -21,20 +21,20 @@ def harvestM(state):
 	])
 
 
-def try_harvest(state, entities=None):
+def try_harvest(state, entities=None, cure=True, unsafe=False):
 	if entities == None or contains(entities, et(state)):
 		if get_here(state, "companion") != None and not HARVEST_COMPANIONS:
 			return state
 		if can_harvest():
 			return dos(state, [
-				[maybe_cure],
+				[when, cure, [maybe_cure, entities, unsafe]],
 				[harvestM]
 			])
 	return state
 	
-def wait_for_harvest(state):
+def wait_for_harvest(state, delay=0.5):
 	while not can_harvest():
-		pass
+		wait_secs(delay)
 	return state
 		
 def set_box_harvested(state, box):
