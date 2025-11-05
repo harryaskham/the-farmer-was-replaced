@@ -2,15 +2,19 @@ from lib import *
 
 def moveM(state, d):
 	if not move(d):
-		return state	
+		return state
+
 	if d == North:
 		state["y"] += 1
 	elif d == South:
 		state["y"] -= 1
-	if d == East:
+	elif d == East:
 		state["x"] += 1
 	elif d == West:
 		state["x"] -= 1
+		
+	state["x"] = state["x"] % wh(state)
+	state["y"] = state["y"] % wh(state)
 	return state
 	
 def move_boundedM(state, d):

@@ -2,11 +2,10 @@ from lib import *
 
 from cactus import *
 from cache import *
-from debug import *
 from dinosaurs import *
 from drones import *
 from fertilizer import *
-from flags import *
+from fillers import *
 from harvest import *
 from items import *
 from loops import *

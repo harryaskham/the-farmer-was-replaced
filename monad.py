@@ -1,5 +1,6 @@
 from application import *
 from dict import *
+from debug import *
 
 def pushret(state, v):
 	state["ret"].append(v)
@@ -21,22 +22,90 @@ def whenM(state, ps, xs):
 		return dos(state__, [xs])
 	return state__
 	
+def cond(state, c, a, b):
+	if c:
+		return dos(state, [a])
+	else:
+		return dos(state, [b])
+
+def unless(state, c, a):
+	if c:
+		return state
+	return dos(state, [a])
+
+def whileM(state, cf, a):
+	while True:
+		state, c = dov(state, [cf])
+		if not c:
+			break
+		state = dos(state, [a])
+	return state
+
+def untilM(state, cf, a):
+	while True:
+		state, c = dov(state, [cf])
+		if c:
+			break
+		state = dos(state, [a])
+	return state
+	
+def seq(state, xss):
+	state = dos(state, xss[:-1])
+	state = dos(state, [
+		[bind, xss[-1], [pushret]]
+	])
+	return popret(state)
+	
 def do(state, fs):
 	for xs in fs:
 		state_ = aps(xs)
 		state = merge(state, state_)
 	return state
 	
+def pure(state, x):
+	return {
+		"__state__": state,
+		"__v__": x
+	}
+	
+def dov(state, xss):
+	out = dos(state, xss, False)
+	if len(out) != 2:
+		return error(state, [
+			"final doV did not return value",
+			xss
+		])
+	return out
+	
 def dos(state, xss, copy=False):
+	state = debug(state, xss, 3, "dos")
+	v = None
+	both = False
 	for xs in xss:
+		state = debug(state, xs, 3, "do")
 		xs = list(xs)
 		xs.insert(1, state)
-		state_ = aps(xs)
+		
+		out = aps(xs)
+		
+		if "__state__" in out:
+			state_ = out["__state__"]
+			v = out["__v__"]
+			both = True
+		else:
+			state_ = out
+			v = None
+			both = False
+			
 		if copy:
 			state = merge(state, state_)
 		else:
 			state = state_
-	return state
+			
+	if both:
+		return state, v
+	else:
+		return state
 	
 def chain(xss):
 	head = list(xss[0])
@@ -63,6 +132,8 @@ def then(state, g, f):
 def mapM(state, f, xs):
 	xss = []
 	for x in xs:
+		fxs = [f]
+		for 
 		xss.append([f, x])
 	return dos(state, xss)
 			

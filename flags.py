@@ -1,6 +1,8 @@
-from lib import *
+from aliases import *
 
 DEBUG = True
+DEBUG_LEVEL = 3
+
 AIR_DEBUG = False
 WATER_RANGE = (0.75, 1.0)
 WATER_BEFORE = [
@@ -23,7 +25,14 @@ BOOSTS = 3
 SCAN = False
 PURGE = False
 FARM = False
+PROGS = False
+
 DINO = False
+
+PUMPKIN = True
+
 MAZE = False
 
-PROGS = True
+FILL = True
+
+

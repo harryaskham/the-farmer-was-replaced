@@ -12,9 +12,17 @@ def main(state):
 		[when, PROGS, [dos, [
 			[run_progs, progs]
 		]]],
+		[when, PUMPKIN, [dos, [
+			[filler_pumpkin]
+		]]],
 		[when, MAZE, [dos, [
-			[try_harvest, [E.Treasure, E.Hedge]],
-			[farmloop, do_maze]
+			[cond, FILL,
+				[run_progs, filler_maze],
+				[dos, [
+					[try_harvest, [E.Treasure, E.Hedge]],
+					[farmloop, do_maze]
+				]]
+			]
 		]]],
 		[when, DINO, [dos, [
 			[farmloop, do_dino]

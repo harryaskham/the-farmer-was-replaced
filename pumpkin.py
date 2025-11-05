@@ -14,22 +14,28 @@ def pumpkin_died(state):
 		[pushret, not can_harvest()]
 	])
 		
-def maybe_replant(state):
+def plant_pumpkin(state, do_fertilize=True):
+	if et(state) == E.Pumpkin:
+		return state
 	return dos(state, [
 		[try_harvest, [E.Dead_Pumpkin]],
-		[plantM, E.Pumpkin],
-		[whenM, [pumpkin_died], [maybe_replant]]
+		[cond, do_fertilize,
+			[plantM, E.Pumpkin],
+			[plant_one, E.Pumpkin]],
+		[whenM, [pumpkin_died], [plant_pumpkin, do_fertilize]]
 	])
 
-def Pumpkin(state, x, y, box, otherwise):
+def Pumpkin(state, x, y, box, otherwise, do_fertilize=True, do_harvest=True):
 	return dos(state, [
 		[Box, x, y, box,
 			[dos, [
-				[when, [x, y] == corner(box, SW), [dos, [
-					[try_harvest, [E.Pumpkin]],
-					[set_box_harvested, box]
+				[when, state["this_id"] == 0 and [x, y] == corner(box, SW), [dos, [
+					[when, do_harvest, [dos, [
+						[try_harvest, [E.Pumpkin]],
+						[set_box_harvested, box]
+					]]]
 				]]],
-				[maybe_replant]
+				[plant_pumpkin, do_fertilize]
 			]],
 			otherwise
 		]

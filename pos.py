@@ -1,3 +1,5 @@
+from monad import *
+
 def x(state=None):
 	if state == None:
 		return get_pos_x()
@@ -20,6 +22,10 @@ def et(state=None):
 	if state == None:
 		return get_entity_type()
 	return get_here(state, "entity_type")
+	
+def etM(state):
+	v = et(state)
+	return pure(state, v)
 	
 def gt(state=None):
 	if state == None:

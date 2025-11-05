@@ -13,19 +13,20 @@ def mk_state():
 		"grid": g,
 		"here": g[here_y][here_x],
 		"ret": [],
+		"error": None,
 		"apple": None,
+		"num_drones": 1,
 		"max_drones": max_drones(),
-		"child_drones": {
-		},
-		"this_drone": 0,
+		"child_handles": {},
+		"child_states": {},
+		"this_id": 0,
 		"treasure": None
 	}
 	
-def set_state(state, kvs, children=True):
+def set_state(state, kvs, children=False):
 	for k in kvs:
 		state[k] = kvs[k]
-	for child in state["child_drones"]:
-		child_state = state["child_drones"][child]
+	for child_state in state["child_states"]:
 		for k in kvs:
 			child_state[k] = kvs[k]
 	return state

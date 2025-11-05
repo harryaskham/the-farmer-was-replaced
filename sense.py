@@ -19,10 +19,10 @@ def sense(state, set_companion=False):
 		debug(state, "no companion")
 		return state
 	state = dos(state, [
-		[debug, "companion"],
-		[debug, companion],
-		[debug, "target"],
-		[bind, [at, companion[1]], [debug]]
+		[debug, "companion", 5],
+		[debug, companion, 5],
+		[debug, "target", 5],
+		[bind, [at, companion[1]], [flipM, debug, 3]]
 	])
 		
 	if not set_companion:

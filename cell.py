@@ -6,19 +6,16 @@ def mk_cell_state(x, y, kwargs=None):
 	state = {
 		"x": x,
 		"y": y,
-		"entity_type": get_entity_type(),
-		"ground_type": get_ground_type(),
+		"entity_type": None,
+		"ground_type": None,
 		"companion": None,
 		"companion_at": None,
-		"companion_from": None
-	}
-	fields = {
+		"companion_from": None,
 		"infected": False,
 		"water": None,
 		"petals": None,
 		"cactus_size": None
 	}
-	for k in fields:
-		if k in kwargs:
-			fields[k] = kwargs[k]
-	return merge(state, fields)
+	for k in kwargs:
+		state[k] = kwargs[k]
+	return state
