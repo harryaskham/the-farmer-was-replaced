@@ -73,4 +73,4 @@ def wait_all(state):
 	for child_id in child_ids:
 		state, (child_state, v) = wait_for_child(state, child_id)
 		vs[child_id] = v
-	return pure(state, vs)
+	return state, vs

@@ -166,9 +166,10 @@ def fill_rows(state, f):
 	for y in range(1, d):
 		state = spawnM(state, p(y))
 	state = dos(state, [p(0)])
-	state, sts = wait_all(state)
-	for st in sts:
-		state["grid"][st["y"]] = st["grid"][st["y"]]
+	state, _ = wait_all(state)
+	for child_id in state["child_states"]:
+		child_state = state["child_states"][child_id]
+		state["grid"][child_state["y"]] = child_state["grid"][child_state["y"]]
 	return state
 
 def filler_companions(state):
