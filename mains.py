@@ -40,8 +40,7 @@ def do_purge_all(state, x, y):
 def do_purge(state, x, y):
 	return [
 		[sense, False],
-		[try_harvest, [E.Pumpkin, E.Dead_Pumpkin, E.Tree, E.Carrot, E.Cactus, E.Bush]],
-		[sense, True]
+		[try_harvest, [E.Pumpkin, E.Dead_Pumpkin, E.Tree, E.Carrot, E.Cactus, E.Bush]]
 	]
 	
 def do_scan(state, x, y):
@@ -51,7 +50,7 @@ def do_scan(state, x, y):
 	
 def do_dino(state, x, y):
 	return [
-		[dino, dumb]
+		[dino, search_apple]
 	]
 
 def do_maze(state, x, y):

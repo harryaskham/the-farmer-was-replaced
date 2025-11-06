@@ -16,8 +16,8 @@ def sense(state, set_companion=False):
 
 	companion = get_companion()
 	if companion == None:
-		debug(state, "no companion")
-		return state
+		return debug(state, "no companion", 5)
+		
 	state = dos(state, [
 		[debug, "companion", 5],
 		[debug, companion, 5],

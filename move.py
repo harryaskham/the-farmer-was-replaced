@@ -10,20 +10,32 @@ def inc_x(state, n=1):
 def inc_y(state, n=1):
 	return inc_bounded(state, "y", n)
 
-def moveM(state, d):
+def moveM(state, d, update_tail=False):
+	prev = xy_tup(state)
+	
 	if not move(d):
 		return state
 
 	if d == North:
-		return inc_y(state)
+		state = inc_y(state)
 	elif d == South:
-		return inc_y(state, -1)
+		state = inc_y(state, -1)
 	elif d == East:
-		return inc_x(state)
+		state = inc_x(state)
 	elif d == West:
-		return inc_x(state, -1)
+		state = inc_x(state, -1)
+		
+	if update_tail:
+		state["tail"].append(prev)
+		if len(state["tail"]) > state["tail_len"]:
+			if state["tail"][0] in state["tail_set"]:
+				state["tail_set"].remove(state["tail"][0])
+			state["tail"] = state["tail"][1:]
+		state["tail_set"].add(prev)
+		
+	return state
 	
-def move_boundedM(state, d):
+def move_boundedM(state, d, update_tail=False):
 	[x, y] = xy(state)
 	n = wh(state)
 	if x == n-1 and d == East:
@@ -34,17 +46,7 @@ def move_boundedM(state, d):
 		return state
 	if y == 0 and d == South:
 		return state
-	if not move(d):
-		return state	
-	if d == North:
-		state["y"] += 1
-	elif d == South:
-		state["y"] -= 1
-	if d == East:
-		state["x"] += 1
-	elif d == West:
-		state["x"] -= 1
-	return state
+	return moveM(state, d, update_tail)
 		
 def go_originM(state):
 	return move_to(state, [0, 0])

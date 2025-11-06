@@ -12,6 +12,7 @@ from loops import *
 from maze import *
 from measure import *
 from move import *
+from pathing import *
 from planting import *
 from pumpkin import *
 from sunflower import *

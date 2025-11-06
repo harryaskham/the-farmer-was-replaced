@@ -7,7 +7,7 @@ def main(state):
 		[hatM, Hats.Straw_Hat],
 		[move_to, [0, 0]],
 		[try_harvest],
-		[when, PURGE, [dos, [
+		[when, PURGE or DINO, [dos, [
 			[run_progs, purges]
 		]]],
 		[when, PROGS, [dos, [
@@ -19,6 +19,9 @@ def main(state):
 		[when, ENERGY and FILL, [dos, [
 			[filler_energy]
 		]]],
+		[when, CROPS and FILL, [dos, [
+			[filler_crops]
+		]]],
 		[when, MAZE, [dos, [
 			[cond, FILL,
 				[run_progs, filler_maze],
@@ -28,9 +31,8 @@ def main(state):
 				]]
 			]
 		]]],
-		[when, DINO, [dos, [
-			[farmloop, do_dino]
-		]]],
+		[when, DINO, [dino, dumb]],
+		#[when, DINO, [dino, search_apple]],
 		[when, SCAN, [dos, [
 			[farmloop, do_scan, False]
 		]]],

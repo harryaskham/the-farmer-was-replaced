@@ -12,6 +12,9 @@ def y(state=None):
 	
 def xy(state=None):
 	return [x(state), y(state)]
+
+def xy_tup(state=None):
+	return (x(state), y(state))
 	
 def wh(state=None):
 	if state == None:

@@ -1,7 +1,7 @@
 from aliases import *
 
 DEBUG = False
-DEBUG_LEVEL = 3
+DEBUG_LEVEL = 1
 
 AIR_DEBUG = False
 WATER_RANGE = (0.75, 1.0)
@@ -30,8 +30,10 @@ PROGS = False
 DINO = False
 
 PUMPKIN = False
-ENERGY = True
+ENERGY = False
 MAZE = False
+CROPS = True
+
 FILL = True
 
 

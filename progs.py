@@ -1,13 +1,11 @@
 from farmlib import *
 
-def purges(state, n_drones=None):
+def purges(state, n_drones=16):
 	n = wh(state)
-	if n_drones == None:
-		n_drones = state["max_drones"]
 	every = n // n_drones
 	ps = []
-	for y in range(0, n-every, every):
-		ps.append([boxloop, [0, y, n, every], [try_harvest]])
+	for y in range(0, n, every):
+		ps.append([boxloop, [0, y, n, every], [try_harvest], [0, y], False])
 	return ps
 
 def progs(state):
@@ -70,6 +68,6 @@ def progs(state):
 
 def run_progs(state, mk_fs):
 	ps = mk_fs(state)
-	for p in ps[:-1]:
-		state = spawnM(state, p)
-	return dos(state, [ps[-1]])
+	for p in ps:
+		state = must_spawn(state, p)
+	return wait_all(state)

@@ -1,7 +1,7 @@
 from dict import *
 
-seed = 42
-speedup = 64
+seed = random() * 100000 // 1
+speedup = 65535
 
 all_unlocks = Unlocks
 

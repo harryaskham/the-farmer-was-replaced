@@ -47,6 +47,34 @@ def filler_pumpkin(state):
 		]])
 		
 	return mapM(state, [child, xy(state)], Dirs)
+
+def filler_crops(state):
+	d = wh(state)
+	
+	def spaced(n=32, gap=5):
+		cs = []
+		for y in range(0, d, gap+1):
+			for x in range(0, d, gap+1):
+				cs.append([x, y])
+				if len(cs) == n:
+					break
+			if len(cs) == n:
+				break
+		return cs
+
+	def p(c):
+		
+		return [boxloop, [0, 0, d, d], [dos, [
+			[sense, False],
+			[try_harvest],
+			[water_to],
+			[runSXY, [Checker, [plant_one, E.Tree], [plant_one, E.Carrot]]],
+			[sense, True]
+		]], c, True]
+		
+	for y in range(1, 32):
+		state = spawnM(state, p([0, y]))
+	return dos(state, [p([0, 0])])
 	
 def filler_energy(state):
 	d = wh(state)

@@ -1,6 +1,7 @@
 from lib import *
 from sense import *
 from move import *
+from pathing import *
 
 def hatM(state, hat):
 	change_hat(hat)
@@ -42,7 +43,7 @@ def dumb(state):
 	
 		(ax, ay) = state["apple"]
 		[x, y] = xy(state)
-			
+		
 		ds = []
 		if x > ax:
 			ds.append(West)
@@ -65,13 +66,33 @@ def dumb(state):
 
 def apple_here(state):
 	return set_state(state, { "apple": xy(state) })
+	
+def search_apple(state):
+	while True:
+		state = sense(state, False)
+		state["tail_len"] += 1
+		state = debug(state, ["apple", state["apple"], "len", state["tail_len"], "pos", xy_tup(state)], 2, "search")
+		#state, path = path_to(state, state["apple"])
+		state, path = path_to(state, state["apple"], False)
+		if path == None:
+			return state
+
+		for dir in path:
+			state = moveM(state, dir, True)
 
 def dino(state, policy):
 	while True:
 		state = dos(state, [
-			[hatM, Hats.Wizard_Hat],
+			[hatM, Hats.Straw_Hat],
 			[hatM, Hats.Dinosaur_Hat],
+			[set_state, { "tail": [] }],
+			[set_state, { "tail_set": set() }],
+			[set_state, { "tail_len": 0 }],
 			[policy],
-			[hatM, Hats.Wizard_Hat],
-			[set_state, { "apple": None }]
+			#[wait_secsM, 3600],
+			[hatM, Hats.Straw_Hat],
+			[set_state, { "apple": None }],
+			[set_state, { "tail": [] }],
+			[set_state, { "tail_set": set() }],
+			[set_state, { "tail_len": 0 }],
 		])

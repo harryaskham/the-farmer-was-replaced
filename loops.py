@@ -6,13 +6,13 @@ def nop_f(state, _, _):
 		
 def traverse_farm(state, f, box=None, start=None):
 	d = wh(state)
+		
+	if box == None:
+		box = [0, 0, d-1, d-1]
 	
 	if start == None:
 		start = box[:2]
-		
-	if box == None:
-		box = [0, 0, wh(state)-1, wh(state)-1]
-		
+
 	if state == None:
 		state = mk_state()
 		
