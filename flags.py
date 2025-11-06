@@ -15,7 +15,9 @@ ALWAYS_HARVEST = [
 	E.Carrot,
 	E.Bush
 ]
-HARVEST_COMPANIONS = True
+HARVEST_FLAGS = [
+	Companions.RESERVE
+]
 FERTILIZE = {
 	"entities": ALWAYS_HARVEST,
 	"repeats": 0
@@ -32,7 +34,8 @@ DINO = False
 PUMPKIN = False
 ENERGY = False
 MAZE = False
-CROPS = True
+CROPS = False
+COMPANIONS = True
 
 FILL = True
 

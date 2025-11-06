@@ -22,6 +22,9 @@ def main(state):
 		[when, CROPS and FILL, [dos, [
 			[filler_crops]
 		]]],
+		[when, COMPANIONS and FILL, [dos, [
+			[filler_companions]
+		]]],
 		[when, MAZE, [dos, [
 			[cond, FILL,
 				[run_progs, filler_maze],

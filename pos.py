@@ -1,4 +1,5 @@
 from monad import *
+from aliases import *
 
 def x(state=None):
 	if state == None:
@@ -50,20 +51,29 @@ def get_at(state, c, key=None):
 	else:
 		return at(state, c)[key]
 	
-def set_at(state, c, fields, copy=False):
+def set_at(state, c, fields, flags=[]):
+	flags = set(flags)
 	[x, y] = c
-	if copy:
-		state["grid"][y][x][k] = merge(state["grid"][y][x], fields)
-	else:
-		for k in fields:
-			state["grid"][y][x][k] = fields[k]
-	return state
+	states = [state]
+	if To.CHILDREN in flags:
+		for child_id in state["child_states"]:
+			child_state = state["child_states"][child_id]
+			states.append(child_state)
+
+	for state in states:
+		if Copy.CELL in flags:
+			state["grid"][y][x][k] = merge(state["grid"][y][x], fields)
+		else:
+			for k in fields:
+				state["grid"][y][x][k] = fields[k]
+	
+	return states[0]
 
 def get_here(state, key=None):
 	return get_at(state, xy(state), key)
 	
-def set_here(state, fields):
-	return set_at(state, xy(state), fields)
+def set_here(state, fields, flags=[]):
+	return set_at(state, xy(state), fields, flags)
 	
 def go_origin():
 	while x() > 0:

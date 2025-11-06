@@ -35,18 +35,18 @@ def moveM(state, d, update_tail=False):
 		
 	return state
 	
-def move_boundedM(state, d, update_tail=False):
+def move_boundedM(state, dir, update_tail=False):
 	[x, y] = xy(state)
-	n = wh(state)
-	if x == n-1 and d == East:
+	d = wh(state)
+	if x == d-1 and dir == East:
 		return state
-	if x == 0 and d == West:
+	if x == 0 and dir == West:
 		return state
-	if y == n-1 and d == North:
+	if y == d-1 and dir == North:
 		return state
-	if y == 0 and d == South:
+	if y == 0 and dir == South:
 		return state
-	return moveM(state, d, update_tail)
+	return moveM(state, dir, update_tail)
 		
 def go_originM(state):
 	return move_to(state, [0, 0])

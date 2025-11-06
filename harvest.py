@@ -14,16 +14,17 @@ def harvestM(state):
 			"cactus_size": None,
 			"companion": None,
 			"companion_at": None
-		}],
+		}, [To.CHILDREN]],
 		[when, c_at != None, [set_at, c_at, {
 			"companion": None
-		}]]
+		}, [To.CHILDREN]]]
 	])
 
 
-def try_harvest(state, entities=None, cure=True, unsafe=False):
+def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
+	flags = set(flags)
 	if entities == None or contains(entities, et(state)):
-		if get_here(state, "companion") != None and not HARVEST_COMPANIONS:
+		if get_here(state, "companion") != None and Companions.RESERVE in flags:
 			return state
 		if can_harvest():
 			return dos(state, [

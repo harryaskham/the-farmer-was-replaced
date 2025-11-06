@@ -156,3 +156,30 @@ def filler_energy(state):
 		[mapM, [boost_at], spaced()[1:]],
 		[forever, [boost]]
 	])
+
+	
+	
+def fill_rows(state, f):
+	d = wh(state)
+	def p(y):
+		return [boxloop, [0, 0, d, d], f, [0, y], True]
+	for y in range(1, d):
+		state = spawnM(state, p(y))
+	return dos(state, [p(0)])
+
+def filler_companions(state):
+	return fill_rows(state, [dos, [
+		[sense, True],
+		[try_harvest, None, False, False, [Companions.RESERVE]],
+		[water_to],
+		chain([
+			[Companion],
+			[Checker3,
+				[plant_one, E.Tree],
+				[plant_one, E.Carrot],
+				[plant_one, E.Grass]
+			]
+		]),
+		[sense, True]
+	]])
+	
