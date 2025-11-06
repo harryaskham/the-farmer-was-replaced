@@ -97,3 +97,15 @@ def opposite(d):
 		East: West,
 		West: East
 	}[d]
+	
+def ixy(state, id=None):
+	if id == None:
+		id = state["id"]
+	d = wh(state)
+	y = 0
+	while id >= d:
+		id -= d
+		y += 1
+	x = id
+	return (x, y)
+	

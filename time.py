@@ -4,7 +4,8 @@ def wait_secs(secs):
 		pass
 
 def wait_secsM(state, secs):
-	wait_secs(secs)
+	if secs > 0:
+		wait_secs(secs)
 	return state
 
 def wait_ticks(ticks):

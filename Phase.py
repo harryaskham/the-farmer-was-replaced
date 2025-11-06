@@ -1,0 +1,12 @@
+SCAN = "Phase.SCAN"
+PURGE = "Phase.PURGE"
+FARM = "Phase.FAR<"
+PROGS = "Phase.PROGS"
+DINO = "Phase.DINO"
+PUMPKIN = "Phase.PUMPKIN"
+ENERGY = "Phase.ENERGY"
+MAZE = "Phase.MAZE"
+CROPS = "Phase.CROPS"
+FLIPS = "Phase.FLIPS"
+COMPANIONS = "Phase.COMPANIONS"
+

@@ -3,10 +3,6 @@ from sense import *
 from move import *
 from pathing import *
 
-def hatM(state, hat):
-	change_hat(hat)
-	return state
-
 def set_apple(state):
 	if et(state) != E.Apple or xy(state) != state["apple"]:
 		return state
@@ -57,7 +53,7 @@ def dumb(state):
 			ds.append(d)
 		moved = False
 		for d in ds:
-			state = move_boundedM(state, d)
+			state = move_bounded(state, d)
 			if xy(state) != [x, y]:
 				moved = True
 				break
@@ -80,8 +76,8 @@ def search_apple(state):
 		for dir in path:
 			state = moveM(state, dir, True)
 
-def dino(state, policy):
-	while True:
+def dino(state, policies, delay=0):
+	for policy in policies:
 		state = dos(state, [
 			[hatM, Hats.Straw_Hat],
 			[hatM, Hats.Dinosaur_Hat],
@@ -89,10 +85,11 @@ def dino(state, policy):
 			[set_state, { "tail_set": set() }],
 			[set_state, { "tail_len": 0 }],
 			[policy],
-			#[wait_secsM, 3600],
+			[wait_secsM, delay],
 			[hatM, Hats.Straw_Hat],
 			[set_state, { "apple": None }],
 			[set_state, { "tail": [] }],
 			[set_state, { "tail_set": set() }],
 			[set_state, { "tail_len": 0 }],
 		])
+	return state

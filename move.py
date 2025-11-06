@@ -35,7 +35,7 @@ def moveM(state, d, update_tail=False):
 		
 	return state
 	
-def move_boundedM(state, dir, update_tail=False):
+def move_bounded(state, dir, update_tail=False):
 	[x, y] = xy(state)
 	d = wh(state)
 	if x == d-1 and dir == East:
@@ -52,7 +52,7 @@ def go_originM(state):
 	return move_to(state, [0, 0])
 
 def move_to(state, c):
-	[cx, cy] = c
+	cx, cy = unpack(c)
 	while x(state) > cx:
 		state = moveM(state, West)
 	while x(state) < cx:

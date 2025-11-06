@@ -3,6 +3,13 @@ G = Grounds
 I = Items
 Dirs = [North, East, South, West]
 
-import To
 import Copy
 import Companions
+import Log
+import Mode
+import Phase
+import Size
+import Space
+import Spawn
+import To
+

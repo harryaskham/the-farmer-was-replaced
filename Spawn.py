@@ -1,0 +1,2 @@
+BECOME = "Spawn.BECOME"
+AWAIT = "Spawn.AWAIT"

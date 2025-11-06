@@ -57,3 +57,19 @@ def do_maze(state, x, y):
 	return [
 		[maze_many]
 	]
+	
+	
+def do_flips(state):
+	return dos(state, [
+		[forM, range(32),
+			[constM,
+				[spawn,
+					[dos, [
+						[bind, [ixy], [move_to]],
+						[forever, [do_a_flipM]]
+					]],
+					[Spawn.BECOME]
+				]
+			]
+		]
+	])

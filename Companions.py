@@ -1,1 +1,2 @@
-RESERVE = "Companions_RESERVE"
+RESERVE = "Companions.RESERVE"
+AWAIT = "Companions.AWAIT"

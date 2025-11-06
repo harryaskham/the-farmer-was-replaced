@@ -36,11 +36,13 @@ def Checker1(state, x, y, g):
 	return Checker(state, x, y, [], g)
 	
 def Companion(state, otherwise=[]):
-	c = get_here(state, "companion")
-	debug(state, "companion here?")
-	debug(state, c)
-	if c == None:
-		return dos(state, [otherwise])
-	return dos(state, [
-		[plant_one, c]
-	])
+	def handle_companion(state, c):
+		return dos(state, [
+			[debug, ("companion here?", c)],
+			[cond, c == None,
+				otherwise,
+				[plant_one, c]
+			]
+		])
+		
+	return bind(state, [get_here, "companion"], [handle_companion])

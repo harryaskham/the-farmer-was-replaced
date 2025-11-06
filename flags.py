@@ -1,9 +1,17 @@
 from aliases import *
 
-DEBUG = False
-DEBUG_LEVEL = 1
+MAIN_FLAGS = set([
+	#Mode.SIMULATE,
+	#Log.DEBUG,
+	#Size.SMALL,
+	#Phase.COMPANIONS,
+	Phase.ENERGY,
+	#Phase.FLIPS,
+	Space.FILL,
+])
 
-AIR_DEBUG = False
+GLOBAL_DEBUG = True
+
 WATER_RANGE = (0.75, 1.0)
 WATER_BEFORE = [
 	E.Pumpkin,
@@ -23,20 +31,4 @@ FERTILIZE = {
 	"repeats": 0
 }
 BOOSTS = 3
-
-SCAN = False
-PURGE = False
-FARM = False
-PROGS = False
-
-DINO = False
-
-PUMPKIN = False
-ENERGY = False
-MAZE = False
-CROPS = False
-COMPANIONS = True
-
-FILL = True
-
 

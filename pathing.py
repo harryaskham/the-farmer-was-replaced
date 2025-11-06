@@ -9,7 +9,7 @@ def flood(state, start, tail, tail_len):
 	while q != []:
 		st = q[-1]
 		q = q[:-1]
-		state = debug(state, st, 2, "search state")
+		state = debug(state, ("search state", st))
 		(p, tail, tail_set) = st
 		(px, py) = p
 		
@@ -45,9 +45,9 @@ def flood(state, start, tail, tail_len):
 
 			next_st = ((nx, ny), next_tail, next_tail_set)
 			q.append(next_st)
-			state = debug(state, next_st, 2, "next state")
+			state = verbose(state, ("next state", next_st))
 			
-		state = debug(state, len(q), 2, "q len")
+		state = verbose(state, ("q len", len(q)))
 			
 	return state, seen
 
@@ -56,7 +56,7 @@ def poor_accessible(state, c, start, tail, tail_set, tail_len):
 		
 
 def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len=None):
-	state = debug(state, ["at", xy(state), "apple", state["apple"], "c", c, "check", check, "tail", tail, "tlen", tail_len], 1, "path_to")
+	state = debug(state, ("path_to", "at", xy(state), "apple", state["apple"], "c", c, "check", check, "tail", tail, "tlen", tail_len))
 	d = wh(state)
 	[tx, ty] = c
 	c_tup = (tx, ty)
@@ -78,9 +78,12 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
 	while q != []:
 		st = q[0]
 		q = q[1:]
-		state = debug(state, st, 2, "search state")
+
 		(p, tail, tail_set, path) = st
 		(px, py) = p
+		
+		state = debug(state, ("search at", p))
+		state = verbose(state, ("search state", st))
 		
 		if p == c_tup:
 			#state, accessible = flood(state, p, tail, tail_len + 1)
@@ -91,13 +94,13 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
 					state, p2c = poor_accessible(state, target, p, tail, tail_set, tail_len+1)
 					if p2c == None:
 						good = False
-						state = debug(state, ["no path to", target, "from", p], 1, "path_to")
+						state = debug(state, ("no path to", target, "from", p))
 						break
-					state = debug(state, ["found path to", target, "from", p, p2c], 1, "path_to")
+					state = debug(state, ("found path to", target, "from", p, p2c))
 				if not good:
 					continue
 					
-			state = debug(state, ["found path to target", c, "from", start, path], 1, "path_to")
+			state = debug(state, ("found path to target", c, "from", start, path))
 			return state, path
 			#if len(accessible) == d * d:
 			#	return state, path
@@ -158,9 +161,9 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
 			
 			next_st = ((nx, ny), next_tail, next_tail_set, next_path)
 			q.append(next_st)
-			state = debug(state, next_st, 2, "next state")
+			state = verbose(state, ("next state", next_st))
 			
-		state = debug(state, len(q), 2, "q len")
+		state = verbose(state, ("q len", len(q)))
 			
 	return state, None
 	

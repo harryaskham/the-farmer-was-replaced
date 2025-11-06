@@ -82,7 +82,7 @@ def filler_energy(state):
 	def sunflower_at(state, c):
 		return spawnM(state, [dos, [
 			[move_to, c],
-			[Sunflower, 7, 15, False, True]
+			[Sunflower, 7, 7, True, True, True]
 		]])
 		
 	def boost_at(state, c):
@@ -162,15 +162,19 @@ def filler_energy(state):
 def fill_rows(state, f):
 	d = wh(state)
 	def p(y):
-		return [boxloop, [0, 0, d, d], f, [0, y], True]
+		return [boxloop, [0, y, d, 1], f, [0, y], False]
 	for y in range(1, d):
 		state = spawnM(state, p(y))
-	return dos(state, [p(0)])
+	state = dos(state, [p(0)])
+	state, sts = wait_all(state)
+	for st in sts:
+		state["grid"][st["y"]] = st["grid"][st["y"]]
+	return state
 
 def filler_companions(state):
 	return fill_rows(state, [dos, [
 		[sense, True],
-		[try_harvest, None, False, False, [Companions.RESERVE]],
+		[try_harvest, None, False, False, [Companions.RESERVE, Companions.AWAIT]],
 		[water_to],
 		chain([
 			[Companion],

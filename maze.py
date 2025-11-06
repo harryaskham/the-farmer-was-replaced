@@ -29,12 +29,11 @@ def maze(state, size=None):
 			[plant_one, E.Bush],
 			[useM, I.Weird_Substance, use_n],
 		])
-	state = set_state(state, { "treasure": measure() })
+
 	seen = set()
 	back = []
 	while True:
 		state = sense(state, False)
-		state = set_state(state, { "treasure": measure() })
 		
 		if et(state) == E.Treasure:
 			state = try_harvest(state, [E.Treasure])

@@ -29,7 +29,7 @@ def Pumpkin(state, x, y, box, otherwise, do_fertilize=True, do_harvest=True):
 	return dos(state, [
 		[Box, x, y, box,
 			[dos, [
-				[when, state["this_id"] == 0 and [x, y] == corner(box, SW), [dos, [
+				[when, state["id"] == 0 and [x, y] == corner(box, SW), [dos, [
 					[when, do_harvest, [dos, [
 						[try_harvest, [E.Pumpkin]],
 						[set_box_harvested, box]

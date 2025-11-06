@@ -2,6 +2,7 @@ from application import *
 from dict import *
 from debug import *
 from error import *
+from list import *
 
 def pushret(state, v):
 	state["ret"].append(v)
@@ -10,6 +11,9 @@ def pushret(state, v):
 def popret(state):
 	v = state["ret"].pop()
 	return (state, v)
+
+def constM(state, a, b):
+	return dos(state, [a])
 
 def when(state, p, xs):
 	if p:
@@ -49,7 +53,7 @@ def whileM(state, cf, a):
 		state, c = dov(state, [cf])
 		if not c:
 			break
-		state = dos(state, [a])
+		state, _ = dov(state, [a])
 	return state
 
 def untilM(state, cf, a):
@@ -80,53 +84,52 @@ def pure(state, x):
 	}
 	
 def dov(state, xss):
-	out = dos(state, xss, False)
-	if len(out) == 1:
-		return pure(state, out)
-	if len(out) != 2:
-		return error(state, [
-			"final doV did not return value",
-			xss
-		])
-	return out
+	state, v = dos(state, xss, False, True)
+	return state, v
 	
-ERROR = { "ERROR": "ERROR" }
-	
-def dos(state, xss, copy=False):
+INFER_BOTH = "INFER_BOTH"
+NO_RETURN = "NO_RETURN"
+def dos(state, xss, copy=False, both=INFER_BOTH):
 	state = debug(state, xss, 3, "dos")
 	v = None
-	both = False
 	for xs in xss:
-		state = debug(state, xs, 3, "do")
 		if state["error"] != None:
-			return state
+			v = None
+			break
+				
+		state = debug(state, xs, 3, "do")
 			
 		xs = list(xs)
 		xs.insert(1, state)
 		
 		out = aps(xs)
 		if out == None:
-			state = error(state, [
-				"Do-statement returned None:",
-				xs
-			])
+			state = error(state, ["Do-statement returned None:", xs])
 			continue
 		
 		if "__state__" in out:
 			state_ = out["__state__"]
 			v = out["__v__"]
-			both = True
+		elif len(out) == 2 and "__type__" in out[0] and out[0]["__type__"] == "State":
+			state_, v = unpack(out)
+		elif "__type__" in out and out["__type__"] == "State":
+			state_, v = out, NO_RETURN
 		else:
-			state_ = out
-			v = None
-			both = False
+			state = error(state, ["Malformed do-statement return:", out])
+			continue
 			
 		if copy:
 			state = merge(state, state_)
 		else:
 			state = state_
 			
-	if both:
+	if both == INFER_BOTH:
+		if v == NO_RETURN:
+			return state
+		return state, v
+	elif both:
+		if v == NO_RETURN:
+			v = None
 		return state, v
 	else:
 		return state
@@ -144,11 +147,11 @@ def run(state, xs):
 	xs.insert(1, state)
 	return (state, aps(xs))
 	
-def bind(state, f, g):
-	state, x = run(state, f)
-	g = list(g)
-	g.append(x)
-	return dos(state, [g])
+def bind(state, ma, f):
+	state, a = run(state, ma)
+	fa = list(f)
+	fa.append(a)
+	return dos(state, [fa])
 	
 def then(state, g, f):
 	return bind(state, f, g)
@@ -160,6 +163,9 @@ def mapM(state, f, xs):
 		fx.append(x)
 		xss.append(fx)
 	return dos(state, xss)
+	
+def forM(state, xs, f):
+	return mapM(state, f, xs)
 			
 def runSXY(state, f):
 	f = list(f)
