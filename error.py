@@ -7,7 +7,7 @@ def catch(state, f):
 	if e == None:
 		return state
 	state["error"] = None
-	return apply(state, f, e)
+	return apply(state, f, [e])
 	
 def has_error(state):
 	return pure(state, state["error"] != None)

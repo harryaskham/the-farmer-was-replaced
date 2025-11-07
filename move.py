@@ -16,13 +16,10 @@ def inc_y(state, n=1):
 def moveM(state, d, update_tail=False, update_excursion=True):
 	state, prev = xy_tup(state)
 	
+	state = sense(state)
+	
 	if not move(d):
-		return sense(state)
-		
-	state = do_(state, [
-		[sense],
-		[when, update_excursion, [maybe_update_excursion, d]]
-	])
+		return state
 
 	if d == North:
 		state = inc_y(state)
@@ -32,6 +29,13 @@ def moveM(state, d, update_tail=False, update_excursion=True):
 		state = inc_x(state)
 	elif d == West:
 		state = inc_x(state, -1)
+			
+	state = do_(state, [
+		[sense],
+		[when, update_excursion, [maybe_update_excursion, d]]
+	])
+
+	state["here"] = state["grid"][state["y"]][state["x"]]
 		
 	if update_tail:
 		state["tail"].append(prev)

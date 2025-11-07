@@ -15,17 +15,17 @@ def traverse_farm(state, f, box=None, start=None):
 
 	state = move_to(state, start)
 
-	out = None
+	res = {}
 	for yi in range(box[3]):
 		y = (start[1] + yi) % d
 		for xi in range(box[2]):
 			x = (start[0] + xi) % d
 	
 			state = move_to(state, [x, y])
-			state["here"] = state["grid"][y][x]
 			xss = f(state, x, y)
 			state, out = dos(state, xss)
-	return state, out
+			res[(x, y)] = out
+	return state, res
 	
 def boxloop(state, box, f, start=None, loop=True):
 	def g(state, x, y):

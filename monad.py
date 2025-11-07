@@ -78,7 +78,10 @@ def pure(state, x):
 def liftA2(state, f, ma, mb):
 	state, a = dos(state, [ma])
 	state, b = dos(state, [mb])
-	return apply(state, f, [a, b])
+	f = list(f)
+	f.append(a)
+	f.append(b)
+	return dos(state, [f])
 
 def unit(state):
 	return pure(state, None)

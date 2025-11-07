@@ -39,11 +39,13 @@ def spawnM(state, f, flags=[]):
 	state, can = can_spawn(state)
 	become = Spawn.BECOME in flags and not can
 	if become:
-		state, v = dos(state, [f], False, True)
+		state, v = dos(state, [f])
 		return state
 
 	state, child_id = dos(state, [[next_child_id]])
-	child_state = merge(state, {"id": child_id}, None, True)
+	child_state = State.fork(state, child_id)
+	#child_state["id"] = child_id
+	#child_state = merge(state, {"id": child_id}, None, True)
 
 	def spawn_inner():
 		return dos(child_state, [f])

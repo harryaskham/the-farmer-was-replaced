@@ -6,6 +6,9 @@ from sunflower import *
 from pumpkin import *
 from cactus import *
 
+def get_row(state):
+	return pure(state, state["grid"][state["y"]])
+
 def return_row(state):
 	return pure(state, (state["y"], state["grid"][state["y"]]))
 	
@@ -23,7 +26,7 @@ def result_list(state, results):
 	for child_id in results:
 		xs.append(results[child_id])
 	return pure(state, xs)
-
+	
 def fill_rows(state, f, handler=None, n=None):
 	if n == None:
 		n = state["max_drones"]

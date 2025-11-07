@@ -87,3 +87,18 @@ def ixy(state, id=None):
 		y += 1
 	x = id
 	return pure(state, (x, y))
+	
+def pos_to(state, d, c=None):
+	if c == None:
+		state, c = xy(state)
+	x, y = unpack(c)
+	state, d = wh(state)
+	if d == North and y < d - 1:
+		return pure(state, [x, y+1])
+	if d == South and y > 0:
+		return pure(state, [x, y-1])
+	if d == East and x < d - 1:
+		return pure(state, [x+1, y])
+	if d == West and x > 0:
+		return pure(state, [x-1, y])
+	return unit(state)

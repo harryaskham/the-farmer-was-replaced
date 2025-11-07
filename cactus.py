@@ -5,19 +5,6 @@ from planting import *
 from measure import *
 from sense import *
 	
-def pos_to(state, d, c):
-	x, y = unpack(c)
-	state, d = wh(state)
-	if d == North and y < d - 1:
-		return pure(state, [x, y+1])
-	if d == South and y > 0:
-		return pure(state, [x, y-1])
-	if d == East and x < d - 1:
-		return pure(state, [x+1, y])
-	if d == West and x > 0:
-		return pure(state, [x-1, y])
-	return unit(state)
-	
 def neighbor_to(state, d):
 	state, c = xy(state)
 	state, n = pos_to(state, d, c)
@@ -34,14 +21,8 @@ def swapM(state, d):
 	if that == None:
 		return state
 	swap(d)
-	swap_key(this, that, "x")
-	swap_key(this, that, "y")
-	swap_key(this, that, "ground_type")
-	state["grid"][that["y"]][that["x"]] = that
-	state["grid"][this["y"]][this["x"]] = this	
-	return sense(state)
+	return moveM(state, d)
 
-	
 def ordinal_neighbors(state):
 	state, [x, y] = xy(state)
 	return pure(state, {
@@ -51,7 +32,7 @@ def ordinal_neighbors(state):
 		North: get_at(state, [x,y+1])[1]
 	})
 	
-def cactus_cmp(d, a, b):
+def swap_if(d, a, b):
 	if not ("cactus_size" in a and "cactus_size" in b):
 		return None
 	ca = a["cactus_size"]
@@ -63,17 +44,20 @@ def cactus_cmp(d, a, b):
 		South: ca < cb,
 		East: ca > cb,
 		North: ca > cb
-	}
+	}[d]
 
 def emplace_cactus(state, dirs=list(Dirs)):
+	state = sense(state, False)
 	state = start_excursion(state)
-	moved = True
-	while moved:
-		state = sense(state)
+	done = False
+	moved = False
+	while not done:
+		state = sense(state, False)
 		state, [x, y] = xy(state)
 		state, this = here(state)
 		state, ns = ordinal_neighbors(state)
-		moved = False
+		
+		done = True
 		for d in dirs:
 			if d not in ns:
 				continue
@@ -82,19 +66,16 @@ def emplace_cactus(state, dirs=list(Dirs)):
 			if n == None:
 				continue
 				
-			cmp = cactus_cmp(d, this, n)
-			if cmp == None or not cmp[d]:
-				continue
-
-			state = info(state, (x, y, d, cmp))
-			moved = True
-			state = swapM(state, d)
-			state = moveM(state, d)
-			break
-	state, excursion = current_excursion(state)
-	did_sort = excursion != []
+			cmp = swap_if(d, this, n)
+			state = info(state, ((x, y), d, this["cactus_size"], n["cactus_size"], cmp))
+			if cmp == True:
+				moved = True
+				done = False
+				state = swapM(state, d)
+				break
+			
 	state = end_excursion(state)
-	return pure(state, did_sort)
+	return pure(state, moved)
 
 def Cactus(state, x, y, box, otherwise):
 	def do_harvest(state):

@@ -6,16 +6,17 @@ import State
 def sense(state, set_companion=True):
 	e = get_entity_type()
 	g = get_ground_type()
+
 	state = do_(state, [
 		[set_here, {
 			"entity_type": e,
 			"ground_type": g
 		}],
-		[when, e == E.Cactus, [measureM, "cactus_size"]],
-		[when, e == E.Sunflower, [measureM, "petals"]],
-		[when, e == E.Apple, [State.set, {"apple": measure()}]],
-		[when, e == E.Hedge, [State.set, {"treasure": measure()}, [To.CHILDREN]]]
 	])
+	
+	state = measureM(state)
+	for dir in Dirs:
+		state = measureM(state, None, dir)
 		
 	if not set_companion:
 		return state

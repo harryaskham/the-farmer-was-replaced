@@ -48,6 +48,22 @@ def State__put(state, kvs, flags=[]):
 def State__get(self, key):
 	return pure(self, self[key])
 
+def State__fork(self, id):
+	child = dict(self)
+	child["id"] = id
+	child["grid"] = []
+	for row in self["grid"]:
+		child_row = []
+		for cell in row:
+			child_row.append(dict(cell))
+		child["grid"].append(child_row)
+	child["ret"] = []
+	child["child_handles"] = {}
+	child["child_states"] = {}
+	child["drone_return"] = {}
+	child["excursions"] = []
+	return child
+
 State = Type.new(
 	__name__,
 	[Type.field("flags", set(), set)],
@@ -55,6 +71,7 @@ State = Type.new(
 		"__init__": __State__,
 		"put": State__put,
 		"get": State__get,
+		"fork": State__fork
 	})
 	
 new = State["new"]
@@ -64,6 +81,9 @@ def put(state, kvs, flags):
 	
 def get(state, k):
 	return state["get"](k)
+	
+def fork(state, id):
+	return state["fork"](id)
 	
 def set_size(state, n=Size.NORMAL):
 	if n in Size.Sizes:
