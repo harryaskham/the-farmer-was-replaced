@@ -57,7 +57,7 @@ def poor_accessible(state, c, start, tail, tail_set, tail_len):
 
 def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len=None):
 	state = debug(state, ("path_to", "at", xy(state), "apple", state["apple"], "c", c, "check", check, "tail", tail, "tlen", tail_len))
-	d = wh(state)
+	state, d = wh(state)
 	[tx, ty] = c
 	c_tup = (tx, ty)
 	

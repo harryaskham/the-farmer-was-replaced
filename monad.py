@@ -12,30 +12,23 @@ def popret(state):
 	v = state["ret"].pop()
 	return (state, v)
 
+def identity(x):
+	return x
+
+def identityM(state, x):
+	return dos(state, [x])
+
 def constM(state, a, b):
 	return dos(state, [a])
 
 def when(state, p, xs):
 	if p:
 		return dos(state, [xs])
-	return state
+	return unit(state)
 	
 def whenM(state, ps, xs):
-	out = dos(state, [ps])
-	if out == None:
-		return error(state, [
-			"whenM condition returned None:",
-			ps
-		])
-	if len(out) != 2:
-		return error(state, [
-			"whenM condition return != 2:",
-			ps
-		])
-	state, p = out
-	if p:
-		return dos(state, [xs])
-	return state
+	state, p = dos(state, [ps])
+	return when(state, p, xs)
 	
 def cond(state, c, a, b):
 	if c:
@@ -89,6 +82,7 @@ def dos(state, xss):
 	v = None
 	for xs in xss:
 		if state["error"] != None:
+			fatal(state, ("Error in do-block:", state["error"]))
 			v = None
 			break
 				
@@ -127,7 +121,12 @@ def run(state, ma):
 	ma = list(ma)
 	ma.insert(1, state)
 	return aps(ma)
-	
+
+def apply(state, f, a):
+	fa = list(f)
+	fa.append(a)
+	return run(state, fa)
+
 def bind(state, ma, f):
 	state = debug(state, ("bind", ma, f))
 	state, a = dos(state, [ma])

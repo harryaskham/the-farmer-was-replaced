@@ -1,24 +1,22 @@
-def print_error(state):
-	if not has_error(state):
+def throw(state, msg):
+	state["error"] = msg
+	return state
+	
+def catch(state, f):
+	e = state["error"]
+	if e == None:
 		return state
-		
-	quick_print("")
-	quick_print("Error:")
-	for msg in state["error"]:
-		quick_print(msg)
-		
-	return state
-	
-def set_error(state, msgs):
-	state["error"] = msgs
-	return state
-	
-def clear_error(state):
-	return set_error(None)
+	state["error"] = None
+	return apply(state, f, e)
 	
 def has_error(state):
-	return state["error"] != None
+	return pure(state, state["error"] != None)
 
-def error(state, msgs):
-	state = set_error(state, msgs)
-	return print_error(state)
+def terminate(state):
+	quick_print("Terminating with state:")
+	quick_print(state)
+	return terminate_()
+	
+def terminate_():
+	quick_print("Terminating")
+	return TERMINATE

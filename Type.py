@@ -2,11 +2,11 @@ from strings import *
 from monad import *
 from debug import *
 
-NOT_PROVIDED = "NOT_PROVIDED"
+_ = "NOT_PROVIDED"
 
 def mkF(handler):
 	debug_(("mkF", handler))
-	def fn(a=NOT_PROVIDED, b=NOT_PROVIDED, c=NOT_PROVIDED, d=NOT_PROVIDED, e=NOT_PROVIDED, f=NOT_PROVIDED):
+	def fn(a=_, b=_, c=_, d=_, e=_, f=_):
 		debug_(("fn", (a, b, c, d, e, f)))
 		return handler([a, b, c, d, e, f])
 	return fn
@@ -20,6 +20,20 @@ def field(name, default=NO_DEFAULT, handler=identity):
 		"handler": handler
 	}
 
+def provided_args(args):
+	xs = []
+	for arg in args:
+		if arg == _:
+			break
+		xs.append(arg)
+	return xs
+
+def method_call(self, method, args):
+	f = provided_args(args)
+	f.insert(0, self)
+	f.insert(0, method)
+	return aps(f)
+
 def new(name, fields=[], methods={}):
 	def setting_handler(self_args):
 		debug_(("setting_handler", self_args))
@@ -31,26 +45,22 @@ def new(name, fields=[], methods={}):
 		for i in range(len(args)):
 			arg = args[i]
 			field = fields[i]
-			if arg == NOT_PROVIDED:
+			if arg == _:
 				if field["default"] == NO_DEFAULT:
 					error_(("error: no default and not provided", field["name"]))
 					return None
 				arg = field["default"]
 			self[field["name"]] = field["handler"](arg)
 
-	if "__init__" in methods:
-		__init__ = methods["__init__"]
-	else:
+	if "__init__" not in methods:
 		__init__ = mkF(setting_handler)
+		methods["__init__"] = __init__
 	
 	def bound_method(self, method):
 		debug_(("bound_method", self, method))
 		def handler(args):
 			debug_(("bound_method_handler", args))
-			args = list(args)
-			args.insert(0, self)
-			args.insert(0, method)
-			return aps(args)
+			return method_call(self, method, args)
 		return mkF(handler)
 
 	Self = {
@@ -67,17 +77,10 @@ def new(name, fields=[], methods={}):
 			"__Type__": Self
 		}
 		for method_name in methods:
-			if method_name == "__init__":
-				continue
 			method = methods[method_name]
 			self[method_name] = bound_method(self, method)
-			
-		ctor_args = [__init__, self]
-		for arg in args:
-			if arg == NOT_PROVIDED:
-				break
-			ctor_args.append(arg)
-		aps(ctor_args)
+
+		method_call(self, self["__init__"], args)
 		return self
 		
 	ctor = mkF(ctor_handler)
@@ -85,3 +88,13 @@ def new(name, fields=[], methods={}):
 	Self["new"] = ctor
 	
 	return Self
+	
+def name(x):
+	if "__type__" in x:
+		return x["__type__"]
+	fatal_(("Cannot get type name of", x))
+	
+def of(x):
+	if "__Type__" in x:
+		return x["__Type__"]
+	fatal_(("Cannot get Type of", x))

@@ -7,24 +7,22 @@ from sense import *
 from move import *
 	
 def pos_to(state, d, c):
-	[x, y] = c
-	if d == North and y < wh(state) - 1:
-		return [x, y+1]
+	x, y = unpack(c)
+	state, d = wh(state)
+	if d == North and y < d - 1:
+		return pure(state, [x, y+1])
 	if d == South and y > 0:
-		return [x, y-1]
-	if d == East and x < wh(state) - 1:
-		return [x+1, y]
+		return pure(state, [x, y-1])
+	if d == East and x < d - 1:
+		return pure(state, [x+1, y])
 	if d == West and x > 0:
-		return [x-1, y]
-	return None
+		return pure(state, [x-1, y])
+	return unit(state)
 	
 def neighbor_to(state, d):
-	return dos(state, [
-		[then,
-			[at],
-			[bind, [xy], [pos_to, d]],
-		]
-	])
+	state, c = xy(state)
+	state, n = pos_to(state, d, c)
+	return pure(state, n)
 
 def swap_key(a, b, key):
 	ax = a[key]
@@ -32,8 +30,8 @@ def swap_key(a, b, key):
 	b[key] = ax
 
 def swapM(state, d):
-	this = here(state)
-	that = neighbor_to(state, d)
+	state, this = here(state)
+	state, that = neighbor_to(state, d)
 	if that == None:
 		return state
 	swap(d)
@@ -46,13 +44,13 @@ def swapM(state, d):
 
 	
 def ordinal_neighbors(state):
-	[x, y] = xy(state)
-	return {
-		West: get_at(state, [x-1,y]),
-		South: get_at(state, [x,y-1]),
-		East: get_at(state, [x+1,y]),
-		North: get_at(state, [x,y+1])
-	}
+	state, [x, y] = xy(state)
+	return pure(state, {
+		West: get_at(state, [x-1,y])[1],
+		South: get_at(state, [x,y-1])[1],
+		East: get_at(state, [x+1,y])[1],
+		North: get_at(state, [x,y+1])[1]
+	})
 	
 def cactus_cmp(d, a, b):
 	if not ("cactus_size" in a and "cactus_size" in b):
@@ -68,18 +66,27 @@ def cactus_cmp(d, a, b):
 		North: ca > cb
 	}
 
-def emplace_cactus(state, box, path=[]):
-	while True:
-		[x, y] = xy(state)
-		this = here(state)
-		ns = ordinal_neighbors(state)
+def sort_cactus(state, dirs):
+	state, d = wh(state)
+	box = [0, 0, d, d]
+	return emplace_cactus(state, box, [], dirs)
+
+def emplace_cactus(state, box, dirs=list(Dirs)):
+	state = start_excursion(state)
+	moved = True
+	while moved:
+		state, [x, y] = xy(state)
+		state, this = here(state)
+		state, ns = ordinal_neighbors(state)
 		moved = False
-		for d in [South, West]:
+		for d in dirs:
 			if d not in ns:
 				continue
+				
 			n = ns[d]
 			if n == None:
 				continue
+				
 			cmp = cactus_cmp(d, this, n)
 			if cmp == None or not cmp[d]:
 				continue
@@ -87,25 +94,16 @@ def emplace_cactus(state, box, path=[]):
 			moved = True
 			state = swapM(state, d)
 			state = moveM(state, d)
-			state = sense(state, False)
-			path.append(opposite(d))
 			break
-			
-		if moved:
-			continue
-				
-		if path == []:
-			return state
-			
-		while path != []:
-			d = path.pop()
-			state = moveM(state, d)
-			state = sense(state)
-
+	state, excursion = current_excursion(state)
+	did_sort = excursion != []
+	state = end_excursion(state)
+	return pure(state, did_sort)
 
 def Cactus(state, x, y, box, otherwise):
 	def do_harvest(state):
-		if xy(state) == corner(box, SW):
+		state, c = xy(state)
+		if c == corner(box, SW):
 			state = try_harvest(state, [E.Cactus])
 			state = set_box_harvested(state, box)
 		return state

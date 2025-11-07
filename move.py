@@ -1,7 +1,8 @@
 from lib import *
 
 def inc_bounded(state, key, n=1):
-	state[key] = (state[key] + n) % wh(state)
+	state, d = wh(state)
+	state[key] = (state[key] + n) % d
 	return state
 	
 def inc_x(state, n=1):
@@ -15,6 +16,8 @@ def moveM(state, d, update_tail=False):
 	
 	if not move(d):
 		return state
+		
+	state = maybe_update_excursion(state, d)
 
 	if d == North:
 		state = inc_y(state)

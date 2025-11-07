@@ -8,7 +8,8 @@ def fertilizable(e):
 	], e)
 
 def fertilize(state, over=None, n=None):
-	if over == None or contains(over, et(state)):
+	state, e = et(state)
+	if over == None or contains(over, e):
 		i = 0
 		while (
 			fertilizable(et(state))
@@ -22,8 +23,10 @@ def fertilize(state, over=None, n=None):
 	return state
 
 def maybe_cure(state, over=None, unsafe=False):
-	if over == None or contains(over, et(state)):
-		if get_here(state, "infected"):
+	e = et(state)
+	if over == None or contains(over, e):
+		state, infected = get_here(state, "infected")
+		if infected:
 			return dos(state, [
 				[useM, I.Weird_Substance],
 				[unless, unsafe, [dos, [

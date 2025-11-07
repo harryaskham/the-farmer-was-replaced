@@ -6,14 +6,13 @@ from move import *
 
 def harvestM(state):
 	harvest()
-	c_at = get_here(state, "companion_at")
+	state, c_at = get_here(state, "companion_at")
 	return dos(state, [
 		[set_here, {
 			"entity_type": None,
 			"infected": False,
 			"petals": None,
 			"cactus_size": None,
-			"companion": None,
 			"companion_at": None
 		}, [To.CHILDREN]],
 		[when, c_at != None, [set_at, c_at, {
@@ -24,12 +23,13 @@ def harvestM(state):
 
 def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
 	flags = set(flags)
-	if not (entities == None or contains(entities, et(state))):
+	state, e = et(state)
+	if not (entities == None or contains(entities, e)):
 		return state
 		
-	c_at = get_here(state, "companion_at")
+	state, c_at = get_here(state, "companion_at")
 	if c_at != None:
-		cn = at(state, c_at)
+		state, cn = at(state, c_at)
 		companion = cn["companion"]
 		planted = cn["entity_type"]
 		if (
@@ -38,24 +38,23 @@ def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
 			and companion != None
 			and planted != companion
 		):
-			here = xy(state)
+			state, h = xy(state)
 			state = do_(state, [
 				[move_to, c_at],
 				[plant_one, companion],
 				[sense, True],
-				[move_to, here],
+				[move_to, h],
 			])
 			
-	is_companion = (
-		et(state) != None
-		and get_here(state, "companion") == et(state))
+	is_companion = e != None and get_here(state, "companion")[1] == e
 	
 	if Companions.AWAIT in flags:
-		while True:
-			cn = at(state, get_here(state, "companion_at"))
-			if cn["companion"] == None or cn["entity_type"] == cn["companion"]:
-				break
-	elif Companions.RESERVE in flags and is_companion:
+		state, c_at = get_here(state, "companion_at")
+		state, cn = at(state, c_at)
+		if cn["companion"] == None or cn["entity_type"] == cn["companion"]:
+			return state
+
+	if Companions.RESERVE in flags and is_companion:
 		return state
 			
 	if can_harvest():
@@ -84,7 +83,7 @@ def cleanup(state):
 	return try_harvest(state, [E.Dead_Pumpkin])
 
 def fertilize_loop(state, over=None, n=None):
-	e = et(state)
+	state, e = et(state)
 	if (over == None or contains(over, e)) and (n == None or n > 0):
 		i = 0
 		while num_items(I.Fertilizer) > 0 and (n == None or i < n):

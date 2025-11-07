@@ -23,7 +23,7 @@ def plantable(e):
 	return e != Entities.Grass
 
 def maybe_till(state, e):
-	if tillable(e) and gt(state) != G.Soil:
+	if tillable(e) and gt(state)[1] != G.Soil:
 		till()
 		return set_here(state, {
 			"ground_type": G.Soil
@@ -31,7 +31,7 @@ def maybe_till(state, e):
 	return state
 
 def maybe_untill(state, e=None):
-	if untillable(e) and gt(state) != G.Grassland:
+	if untillable(e) and gt(state)[1] != G.Grassland:
 		till()
 		return set_here(state, {
 			"ground_type": G.Grassland
@@ -39,7 +39,7 @@ def maybe_untill(state, e=None):
 	return state
 		
 def maybe_plant(state, e, water=False):
-	if plantable(e) and et(state) != e:
+	if plantable(e) and et(state)[1] != e:
 		if water:
 			state = water_to(state, WATER_RANGE[0], WATER_RANGE[1], WATER_BEFORE)
 		plant(e)

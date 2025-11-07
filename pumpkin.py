@@ -15,7 +15,8 @@ def pumpkin_died(state):
 	])
 		
 def plant_pumpkin(state, do_fertilize=True):
-	if et(state) == E.Pumpkin:
+	state, e = et(state)
+	if e == E.Pumpkin:
 		return state
 	return dos(state, [
 		[try_harvest, [E.Dead_Pumpkin]],

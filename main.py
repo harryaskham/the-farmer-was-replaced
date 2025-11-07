@@ -8,6 +8,9 @@ def init(state):
 		[when, Size.SMALL in state["flags"], [dos, [
 			[State.set_size, Size.SMALL]
 		]]],
+		[when, Size.TINY in state["flags"], [dos, [
+			[State.set_size, Size.TINY]
+		]]],
 		[hatM, Hats.Straw_Hat],
 		[move_to, [0, 0]]
 	])
@@ -43,6 +46,12 @@ def main(state=None, flags=MAIN_FLAGS):
 			]]],
 			[when, Phase.CROPS in flags, [dos, [
 				[when, Space.FILL in flags, [filler_crops]]
+			]]],
+			[when, Phase.CARROTS in flags, [dos, [
+				[when, Space.FILL in flags, [filler_crop, E.Carrot]]
+			]]],
+			[when, Phase.CACTUS in flags, [dos, [
+				[when, Space.FILL in flags, [filler_cactus]]
 			]]],
 			[when, Phase.COMPANIONS in flags, [dos, [
 				[when, Space.FILL in flags, [filler_companions]]

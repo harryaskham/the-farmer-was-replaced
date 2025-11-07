@@ -2,12 +2,13 @@ from lib import *
 from debug import *
 from measure import *
 
-def sense(state, set_companion=False):
+def sense(state, set_companion=True):
 	e = get_entity_type()
+	g = get_ground_type()
 	state = do_(state, [
 		[set_here, {
 			"entity_type": e,
-			"ground_type": get_ground_type()
+			"ground_type": g
 		}],
 		[when, e == E.Cactus, [measureM, "cactus_size"]],
 		[when, e == E.Sunflower, [measureM, "petals"]],

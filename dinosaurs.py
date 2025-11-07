@@ -4,7 +4,9 @@ from move import *
 from pathing import *
 
 def set_apple(state):
-	if et(state) != E.Apple or xy(state) != state["apple"]:
+	state, e = et(state)
+	state, c = xy(state)
+	if e != E.Apple or c != state["apple"]:
 		return state
 	return set_state(state, {
 		"apple": measure()

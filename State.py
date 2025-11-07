@@ -8,7 +8,7 @@ import To
 import Size
 import Type
 
-def __init__(self, flags=set()):
+def __State__(self, flags=set()):
 	debug_(("__init__", self, flags))
 	self["flags"] = set(flags)
 	self["id"] = 0
@@ -30,16 +30,10 @@ def __init__(self, flags=set()):
 	self["child_states"] = {}
 	self["drone_return"] = {}
 	self["treasure"] = None
+	self["excursions"] = None
 	debug_(("self", self))
-
-State = Type.new(
-	__name__,
-	[Type.field("flags", set(), set)],
-	{"__init__": __init__})
 	
-new = State["new"]
-
-def put(state, kvs, flags=[]):
+def State__put(state, kvs, flags=[]):
 	flags = set(flags)
 	states = [state]
 	if To.CHILDREN in flags:
@@ -50,6 +44,19 @@ def put(state, kvs, flags=[]):
 		for k in kvs:
 			st[k] = kvs[k]
 	return state
+
+State = Type.new(
+	__name__,
+	[Type.field("flags", set(), set)],
+	{
+		"__init__": __State__,
+		"put": State__put
+	})
+	
+new = State["new"]
+
+def put(state, a, b):
+	return state["put"](a, b)
 	
 def set_size(state, n=Size.NORMAL):
 	if n in Size.Sizes:
@@ -64,7 +71,3 @@ def drone_id(state):
 	
 def loop_index(state):
 	return state["i"]
-	
-def inc_loop_index(state):
-	state["i"] += 1
-	return state

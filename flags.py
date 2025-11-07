@@ -1,16 +1,17 @@
 from aliases import *
 
 MAIN_FLAGS = set([
-	Mode.SIMULATE,
-	Log.DEBUG,
-	Size.SMALL,
-	Phase.COMPANIONS,
+	Mode.SIMULATE, Size.SMALL, Log.DEBUG, Log.DRONE_DETAILS,
+	#Log.ALL,
+	#Size.SMALL,
+	#Phase.COMPANIONS,
+	#Phase.CROPS,
+	#Phase.CARROTS,
+	Phase.CACTUS,
 	#Phase.ENERGY,
 	#Phase.FLIPS,
 	Space.FILL,
 ])
-
-GLOBAL_DEBUG = True
 
 WATER_RANGE = (0.75, 1.0)
 WATER_BEFORE = [

@@ -13,11 +13,9 @@ def traverse_farm(state, f, box=None, start=None):
 	if start == None:
 		start = box[:2]
 
-	if state == None:
-		state = mk_state()
-		
 	state = move_to(state, start)
-	
+
+	out = None
 	for yi in range(box[3]):
 		y = (start[1] + yi) % d
 		for xi in range(box[2]):
@@ -26,8 +24,8 @@ def traverse_farm(state, f, box=None, start=None):
 			state = move_to(state, [x, y])
 			state["here"] = state["grid"][y][x]
 			xss = f(state, x, y)
-			state = do_(state, xss)
-	return state
+			state, out = dos(state, xss)
+	return state, out
 	
 def boxloop(state, box, f, start=None, loop=True):
 	def g(state, x, y):
@@ -36,14 +34,13 @@ def boxloop(state, box, f, start=None, loop=True):
 
 def farmloop(state, f, loop=True, scan=False, box=None, start=None):
 	if scan:
-		state = traverse_farm(state, nop3, box, start)
+		state, out = traverse_farm(state, nop3, box, start)
 		
 	def go(state):
 		return traverse_farm(state, f, box, start)
 		
-	if loop:
-		while True:
-			state = go(state)
-			state["i"] += 1
-	else:
-		return go(state)
+	while True:
+		state, out = go(state)
+		state["i"] += 1
+		if not loop:
+			return state, out

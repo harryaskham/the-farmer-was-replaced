@@ -29,6 +29,7 @@ def must_spawn(state, f, flags=[]):
 	return state
 
 def spawnM(state, f, flags=[]):
+	state = info(state, ["Spawning with flags", flags, "program", f])
 	flags = set(flags)
 	
 	if Spawn.AWAIT in flags:
@@ -39,16 +40,15 @@ def spawnM(state, f, flags=[]):
 	become = Spawn.BECOME in flags and not can
 	if become:
 		state, v = dos(state, [f], False, True)
-		state["drone_return"][state["id"]] = v
 		return state
 
 	state, child_id = dos(state, [[next_child_id]])
 	child_state = merge(state, {"id": child_id}, None, True)
 
-	def g():
+	def spawn_inner():
 		return dos(child_state, [f])
 
-	child = spawn_drone(g)
+	child = spawn_drone(spawn_inner)
 	if child == None:
 		return error(state, ["Failed to spawn drone"])
 	state["child_states"][child_id] = child_state
@@ -59,10 +59,9 @@ spawn = spawnM
 	
 def wait_for_child(state, child_id):
 	child_state, v = wait_for(state["child_handles"][child_id])
-	state["drone_return"][child_id] = v
 	state["child_handles"].pop(child_id)
 	state["child_states"].pop(child_id)
-	return state, (child_state, v)
+	return pure(state, (child_state, v))
 	
 def wait_all(state):
 	vs = {}
@@ -72,4 +71,4 @@ def wait_all(state):
 	for child_id in child_ids:
 		state, (child_state, v) = wait_for_child(state, child_id)
 		vs[child_id] = v
-	return state, vs
+	return pure(state, vs)

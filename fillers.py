@@ -4,6 +4,9 @@ from maze import *
 from drones import *
 from sunflower import *
 from pumpkin import *
+from cactus import *
+from filler_utils import *
+from filler_cactus import *
 
 def filler_maze(state, num_drones=16):
 	d = wh(state)
@@ -49,32 +52,19 @@ def filler_pumpkin(state):
 	return mapM(state, [child, xy(state)], Dirs)
 
 def filler_crops(state):
-	d = wh(state)
-	
-	def spaced(n=32, gap=5):
-		cs = []
-		for y in range(0, d, gap+1):
-			for x in range(0, d, gap+1):
-				cs.append([x, y])
-				if len(cs) == n:
-					break
-			if len(cs) == n:
-				break
-		return cs
+	return fill_rows(state, [dos, [
+		[sense],
+		[try_harvest],
+		[Checker3, [plant_one, E.Tree], [plant_one, E.Carrot], [plant_one, E.Grass]],
+	]])
 
-	def p(c):
-		
-		return [boxloop, [0, 0, d, d], [dos, [
-			[sense, False],
-			[try_harvest],
-			[water_to],
-			[runSXY, [Checker, [plant_one, E.Tree], [plant_one, E.Carrot]]],
-			[sense, True]
-		]], c, True]
-		
-	for y in range(1, 32):
-		state = spawnM(state, p([0, y]))
-	return dos(state, [p([0, 0])])
+
+def filler_crop(state, e):
+	return fill_rows(state, [dos, [
+		[sense, False],
+		[try_harvest],
+		[plant_one, e]
+	]])
 	
 def filler_energy(state):
 	d = wh(state)
@@ -127,7 +117,8 @@ def filler_energy(state):
 			return state
 			
 		def do_harv(state):
-			petals = get_here(state)["petals"]
+			state, h = get_here(state)
+			petals = h["petals"]
 			return pure(state, petals != None and petals >= state["petal_threshold"])
 
 		return dos(state, [
@@ -141,15 +132,6 @@ def filler_energy(state):
 			]]]
 		])
 		
-	#for y in range(1, 16):
-	#	state = spawnM(state, [planter, y])
-	#	state = spawnM(state, [harvester, y])
-		
-	#state = spawnM(state, [planter, 0])
-	#state = harvester(state, 0)
-	
-	#return state
-
 	return dos(state, [
 		[mapM, [sunflower_at], sunflower_row()],
 		[wait_all],
@@ -157,41 +139,12 @@ def filler_energy(state):
 		[forever, [boost]]
 	])
 
-	
-	
-def fill_rows(state, f):
-	d = wh(state)
-	def p(y):
-		return [boxloop, [0, y, d, 1], f, [0, y], False]
-	for y in range(1, d):
-		state = spawnM(state, p(y))
-	state = do_(state, [p(0)])
-	state, y_rows = wait_all(state)
-	for y, row in y_rows:
-		state["grid"][y] = row
-	return State.inc_loop_index(state)
 
 def filler_companions(state):
-	def select_loop(state):
-		return pure(state, state["i"] % 2 == 0)
-		
-	def return_row(state):
-		return pure(state, (state["y"], state["grid"][state["y"]]))
-		
 	return fill_rows(state, [dos, [
-		[sense, True],
-		[condM, [select_loop],
-			[dos, [
-				[Checker3,
-					[plant_one, E.Tree],
-					[plant_one, E.Carrot],
-					[plant_one, E.Grass]
-				]
-			]],
-			[dos, [
-				[Companion]
-			]]
-		],
+		[sense],
+		[try_harvest, None, False, False, [Companions.AWAIT]],
+		[Companion, [Checker3, [plant_one, E.Tree], [plant_one, E.Carrot], [plant_one, E.Grass]]],
+		[sense],
 		[return_row]
-	]])
-	
+	]], merge_rows)

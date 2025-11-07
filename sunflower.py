@@ -6,13 +6,15 @@ def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=Fals
 	state = sense(state, False)
 	state = when(state,do_water, [water_to])
 	while True:
-		if force or et(state) != E.Sunflower:
+		state, e = et(state)
+		if force or e != E.Sunflower:
 			state = do_(state, [
 				[harvestM],
 				[plant_one, E.Sunflower],
 			])
 		state = sense(state, False)
-		petals = here(state)["petals"]
+		h = here(state)
+		petals = h["petals"]
 		if petals != None and petals >= min_petals and petals <= max_petals:
 			break
 
@@ -39,7 +41,7 @@ def boost_box(state, box, num_flowers=10, boosts=10, force=False, do_fertilize=T
 				break
 		if i == num_flowers:
 			break
-	[hx, hy] = xy(state)
+	state, [hx, hy] = xy(state)
 	if (hx, hy) in flowers:
 		return Sunflower(state, 7, 7, force, do_fertilize)
 	else:
