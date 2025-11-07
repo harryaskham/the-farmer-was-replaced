@@ -4,6 +4,7 @@ from cactus import *
 from cache import *
 from dinosaurs import *
 from drones import *
+from excursion import *
 from fertilizer import *
 from fillers import *
 from harvest import *

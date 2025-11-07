@@ -43,24 +43,26 @@ def maybe_plant(state, e, water=False):
 		if water:
 			state = water_to(state, WATER_RANGE[0], WATER_RANGE[1], WATER_BEFORE)
 		plant(e)
-		return set_here(state, {
-			"entity_type": e
-		})
-	return state
+		return dos(state, [
+			[set_here, {"entity_type": e}],
+			[sense],
+			[pure, True]
+		])
+	return pure(state, False)
 
 def plant_one(state, e, unused=None):
 	return dos(state, [
 		[maybe_till, e],
 		[maybe_untill, e],
-		[maybe_plant, e, True],
-		[sense, True]
+		[maybe_plant, e, True]
 	])
 	
 def plantM(state, e, unused=None):
+	state, planted = plant_one(state, e)
 	return dos(state, [
-		[plant_one, e],
 		[fertilize],
-		[maybe_cure]
+		[maybe_cure],
+		[pure, planted]
 	])
 
 		

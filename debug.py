@@ -9,9 +9,11 @@ def log(state, msg, level=Log.DEBUG, prefix=None):
 			debug_level = max(debug_level, Log.Levels[l])
 	
 	if level in Log.Levels:
-		level = Log.Levels[level]
+		n_level = Log.Levels[level]
+	else:
+		n_level = level
 
-	if level > debug_level:
+	if n_level > debug_level:
 		return state
 		
 	if prefix != None:

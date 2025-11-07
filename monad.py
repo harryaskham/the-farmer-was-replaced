@@ -10,7 +10,12 @@ def pushret(state, v):
 	
 def popret(state):
 	v = state["ret"].pop()
-	return (state, v)
+	return state, v
+	
+def clearret(state):
+	ret = list(state["ret"])
+	state["ret"] = []
+	return state, ret
 
 def identity(x):
 	return x
@@ -70,6 +75,11 @@ def do(state, fs):
 def pure(state, x):
 	return state, x
 
+def liftA2(state, f, ma, mb):
+	state, a = dos(state, [ma])
+	state, b = dos(state, [mb])
+	return apply(state, f, [a, b])
+
 def unit(state):
 	return pure(state, None)
 	
@@ -122,9 +132,10 @@ def run(state, ma):
 	ma.insert(1, state)
 	return aps(ma)
 
-def apply(state, f, a):
+def apply(state, f, args):
 	fa = list(f)
-	fa.append(a)
+	for arg in args:
+		fa.append(args)
 	return run(state, fa)
 
 def bind(state, ma, f):

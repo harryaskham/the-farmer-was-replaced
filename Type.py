@@ -6,9 +6,9 @@ _ = "NOT_PROVIDED"
 
 def mkF(handler):
 	debug_(("mkF", handler))
-	def fn(a=_, b=_, c=_, d=_, e=_, f=_):
-		debug_(("fn", (a, b, c, d, e, f)))
-		return handler([a, b, c, d, e, f])
+	def fn(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
+		debug_(("fn", (a, b, c, d, e, f, g, h, i, j, k)))
+		return handler(provided_args([a, b, c, d, e, f, g, h, i, j, k]))
 	return fn
 
 NO_DEFAULT = "NO_DEFAULT"
@@ -21,6 +21,7 @@ def field(name, default=NO_DEFAULT, handler=identity):
 	}
 
 def provided_args(args):
+	debug_(("provided_args", args))
 	xs = []
 	for arg in args:
 		if arg == _:
@@ -29,7 +30,7 @@ def provided_args(args):
 	return xs
 
 def method_call(self, method, args):
-	f = provided_args(args)
+	f = list(args)
 	f.insert(0, self)
 	f.insert(0, method)
 	return aps(f)
@@ -38,8 +39,7 @@ def new(name, fields=[], methods={}):
 	def setting_handler(self_args):
 		debug_(("setting_handler", self_args))
 		if len(self_args) > len(fields) + 1:
-			error_(("error: more args than fields", len(args), len(fields)))
-			return None
+			fatal_(("error: more args than fields", len(args), len(fields)))
 
 		self, args = self_args[0], self_args[1:1+len(fields)]
 		for i in range(len(args)):
@@ -47,8 +47,7 @@ def new(name, fields=[], methods={}):
 			field = fields[i]
 			if arg == _:
 				if field["default"] == NO_DEFAULT:
-					error_(("error: no default and not provided", field["name"]))
-					return None
+					fatal_(("error: no default and not provided", field["name"]))
 				arg = field["default"]
 			self[field["name"]] = field["handler"](arg)
 
@@ -80,7 +79,10 @@ def new(name, fields=[], methods={}):
 			method = methods[method_name]
 			self[method_name] = bound_method(self, method)
 
-		method_call(self, self["__init__"], args)
+		f = [self["__init__"]]
+		for arg in args:
+			f.append(arg)
+		aps(f)
 		return self
 		
 	ctor = mkF(ctor_handler)

@@ -4,7 +4,6 @@ from pattern import *
 from planting import *
 from measure import *
 from sense import *
-from move import *
 	
 def pos_to(state, d, c):
 	x, y = unpack(c)
@@ -40,7 +39,7 @@ def swapM(state, d):
 	swap_key(this, that, "ground_type")
 	state["grid"][that["y"]][that["x"]] = that
 	state["grid"][this["y"]][this["x"]] = this	
-	return state
+	return sense(state)
 
 	
 def ordinal_neighbors(state):
@@ -66,15 +65,11 @@ def cactus_cmp(d, a, b):
 		North: ca > cb
 	}
 
-def sort_cactus(state, dirs):
-	state, d = wh(state)
-	box = [0, 0, d, d]
-	return emplace_cactus(state, box, [], dirs)
-
-def emplace_cactus(state, box, dirs=list(Dirs)):
+def emplace_cactus(state, dirs=list(Dirs)):
 	state = start_excursion(state)
 	moved = True
 	while moved:
+		state = sense(state)
 		state, [x, y] = xy(state)
 		state, this = here(state)
 		state, ns = ordinal_neighbors(state)
@@ -91,6 +86,7 @@ def emplace_cactus(state, box, dirs=list(Dirs)):
 			if cmp == None or not cmp[d]:
 				continue
 
+			state = info(state, (x, y, d, cmp))
 			moved = True
 			state = swapM(state, d)
 			state = moveM(state, d)

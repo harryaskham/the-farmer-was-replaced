@@ -29,3 +29,6 @@ def pureM(state, f):
 def do_a_flipM(state):
 	do_a_flip()
 	return unit(state)
+	
+def pair(state, a, b):
+	return pure(state, (a, b))

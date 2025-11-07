@@ -30,7 +30,7 @@ def __State__(self, flags=set()):
 	self["child_states"] = {}
 	self["drone_return"] = {}
 	self["treasure"] = None
-	self["excursions"] = None
+	self["excursions"] = []
 	debug_(("self", self))
 	
 def State__put(state, kvs, flags=[]):
@@ -44,19 +44,26 @@ def State__put(state, kvs, flags=[]):
 		for k in kvs:
 			st[k] = kvs[k]
 	return state
+	
+def State__get(self, key):
+	return pure(self, self[key])
 
 State = Type.new(
 	__name__,
 	[Type.field("flags", set(), set)],
 	{
 		"__init__": __State__,
-		"put": State__put
+		"put": State__put,
+		"get": State__get,
 	})
 	
 new = State["new"]
 
-def put(state, a, b):
-	return state["put"](a, b)
+def put(state, kvs, flags):
+	return state["put"](kvs, flags)
+	
+def get(state, k):
+	return state["get"](k)
 	
 def set_size(state, n=Size.NORMAL):
 	if n in Size.Sizes:

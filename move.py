@@ -1,4 +1,6 @@
 from lib import *
+from excursion import *
+from sense import *
 
 def inc_bounded(state, key, n=1):
 	state, d = wh(state)
@@ -11,13 +13,16 @@ def inc_x(state, n=1):
 def inc_y(state, n=1):
 	return inc_bounded(state, "y", n)
 
-def moveM(state, d, update_tail=False):
+def moveM(state, d, update_tail=False, update_excursion=True):
 	state, prev = xy_tup(state)
 	
 	if not move(d):
-		return state
+		return sense(state)
 		
-	state = maybe_update_excursion(state, d)
+	state = do_(state, [
+		[sense],
+		[when, update_excursion, [maybe_update_excursion, d]]
+	])
 
 	if d == North:
 		state = inc_y(state)
@@ -61,4 +66,11 @@ def move_to(state, c):
 		state = moveM(state, South)
 	while y(state)[1] < cy:
 		state = moveM(state, North)
+	return state
+
+def end_excursion(state):
+	excursion = state["excursions"].pop()
+	while excursion != []:
+		d = excursion.pop()
+		state = moveM(state, opposite(d), True, False)
 	return state

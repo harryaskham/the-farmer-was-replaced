@@ -1,6 +1,7 @@
 from lib import *
 from debug import *
 from measure import *
+import State
 
 def sense(state, set_companion=True):
 	e = get_entity_type()
@@ -12,8 +13,8 @@ def sense(state, set_companion=True):
 		}],
 		[when, e == E.Cactus, [measureM, "cactus_size"]],
 		[when, e == E.Sunflower, [measureM, "petals"]],
-		[when, e == E.Apple, [set_state, {"apple": measure()}]],
-		[when, e == E.Hedge, [set_state, {"treasure": measure()}, [To.CHILDREN]]]
+		[when, e == E.Apple, [State.set, {"apple": measure()}]],
+		[when, e == E.Hedge, [State.set, {"treasure": measure()}, [To.CHILDREN]]]
 	])
 		
 	if not set_companion:
@@ -23,7 +24,7 @@ def sense(state, set_companion=True):
 	if companion == None:
 		return verbose(state, "no companion")
 
-	return dos(state, [
+	return do_(state, [
 		[cond, companion == None,
 		 [verbose, "no companion"],
 		 [dos, [
