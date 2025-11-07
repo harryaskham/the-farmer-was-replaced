@@ -11,7 +11,7 @@ def inc_y(state, n=1):
 	return inc_bounded(state, "y", n)
 
 def moveM(state, d, update_tail=False):
-	prev = xy_tup(state)
+	state, prev = xy_tup(state)
 	
 	if not move(d):
 		return state
@@ -36,8 +36,8 @@ def moveM(state, d, update_tail=False):
 	return state
 	
 def move_bounded(state, dir, update_tail=False):
-	[x, y] = xy(state)
-	d = wh(state)
+	state, [x, y] = xy(state)
+	state, d = wh(state)
 	if x == d-1 and dir == East:
 		return state
 	if x == 0 and dir == West:
@@ -48,17 +48,14 @@ def move_bounded(state, dir, update_tail=False):
 		return state
 	return moveM(state, dir, update_tail)
 		
-def go_originM(state):
-	return move_to(state, [0, 0])
-
 def move_to(state, c):
 	cx, cy = unpack(c)
-	while x(state) > cx:
+	while x(state)[1] > cx:
 		state = moveM(state, West)
-	while x(state) < cx:
+	while x(state)[1] < cx:
 		state = moveM(state, East)
-	while y(state) > cy:
+	while y(state)[1] > cy:
 		state = moveM(state, South)
-	while y(state) < cy:
+	while y(state)[1] < cy:
 		state = moveM(state, North)
 	return state

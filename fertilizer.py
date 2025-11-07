@@ -15,7 +15,7 @@ def fertilize(state, over=None, n=None):
 			and not can_harvest()
 			and (n == None or i < n)
 			and num_items(I.Fertilizer) > 0):
-			state = dos(state, [
+			state = do_(state, [
 				[useM, I.Fertilizer]
 			])
 			i += 1

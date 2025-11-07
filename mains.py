@@ -1,6 +1,7 @@
 from farmlib import *
 
 def loop(state, x, y):
+	state, d = wh(state)
 	return [
 		[debug, ""],
 		[when, x == 0 and y == 8, [dos, [
@@ -15,9 +16,9 @@ def loop(state, x, y):
 			[dos, [
 				[when, x == 0, [boost, BOOSTS]],
 				chain([
-					[Pumpkin, x, y, [0, wh(state) - 6, 6, 6]],
-					[Pumpkin, x, y, [6, wh(state) - 6, 6, 6]],
-					[Pumpkin, x, y, [12, wh(state) - 6, 6, 6]],
+					[Pumpkin, x, y, [0, d - 6, 6, 6]],
+					[Pumpkin, x, y, [6, d - 6, 6, 6]],
+					[Pumpkin, x, y, [12, d - 6, 6, 6]],
 					[Cactus, x, y, [10, 0, 8, 8]],
 					[Companion],
 					[Box, x, y, [0, 1, 10, 11], [plant_one, E.Carrot]],

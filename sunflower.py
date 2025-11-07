@@ -7,7 +7,7 @@ def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=Fals
 	state = when(state,do_water, [water_to])
 	while True:
 		if force or et(state) != E.Sunflower:
-			state = dos(state, [
+			state = do_(state, [
 				[harvestM],
 				[plant_one, E.Sunflower],
 			])
@@ -20,7 +20,7 @@ def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=Fals
 		
 def boost(state, n=1, do_fertilize=True, do_water=True, min_petals=7, max_petals=15, cure=True, unsafe=False):
 	for _ in range(n):
-		state = dos(state, [
+		state = do_(state, [
 			[Sunflower, min_petals, max_petals, True, do_fertilize, do_water],
 			[wait_for_harvest],
 			[try_harvest, [E.Sunflower], cure, unsafe]
@@ -51,4 +51,3 @@ def boost_solo(state):
 		[water_to],
 		[Sunflower]
 	])
-	

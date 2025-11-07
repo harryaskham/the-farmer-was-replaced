@@ -25,7 +25,7 @@ def maze(state, size=None):
 		if size == None:
 			size = wh(state)
 		use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
-		state = dos(state, [
+		state = do_(state, [
 			[plant_one, E.Bush],
 			[useM, I.Weird_Substance, use_n],
 		])
@@ -74,4 +74,3 @@ def maze(state, size=None):
 			
 	state = move_to(state, start_pos)
 	return state
-			

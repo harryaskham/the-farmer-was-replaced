@@ -39,7 +39,7 @@ def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
 			and planted != companion
 		):
 			here = xy(state)
-			state = dos(state, [
+			state = do_(state, [
 				[move_to, c_at],
 				[plant_one, companion],
 				[sense, True],
@@ -88,11 +88,10 @@ def fertilize_loop(state, over=None, n=None):
 	if (over == None or contains(over, e)) and (n == None or n > 0):
 		i = 0
 		while num_items(I.Fertilizer) > 0 and (n == None or i < n):
-			state = dos(state, [
+			state = do_(state, [
 				[fertilize, [e]],
 				[try_harvest, [e]],
 				[plantM, e]
 			])
 			i += 1
 	return state
-	

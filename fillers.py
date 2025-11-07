@@ -165,7 +165,7 @@ def fill_rows(state, f):
 		return [boxloop, [0, y, d, 1], f, [0, y], False]
 	for y in range(1, d):
 		state = spawnM(state, p(y))
-	state = dos(state, [p(0)])
+	state = do_(state, [p(0)])
 	state, y_rows = wait_all(state)
 	for y, row in y_rows:
 		state["grid"][y] = row

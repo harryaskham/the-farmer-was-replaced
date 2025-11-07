@@ -4,7 +4,7 @@ from measure import *
 
 def sense(state, set_companion=False):
 	e = get_entity_type()
-	state = dos(state, [
+	state = do_(state, [
 		[set_here, {
 			"entity_type": e,
 			"ground_type": get_ground_type()
@@ -21,14 +21,16 @@ def sense(state, set_companion=False):
 	companion = get_companion()
 	if companion == None:
 		return verbose(state, "no companion")
-		
-	state = dos(state, [
-		[debug, "companion/target"],
-		[debug, companion],
-		[bind, [at, companion[1]], [debug]]
-	])
 
 	return dos(state, [
-		[set_at, companion[1], {"companion": companion[0]}, [To.CHILDREN]],
-		[set_here, {"companion_at": companion[1]}, [To.CHILDREN]]
+		[cond, companion == None,
+		 [verbose, "no companion"],
+		 [dos, [
+			[debug, "companion/target"],
+			[debug, companion],
+			[bind, [at, companion[1]], [debug]],
+			[set_at, companion[1], {"companion": companion[0]}, [To.CHILDREN]],
+			[set_here, {"companion_at": companion[1]}, [To.CHILDREN]]
+		 ]]
+		]
 	])

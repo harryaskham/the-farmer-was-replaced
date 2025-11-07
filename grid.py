@@ -9,10 +9,10 @@ SW = [South, West]
 
 def mk_grid(cell=None):
 	grid = []
-	n = wh()
-	for y in range(n):
+	d = get_world_size()
+	for y in range(d):
 		row = []
-		for x in range(n):
+		for x in range(d):
 			row.append(mk_cell_state(x, y))
 
 		grid.append(row)
@@ -43,34 +43,36 @@ def corner(box, dir):
 
 	
 def neighbors(state, cx=None, cy=None):
+	state, d = wh(state)
 	if cx == None:
-		cx = x(state)
+		state, cx = x(state)
 	if cy == None:
-		cy = y(state)
+		state, cy = y(state)
 	ns = []
 	if cx > 0:
 		ns.append([cx-1, cy])
-	if cx < wh() - 1:
+	if cx < d - 1:
 		ns.append([cx+1, cy])
 	if cy > 0:
 		ns.append([cx, cy-1])
-	if cy < wh() - 1:
+	if cy < d - 1:
 		ns.append([cx, cy+1])
 	return ns
 	
 def neighbors_dict(state, cx=None, cy=None):
+	state, d = wh(state)
 	if cx == None:
-		cx = x(state)
+		state, cx = x(state)
 	if cy == None:
-		cy = y(state)
+		state, cy = y(state)
 	ns = {}
 	if cx > 0:
 		ns[West] = (cx-1, cy)
-	if cx < wh() - 1:
+	if cx < d - 1:
 		ns[East] = (cx+1, cy)
 	if cy > 0:
 		ns[South] = (cx, cy-1)
-	if cy < wh() - 1:
+	if cy < d - 1:
 		ns[North] = (cx, cy+1)
 	return ns
 	

@@ -13,9 +13,10 @@ def set_apple(state):
 def brute(state):
 	xd = East
 	yd = North
-	[w, h] = [wh(state), wh(state)]
+	state, d = wh(state)
+	[w, h] = [d, d]
 	while True:
-		[x, y] = xy(state)
+		state, [x, y] = xy(state)
 		if x == 0:
 			xd = East
 		if x == w - 1:
@@ -27,7 +28,7 @@ def brute(state):
 			yd = South
 			state = moveM(state, xd)
 		state = moveM(state, yd)
-		if xy(state) == [x, y]:
+		if xy(state)[1] == [x, y]:
 			return state
 
 def dumb(state):
@@ -38,7 +39,7 @@ def dumb(state):
 			return state
 	
 		(ax, ay) = state["apple"]
-		[x, y] = xy(state)
+		state, [x, y] = xy(state)
 		
 		ds = []
 		if x > ax:
@@ -67,7 +68,7 @@ def search_apple(state):
 	while True:
 		state = sense(state, False)
 		state["tail_len"] += 1
-		state = debug(state, ["apple", state["apple"], "len", state["tail_len"], "pos", xy_tup(state)], 2, "search")
+		state = debug(state, ["apple", state["apple"], "len", state["tail_len"], "pos", xy_tup(state)[1]], 2, "search")
 		#state, path = path_to(state, state["apple"])
 		state, path = path_to(state, state["apple"], False)
 		if path == None:
@@ -78,7 +79,7 @@ def search_apple(state):
 
 def dino(state, policies, delay=0):
 	for policy in policies:
-		state = dos(state, [
+		state = do_(state, [
 			[hatM, Hats.Straw_Hat],
 			[hatM, Hats.Dinosaur_Hat],
 			[set_state, { "tail": [] }],

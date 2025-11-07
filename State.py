@@ -13,9 +13,9 @@ def __init__(self, flags=set()):
 	self["flags"] = set(flags)
 	self["id"] = 0
 	self["i"] = 0
-	self["x"] = x()
-	self["y"] = y()
-	self["wh"] = wh()
+	self["x"] = get_pos_x()
+	self["y"] = get_pos_y()
+	self["wh"] = get_world_size()
 	self["grid"] = mk_grid()
 	self["here"] = self["grid"][self["y"]][self["x"]]
 	self["ret"] = []
@@ -39,35 +39,6 @@ State = Type.new(
 	
 new = State["new"]
 
-def state_new(flags=[]):
-	sx = x()
-	sy = y()
-	swh = wh()
-	grid = mk_grid()
-	return {
-		"__type__": "State",
-		"id": 0,
-		"flags": set(flags),
-		"i": 0,
-		"x": x(),
-		"y": y(),
-		"wh": wh(),
-		"grid": grid,
-		"here": grid[sy][sx],
-		"ret": [],
-		"error": None,
-		"apple": None,
-		"tail": [],
-		"tail_set": set(),
-		"tail_len": 0,
-		"num_drones": 1,
-		"max_drones": max_drones(),
-		"child_handles": {},
-		"child_states": {},
-		"drone_return": {},
-		"treasure": None
-	}
-	
 def put(state, kvs, flags=[]):
 	flags = set(flags)
 	states = [state]

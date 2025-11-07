@@ -5,7 +5,7 @@ def nop_f(state, _, _):
 	return [const, state]
 		
 def traverse_farm(state, f, box=None, start=None):
-	d = wh(state)
+	state, d = wh(state)
 		
 	if box == None:
 		box = [0, 0, d-1, d-1]
@@ -47,7 +47,3 @@ def farmloop(state, f, loop=True, scan=False, box=None, start=None):
 			state["i"] += 1
 	else:
 		return go(state)
-
-		
-
-		
