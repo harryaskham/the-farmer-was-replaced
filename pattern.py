@@ -35,7 +35,7 @@ def Checker0(state, x, y, f):
 def Checker1(state, x, y, g):
 	return Checker(state, x, y, [], g)
 	
-def Companion(state, otherwise=[]):
+def Companion(state, otherwise=[unit]):
 	def handle_companion(state, c):
 		return dos(state, [
 			[debug, ("companion here?", c)],
@@ -45,4 +45,5 @@ def Companion(state, otherwise=[]):
 			]
 		])
 		
-	return bind(state, [get_here, "companion"], [handle_companion])
+	companion = get_here(state, "companion")
+	return handle_companion(state, companion)

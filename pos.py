@@ -37,7 +37,7 @@ def gt(state=None):
 	return get_here(state, "ground_type")
 
 def at(state, c):
-	[x, y] = c
+	x, y = unpack(c)
 	if x < 0 or y < 0 or x >= wh(state) or y >= wh(state):
 		return None
 	return state["grid"][y][x]

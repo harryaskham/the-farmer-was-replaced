@@ -2,13 +2,13 @@ from dict import *
 from aliases import *
 
 seed = random() * 100000 // 1
-speedup = 65535
+speedup = 218
 
 all_unlocks = Unlocks
 
 all_items = {}
 for i in Items:
-	all_items[i] = 10**4
+	all_items[i] = 10**10
 	
 all_globals = {}
 

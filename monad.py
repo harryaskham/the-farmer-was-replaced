@@ -42,6 +42,10 @@ def cond(state, c, a, b):
 		return dos(state, [a])
 	else:
 		return dos(state, [b])
+	
+def condM(state, mc, a, b):
+	state, c = dos(state, [mc])
+	return cond(state, c, a, b)
 
 def unless(state, c, a):
 	if c:
@@ -50,27 +54,20 @@ def unless(state, c, a):
 
 def whileM(state, cf, a):
 	while True:
-		state, c = dov(state, [cf])
-		if not c:
+		state, c = dos(state, [cf])
+		if c == False:
 			break
-		state, _ = dov(state, [a])
+		state = do_(state, [a])
 	return state
 
 def untilM(state, cf, a):
 	while True:
-		state, c = dov(state, [cf])
-		if c:
+		state, c = dos(state, [cf])
+		if c == True:
 			break
 		state = dos(state, [a])
 	return state
-	
-def seq(state, xss):
-	state = dos(state, xss[:-1])
-	state = dos(state, [
-		[bind, xss[-1], [pushret]]
-	])
-	return pure(state, popret(state))
-	
+
 def do(state, fs):
 	for xs in fs:
 		state_ = aps(xs)
@@ -78,61 +75,45 @@ def do(state, fs):
 	return state
 	
 def pure(state, x):
-	return {
-		"__state__": state,
-		"__v__": x
-	}
+	return state, x
+
+def unit(state):
+	return pure(state, None)
 	
-def dov(state, xss):
-	state, v = dos(state, xss, False, True)
-	return state, v
+def dos(state, xss):
+	state = debug(state, ("dos", xss))
 	
-INFER_BOTH = "INFER_BOTH"
-NO_RETURN = "NO_RETURN"
-def dos(state, xss, copy=False, both=INFER_BOTH):
-	state = debug(state, xss, 3, "dos")
+	if xss == []:
+		return unit(state)
+		
 	v = None
 	for xs in xss:
 		if state["error"] != None:
 			v = None
 			break
 				
-		state = debug(state, xs, 3, "do")
+		state = debug(state, ("do", xs))
 			
 		xs = list(xs)
 		xs.insert(1, state)
 		
 		out = aps(xs)
 		if out == None:
-			state = error(state, ["Do-statement returned None:", xs])
-			continue
-		
-		if "__state__" in out:
-			state_ = out["__state__"]
-			v = out["__v__"]
-		elif len(out) == 2 and "__type__" in out[0] and out[0]["__type__"] == "State":
-			state_, v = unpack(out)
-		elif "__type__" in out and out["__type__"] == "State":
-			state_, v = out, NO_RETURN
+			state_, v = state, None
+		elif "__type__" in out and state["__type__"] == "State":
+			state_, v = out, None
 		else:
-			state = error(state, ["Malformed do-statement return:", out])
-			continue
-			
-		if copy:
-			state = merge(state, state_)
-		else:
-			state = state_
-			
-	if both == INFER_BOTH:
-		if v == NO_RETURN:
-			return state
-		return state, v
-	elif both:
-		if v == NO_RETURN:
-			v = None
-		return state, v
-	else:
-		return state
+			state_, v = out
+			if "__type__" not in state_ or state_["__type__"] != "State":
+				state = error(state, ["Malformed state returned:", state_, v])
+				continue
+				
+		state = state_
+				
+	return state, v
+	
+def do_(state, xss):
+	return dos(state, xss)[0]
 	
 def chain(xss):
 	head = list(xss[0])
@@ -142,13 +123,14 @@ def chain(xss):
 	head.append(tail)
 	return head
 
-def run(state, xs):
-	xs = list(xs)
-	xs.insert(1, state)
-	return (state, aps(xs))
+def run(state, ma):
+	ma = list(ma)
+	ma.insert(1, state)
+	return aps(ma)
 	
 def bind(state, ma, f):
-	state, a = run(state, ma)
+	state = debug(state, ("bind", ma, f))
+	state, a = dos(state, [ma])
 	fa = list(f)
 	fa.append(a)
 	return dos(state, [fa])

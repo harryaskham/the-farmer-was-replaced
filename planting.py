@@ -53,7 +53,7 @@ def plant_one(state, e, unused=None):
 		[maybe_till, e],
 		[maybe_untill, e],
 		[maybe_plant, e, True],
-		[sense]
+		[sense, True]
 	])
 	
 def plantM(state, e, unused=None):

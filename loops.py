@@ -26,7 +26,7 @@ def traverse_farm(state, f, box=None, start=None):
 			state = move_to(state, [x, y])
 			state["here"] = state["grid"][y][x]
 			xss = f(state, x, y)
-			state = dos(state, xss)
+			state = do_(state, xss)
 	return state
 	
 def boxloop(state, box, f, start=None, loop=True):

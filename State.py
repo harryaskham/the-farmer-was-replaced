@@ -1,5 +1,5 @@
 from pos import x, y, wh
-from monad import dos, when
+from monad import dos, when, pure
 from hat import hatM
 from move import move_to
 from grid import mk_grid
@@ -87,3 +87,13 @@ def set_size(state, n=Size.NORMAL):
 	return put(state, {
 		"wh": get_world_size()
 	}, [To.CHILDREN])
+	
+def drone_id(state):
+	return state["id"]
+	
+def loop_index(state):
+	return state["i"]
+	
+def inc_loop_index(state):
+	state["i"] += 1
+	return state

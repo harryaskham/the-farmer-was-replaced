@@ -5,6 +5,8 @@ def contains(xs, x):
 	return False
 
 def unpack(xs):
+	if xs == None:
+		return None
 	if len(xs) == 0:
 		return None
 	if len(xs) == 1:

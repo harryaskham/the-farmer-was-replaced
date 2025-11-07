@@ -73,3 +73,6 @@ def neighbors_dict(state, cx=None, cy=None):
 	if cy < wh() - 1:
 		ns[North] = (cx, cy+1)
 	return ns
+	
+def get_row(state, y):
+	return pure(state, state["grid"][y])

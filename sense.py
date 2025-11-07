@@ -28,7 +28,6 @@ def sense(state, set_companion=False):
 		[bind, [at, companion[1]], [debug]]
 	])
 
-		
 	return dos(state, [
 		[set_at, companion[1], {"companion": companion[0]}, [To.CHILDREN]],
 		[set_here, {"companion_at": companion[1]}, [To.CHILDREN]]

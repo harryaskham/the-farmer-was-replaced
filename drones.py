@@ -46,8 +46,7 @@ def spawnM(state, f, flags=[]):
 	child_state = merge(state, {"id": child_id}, None, True)
 
 	def g():
-		child_state_after, v = dos(child_state, [f], False, True)
-		return child_state_after, v
+		return dos(child_state, [f])
 
 	child = spawn_drone(g)
 	if child == None:
@@ -61,8 +60,8 @@ spawn = spawnM
 def wait_for_child(state, child_id):
 	child_state, v = wait_for(state["child_handles"][child_id])
 	state["drone_return"][child_id] = v
-	state["child_states"][child_id] = child_state
 	state["child_handles"].pop(child_id)
+	state["child_states"].pop(child_id)
 	return state, (child_state, v)
 	
 def wait_all(state):

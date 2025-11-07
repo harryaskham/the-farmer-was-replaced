@@ -166,25 +166,32 @@ def fill_rows(state, f):
 	for y in range(1, d):
 		state = spawnM(state, p(y))
 	state = dos(state, [p(0)])
-	state, _ = wait_all(state)
-	for child_id in state["child_states"]:
-		child_state = state["child_states"][child_id]
-		state["grid"][child_state["y"]] = child_state["grid"][child_state["y"]]
-	return state
+	state, y_rows = wait_all(state)
+	for y, row in y_rows:
+		state["grid"][y] = row
+	return State.inc_loop_index(state)
 
 def filler_companions(state):
+	def select_loop(state):
+		return pure(state, state["i"] % 2 == 0)
+		
+	def return_row(state):
+		return pure(state, (state["y"], state["grid"][state["y"]]))
+		
 	return fill_rows(state, [dos, [
 		[sense, True],
-		[try_harvest, None, False, False, [Companions.RESERVE, Companions.AWAIT]],
-		[water_to],
-		chain([
-			[Companion],
-			[Checker3,
-				[plant_one, E.Tree],
-				[plant_one, E.Carrot],
-				[plant_one, E.Grass]
-			]
-		]),
-		[sense, True]
+		[condM, [select_loop],
+			[dos, [
+				[Checker3,
+					[plant_one, E.Tree],
+					[plant_one, E.Carrot],
+					[plant_one, E.Grass]
+				]
+			]],
+			[dos, [
+				[Companion]
+			]]
+		],
+		[return_row]
 	]])
 	

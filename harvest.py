@@ -2,6 +2,7 @@ from lib import *
 from items import *
 from planting import *
 from fertilizer import *
+from move import *
 
 def harvestM(state):
 	harvest()
@@ -23,14 +24,46 @@ def harvestM(state):
 
 def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
 	flags = set(flags)
-	if entities == None or contains(entities, et(state)):
-		if get_here(state, "companion") != None and Companions.RESERVE in flags:
-			return state
-		if can_harvest():
-			return dos(state, [
-				[when, cure, [maybe_cure, entities, unsafe]],
-				[harvestM]
+	if not (entities == None or contains(entities, et(state))):
+		return state
+		
+	c_at = get_here(state, "companion_at")
+	if c_at != None:
+		cn = at(state, c_at)
+		companion = cn["companion"]
+		planted = cn["entity_type"]
+		if (
+			Companions.PLANT in flags
+			and c_at != None
+			and companion != None
+			and planted != companion
+		):
+			here = xy(state)
+			state = dos(state, [
+				[move_to, c_at],
+				[plant_one, companion],
+				[sense, True],
+				[move_to, here],
 			])
+			
+	is_companion = (
+		et(state) != None
+		and get_here(state, "companion") == et(state))
+	
+	if Companions.AWAIT in flags:
+		while True:
+			cn = at(state, get_here(state, "companion_at"))
+			if cn["companion"] == None or cn["entity_type"] == cn["companion"]:
+				break
+	elif Companions.RESERVE in flags and is_companion:
+		return state
+			
+	if can_harvest():
+		return dos(state, [
+			[when, cure, [maybe_cure, entities, unsafe]],
+			[harvestM]
+		])
+
 	return state
 	
 def wait_for_harvest(state, delay=0.5):

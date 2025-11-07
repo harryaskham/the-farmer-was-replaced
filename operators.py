@@ -5,6 +5,9 @@ from strings import *
 def eq(state, a, b):
 	return pure(state, a == b)
 	
+def mod(state, a, b):
+	return pure(state, a % b)
+	
 def eqM(state, a, b):
 	state, ax = dos(state, [a])
 	state, bx = dos(state, [b])
@@ -21,8 +24,8 @@ def forever(state, f):
 	])
 
 def pureM(state, f):
-	return seq(state, [f])
+	return bind(state, f, [pure])
 	
 def do_a_flipM(state):
 	do_a_flip()
-	return state
+	return unit(state)
