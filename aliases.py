@@ -10,6 +10,7 @@ import Log
 import Mode
 import Movement
 import Phase
+import Sensing
 import Size
 import Space
 import Spawn

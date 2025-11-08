@@ -6,7 +6,7 @@ all_items = {}
 for i in Items:
 	all_items[i] = 10**10
 	
-def run_sim(main_flags=flags.MAIN_FLAGS, name="simulation", globals={}, speedup=64, seed=random() * 100000 // 1, unlocks=Unlocks, items=all_items):
+def run_sim(main_flags=flags.MAIN_FLAGS, name="simulation", globals={}, speedup=2048, seed=random() * 100000 // 1, unlocks=Unlocks, items=all_items):
 	main_flags = set(main_flags)
 	if Mode.SIMULATE in main_flags:
 		main_flags.remove(Mode.SIMULATE)

@@ -47,12 +47,11 @@ def swap_if(d, a, b):
 	}[d]
 
 def emplace_cactus(state, dirs=list(Dirs)):
-	state = sense(state)
 	state = start_excursion(state)
 	done = False
 	moved = False
 	while not done:
-		state = sense(state)
+		state = sense(state, [Sensing.DIRECTIONAL])
 		state, [x, y] = xy(state)
 		state, this = here(state)
 		state, ns = ordinal_neighbors(state)
@@ -92,7 +91,6 @@ def Cactus(state, x, y, box, otherwise):
 			[dos, [
 				[do_harvest],
 				[plant_one, E.Cactus],
-				[sense],
 				[emplace_cactus, box]
 			]],
 			otherwise

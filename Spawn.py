@@ -1,2 +1,3 @@
 BECOME = "Spawn.BECOME"
 AWAIT = "Spawn.AWAIT"
+INHERIT = "Spawn.INHERIT"

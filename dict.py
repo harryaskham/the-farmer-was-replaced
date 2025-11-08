@@ -18,3 +18,9 @@ def merge_all(xss, keys=None, copy=False):
 	
 def copy(xs):
 	return merge(xs, {}, None, True)
+	
+def values(xs):
+	vs = []
+	for k in xs:
+		vs.append(xs[k])
+	return vs
