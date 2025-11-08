@@ -7,19 +7,13 @@ from pumpkin import *
 from cactus import *
 
 def get_row(state):
-	return pure(state, state["grid"][state["y"]])
-
-def return_row(state):
-	return pure(state, (state["y"], state["grid"][state["y"]]))
-	
-def return_grid(state):
-	return pure(state, (state["y"], state["grid"]))
-
-def merge_rows(state, results):
-	for child_id in results:
-		y, row = results[child_id]
-		state["grid"][y] = row
-	return state
+	state, d = wh(state)
+	state, [x, y] = xy(state)
+	cs = []
+	for x in range(d):
+		state, c = at(state, (x, y))
+		cs.append(c)
+	return pure(state, cs)
 
 def result_list(state, results):
 	xs = []

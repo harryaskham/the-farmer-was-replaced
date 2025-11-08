@@ -2,7 +2,6 @@ from pos import x, y, wh
 from monad import dos, when, pure
 from hat import hatM
 from move import move_to
-from grid import mk_grid
 from debug import debug_
 import To
 import Size
@@ -16,7 +15,7 @@ def __State__(self, flags=set()):
 	self["x"] = get_pos_x()
 	self["y"] = get_pos_y()
 	self["wh"] = get_world_size()
-	self["grid"] = mk_grid()
+	self["grid"] = {}
 	self["ret"] = []
 	self["error"] = None
 	self["apple"] = None
@@ -50,12 +49,9 @@ def State__get(self, key):
 def State__fork(self, id):
 	child = dict(self)
 	child["id"] = id
-	child["grid"] = []
-	for row in self["grid"]:
-		child_row = []
-		for cell in row:
-			child_row.append(dict(cell))
-		child["grid"].append(child_row)
+	child["grid"] = {}
+	for c in self["grid"]:
+		child["grid"][c] = dict(self["grid"][c])
 	child["ret"] = []
 	child["child_handles"] = {}
 	child["child_states"] = {}

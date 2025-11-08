@@ -1,5 +1,6 @@
 from monad import *
 from aliases import *
+from cell import mk_cell_state
 
 def x(state):
 	return pure(state, state["x"])
@@ -30,7 +31,11 @@ def at(state, c):
 	state, d = wh(state)
 	if x < 0 or y < 0 or x >= d or y >= d:
 		return unit(state)
-	return pure(state, state["grid"][y][x])
+	if (x, y) in state["grid"]:
+		return pure(state, state["grid"][(x, y)])
+	cell = mk_cell_state(x, y)
+	state["grid"][(x, y)] = cell
+	return pure(state, cell)
 		
 def here(state):
 	state, c = xy(state)
@@ -44,6 +49,7 @@ def get_at(state, c, key=None):
 		return pure(state, xs[key])
 	
 def set_at(state, c, fields, flags=[]):
+	this_state = state
 	flags = set(flags)
 	x, y = unpack(c)
 	states = [state]
@@ -53,11 +59,17 @@ def set_at(state, c, fields, flags=[]):
 			states.append(child_state)
 
 	for state in states:
+		if (x, y) not in state["grid"]:
+			if (x, y) in this_state["grid"]:
+				state["grid"][(x, y)] = this_state["grid"][(x, y)]
+			else:
+				state["grid"][(x, y)] = mk_cell_state(x, y)
+				
 		if Copy.CELL in flags:
-			state["grid"][y][x] = merge(state["grid"][y][x], fields)
+			state["grid"][(x, y)] = merge(state["grid"][(x, y)], fields)
 		else:
 			for k in fields:
-				state["grid"][y][x][k] = fields[k]
+				state["grid"][(x, y)][k] = fields[k]
 	
 	return states[0]
 

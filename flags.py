@@ -5,11 +5,11 @@ MAIN_FLAGS = set([
 	#Log.ALL,
 	#Size.SMALL,
 	#Phase.COMPANIONS,
-	#Phase.CROPS,
+	Phase.CROPS,
 	#Phase.CARROTS,
 	#Phase.CACTUS,
 	#Phase.ENERGY,
-	Phase.DINO,
+	#Phase.DINO,
 	#Phase.FLIPS,
 	Space.FILL,
 ])
