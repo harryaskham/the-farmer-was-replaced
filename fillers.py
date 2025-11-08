@@ -3,10 +3,10 @@ from loops import *
 from maze import *
 from drones import *
 from sunflower import *
-from pumpkin import *
 from cactus import *
 from filler_utils import *
 from filler_cactus import *
+from filler_pumpkin import *
 
 def filler_maze(state, num_drones=16):
 	d = wh(state)
@@ -27,29 +27,7 @@ def filler_maze(state, num_drones=16):
 				[boxloop, [x, y, 1, 1], [maze, n]]
 			]])
 	return ps
-	
-def filler_pumpkin(state):
-	d = wh(state)
-	state = move_to(state, [d//2, d//2])
 
-	def child(state, c, dir):
-		[x, y] = c
-		x = x % d
-		y = y % d
-		return spawnM(state, [dos, [
-			[move_to, [x, y]],
-			[child, [(x+3)%d,(y+3)%d], East],
-			[sense],
-			[whileM, [eqM, [etM], [pure, E.Pumpkin]], [dos, [
-				[moveM, dir],
-				[water_to, 0.75, 1.0],
-				[sense]
-			]]],
-	
-			[plant_pumpkin, False]
-		]])
-		
-	return mapM(state, [child, xy(state)], Dirs)
 
 def filler_crops(state):
 	return fill_rows(state, [dos, [

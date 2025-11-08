@@ -3,11 +3,6 @@ from drones import *
 from cactus import *
 from filler_utils import *
 
-def values(xs):
-	vs = []
-	for k in xs:
-		vs.append(xs[k])
-	return vs
 
 def filler_cactus(state):
 	def handler(state, results):
@@ -34,7 +29,7 @@ def filler_cactus(state):
 		])
 			
 	return fill_rows(state, [dos, [
-		[sense],
+		[sense, [Sensing.DIRECTIONAL]],
 		[wait_secsM, state["id"] / 32.0],
 		[liftA2, [pair],
 			[liftA2, [pair],

@@ -1,8 +1,5 @@
 from lib import *
 from debug import *
-
-def next_child_id(state):
-	return pure(state, num_drones())
 	
 def update_drone_state(state):
 	state["num_drones"] = num_drones()
@@ -41,20 +38,21 @@ def spawnM(state, f, flags=[]):
 	if become:
 		state, v = dos(state, [f])
 		return state
-
-	state, child_id = dos(state, [[next_child_id]])
-	child_state = State.fork(state, child_id)
-	#child_state["id"] = child_id
-	#child_state = merge(state, {"id": child_id}, None, True)
+	
+	if Spawn.INHERIT in flags:
+		child_state = State.fork(state)
+	else:
+		child_state = State.new(state["flags"])
 
 	def spawn_inner():
 		return dos(child_state, [f])
 
+	child_state["id"] = num_drones()
 	child = spawn_drone(spawn_inner)
 	if child == None:
 		return error(state, ["Failed to spawn drone"])
-	state["child_states"][child_id] = child_state
-	state["child_handles"][child_id] = child
+	state["child_states"][child_state["id"]] = child_state
+	state["child_handles"][child_state["id"]] = child
 	return state
 
 spawn = spawnM
