@@ -39,11 +39,11 @@ def filler_pumpkin(state):
 		return spawnM(state, [dos, [
 			[move_to, [x, y]],
 			[child, [(x+3)%d,(y+3)%d], East],
-			[sense, False],
+			[sense],
 			[whileM, [eqM, [etM], [pure, E.Pumpkin]], [dos, [
 				[moveM, dir],
 				[water_to, 0.75, 1.0],
-				[sense, False]
+				[sense]
 			]]],
 	
 			[plant_pumpkin, False]
@@ -61,7 +61,7 @@ def filler_crops(state):
 
 def filler_crop(state, e):
 	return fill_rows(state, [dos, [
-		[sense, False],
+		[sense],
 		[try_harvest],
 		[plant_one, e]
 	]])
@@ -123,7 +123,7 @@ def filler_energy(state):
 
 		return dos(state, [
 			[boxloop, [0, y, d, 1], [dos, [
-				[sense, False],
+				[sense],
 				[whenM, [do_harv], [dos, [
 					[try_harvest],
 					[reset]

@@ -1,7 +1,7 @@
 from farmlib import *
 
 def purges(state, n_drones=16):
-	n = wh(state)
+	state, n = wh(state)
 	every = n // n_drones
 	ps = []
 	for y in range(0, n, every):
@@ -13,32 +13,32 @@ def progs(state):
 	return [
 		[boxloop, [0, 0, 10, 10], [dos, [
 			[hatM, Hats.Brown_Hat],
-			[sense, False],
+			[sense],
 			[try_harvest],
 			[runSXY, [Checker, [plant_one, E.Tree], [plant_one, E.Carrot]]],
-			[sense, True]
+			[sense, [Companions.UPDATE]]
 		]]],
 		[boxloop, [12, 0, 10, 10], [dos, [
 			[hatM, Hats.Green_Hat],
-			[sense, False],
+			[sense],
 			[runSXY,
 				[Box, [12, 0, 10, 1],
 					[Sunflower, 7, 7, True, True],
 					[runSXY, [Cactus, [12, 1, 10, 9], [nop1]]]
 				]
 			],
-			[sense, True]
+			[sense, [Companions.UPDATE]]
 		]]],
 		[boxloop, [0, n-6, 7*3, 6], [dos, [
 			[hatM, Hats.Gold_Hat],
-			[sense, False],
+			[sense],
 			[cleanup],
 			chain([
 				[runSXY1, [Pumpkin, [0, n - 6, 6, 6]]],
 				[runSXY1, [Pumpkin, [7, n - 6, 6, 6]]],
 				[runSXY, [Pumpkin, [14, n - 6, 6, 6], [nop1]]]
 			]),
-			[sense, True]
+			[sense, [Companions.UPDATE]]
 		]]],
 		[boxloop, [18, 10, 4, 6], [dos, [
 			[hatM, Hats.Straw_Hat],

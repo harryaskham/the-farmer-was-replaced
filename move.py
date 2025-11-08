@@ -2,42 +2,21 @@ from lib import *
 from excursion import *
 from sense import *
 
-def inc_bounded(state, key, n=1):
-	state, d = wh(state)
-	state[key] = (state[key] + n) % d
-	return state
-	
-def inc_x(state, n=1):
-	return inc_bounded(state, "x", n)
-	
-def inc_y(state, n=1):
-	return inc_bounded(state, "y", n)
-
-def moveM(state, d, update_tail=False, update_excursion=True):
+def moveM(state, d, flags=[]):
+	flags = set(flags)
 	state, prev = xy_tup(state)
-	
-	state = sense(state)
 	
 	if not move(d):
 		return state
 
-	if d == North:
-		state = inc_y(state)
-	elif d == South:
-		state = inc_y(state, -1)
-	elif d == East:
-		state = inc_x(state)
-	elif d == West:
-		state = inc_x(state, -1)
-			
 	state = do_(state, [
-		[sense],
-		[when, update_excursion, [maybe_update_excursion, d]]
+		[sense, flags],
+		[unless, Movement.REWIND_EXCURSION in flags, [maybe_update_excursion, d]]
 	])
 
 	state["here"] = state["grid"][state["y"]][state["x"]]
 		
-	if update_tail:
+	if Dinosaur.UPDATE_TAIL in flags:
 		state["tail"].append(prev)
 		if len(state["tail"]) > state["tail_len"]:
 			if state["tail"][0] in state["tail_set"]:
@@ -47,18 +26,20 @@ def moveM(state, d, update_tail=False, update_excursion=True):
 		
 	return state
 	
-def move_bounded(state, dir, update_tail=False):
+def move_bounded(state, dir, flags=[]):
+	flags = set(flags)
 	state, [x, y] = xy(state)
 	state, d = wh(state)
 	if x == d-1 and dir == East:
-		return state
+		return pure(state, False)
 	if x == 0 and dir == West:
-		return state
+		return pure(state, False)
 	if y == d-1 and dir == North:
-		return state
+		return pure(state, False)
 	if y == 0 and dir == South:
-		return state
-	return moveM(state, dir, update_tail)
+		return pure(state, False)
+	state = moveM(state, dir, flags)
+	return pure(state, True)
 		
 def move_to(state, c):
 	cx, cy = unpack(c)
@@ -76,5 +57,5 @@ def end_excursion(state):
 	excursion = state["excursions"].pop()
 	while excursion != []:
 		d = excursion.pop()
-		state = moveM(state, opposite(d), True, False)
+		state = moveM(state, opposite(d), [Movement.REWIND_EXCURSION])
 	return state

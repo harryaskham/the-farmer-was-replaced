@@ -11,7 +11,7 @@ def toggle_infected(state, c=None):
 SIDE_EFFECTS = {
 	I.Fertilizer: [dos, [
 		[set_here, { "infected": True }],
-		[sense, True]
+		[sense]
 	]],
 	I.Weird_Substance: [dos, [
 		[toggle_infected],

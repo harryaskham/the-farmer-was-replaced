@@ -7,7 +7,7 @@ def loop(state, x, y):
 		[when, x == 0 and y == 8, [dos, [
 			[spawnM, [farmloop, loop]]
 		]]],
-		[sense, False],
+		[sense],
 		[bind, [here], [debug]],
 		[cleanup],
 		[try_harvest, ALWAYS_HARVEST],
@@ -28,7 +28,7 @@ def loop(state, x, y):
 				[fertilize_loop, FERTILIZE["entities"], FERTILIZE["repeats"]]
 			]]
 		],
-		[sense, True],
+		[sense, [Companions.UPDATE]],
 		[bind, [here], [debug]],
 	]
 
@@ -40,13 +40,13 @@ def do_purge_all(state, x, y):
 	
 def do_purge(state, x, y):
 	return [
-		[sense, False],
+		[sense],
 		[try_harvest, [E.Pumpkin, E.Dead_Pumpkin, E.Tree, E.Carrot, E.Cactus, E.Bush]]
 	]
 	
 def do_scan(state, x, y):
 	return [
-		[sense, True]
+		[sense, [Companions.UPDATE]],
 	]
 	
 def do_dino(state, x, y):

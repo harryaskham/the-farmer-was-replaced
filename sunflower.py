@@ -3,7 +3,7 @@ from harvest import *
 from measure import *
 
 def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=False, do_water=True):
-	state = sense(state, False)
+	state = sense(state)
 	state = when(state,do_water, [water_to])
 	while True:
 		state, e = et(state)
@@ -12,7 +12,7 @@ def Sunflower(state, min_petals=7, max_petals=15, force=False, do_fertilize=Fals
 				[harvestM],
 				[plant_one, E.Sunflower],
 			])
-		state = sense(state, False)
+		state = sense(state)
 		h = here(state)
 		petals = h["petals"]
 		if petals != None and petals >= min_petals and petals <= max_petals:

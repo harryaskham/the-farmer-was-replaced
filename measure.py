@@ -19,8 +19,8 @@ def measureM(state, key=None, dir=None):
 		state = do_(state, [
 			[when, e == E.Cactus, [set_at, c, {"cactus_size": m}]],
 			[when, e == E.Sunflower, [set_at, c, {"petals": m}]],
-			[when, e == E.Apple, [State.set, {"apple": m}]],
-			[when, e == E.Hedge, [State.set, {"treasure": m}, [To.CHILDREN]]]
+			[when, e == E.Apple and dir == None, [State.put, {"apple": m}]],
+			[when, e == E.Hedge, [State.put, {"treasure": m}, [To.CHILDREN]]]
 		])
 	else:
 		state = set_at(state, c, {key: m})

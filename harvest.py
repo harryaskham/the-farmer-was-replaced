@@ -42,7 +42,7 @@ def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
 			state = do_(state, [
 				[move_to, c_at],
 				[plant_one, companion],
-				[sense, True],
+				[sense, [Companions.Update]],
 				[move_to, h],
 			])
 			

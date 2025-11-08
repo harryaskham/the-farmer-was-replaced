@@ -7,8 +7,9 @@ MAIN_FLAGS = set([
 	#Phase.COMPANIONS,
 	#Phase.CROPS,
 	#Phase.CARROTS,
-	Phase.CACTUS,
+	#Phase.CACTUS,
 	#Phase.ENERGY,
+	Phase.DINO,
 	#Phase.FLIPS,
 	Space.FILL,
 ])

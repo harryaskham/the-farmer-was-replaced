@@ -20,7 +20,7 @@ def maze_many(state, size=None):
 
 def maze(state, size=None):
 	start_pos = xy(state)
-	state = sense(state, False)
+	state = sense(state)
 	if et(state) not in [E.Hedge, E.Treasure]:
 		if size == None:
 			size = wh(state)
@@ -33,7 +33,7 @@ def maze(state, size=None):
 	seen = set()
 	back = []
 	while True:
-		state = sense(state, False)
+		state = sense(state)
 		
 		if et(state) == E.Treasure:
 			state = try_harvest(state, [E.Treasure])

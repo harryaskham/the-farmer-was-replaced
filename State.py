@@ -76,7 +76,7 @@ State = Type.new(
 	
 new = State["new"]
 
-def put(state, kvs, flags):
+def put(state, kvs, flags=[]):
 	return state["put"](kvs, flags)
 	
 def get(state, k):
@@ -89,9 +89,7 @@ def set_size(state, n=Size.NORMAL):
 	if n in Size.Sizes:
 		n = Size.Sizes[n]
 	set_world_size(n)
-	return put(state, {
-		"wh": get_world_size()
-	}, [To.CHILDREN])
+	return new(state["flags"])
 	
 def drone_id(state):
 	return state["id"]

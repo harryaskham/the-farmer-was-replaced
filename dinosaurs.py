@@ -35,7 +35,7 @@ def brute(state):
 
 def dumb(state):
 	while True:
-		state = sense(state, False)
+		state = sense(state)
 	
 		if state["apple"] == None:
 			return state
@@ -56,9 +56,8 @@ def dumb(state):
 			ds.append(d)
 		moved = False
 		for d in ds:
-			state = move_bounded(state, d)
-			if xy(state) != [x, y]:
-				moved = True
+			state, moved = move_bounded(state, d)
+			if moved:
 				break
 		if not moved:
 			return state
@@ -68,7 +67,7 @@ def apple_here(state):
 	
 def search_apple(state):
 	while True:
-		state = sense(state, False)
+		state = sense(state)
 		state["tail_len"] += 1
 		state = debug(state, ["apple", state["apple"], "len", state["tail_len"], "pos", xy_tup(state)[1]], 2, "search")
 		#state, path = path_to(state, state["apple"])
@@ -77,7 +76,7 @@ def search_apple(state):
 			return state
 
 		for dir in path:
-			state = moveM(state, dir, True)
+			state = moveM(state, dir, [Dinosaur.UPDATE_TAIL])
 
 def dino(state, policies, delay=0):
 	for policy in policies:

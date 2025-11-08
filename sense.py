@@ -3,11 +3,18 @@ from debug import *
 from measure import *
 import State
 
-def sense(state, set_companion=True):
+def sense(state, flags=[]):
+	flags = set(flags)
+	x = get_pos_x()
+	y = get_pos_y()
 	e = get_entity_type()
 	g = get_ground_type()
 
 	state = do_(state, [
+		[State.put, {
+			"x": x,
+			"y": y,
+		}],
 		[set_here, {
 			"entity_type": e,
 			"ground_type": g
@@ -18,7 +25,7 @@ def sense(state, set_companion=True):
 	for dir in Dirs:
 		state = measureM(state, None, dir)
 		
-	if not set_companion:
+	if Companions.UPDATE not in flags:
 		return state
 		
 	companion = get_companion()
