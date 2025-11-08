@@ -7,15 +7,13 @@ def moveM(state, d, flags=[]):
 	state, prev = xy_tup(state)
 	
 	if not move(d):
-		return state
+		return pure(state, False)
 
 	state = do_(state, [
 		[sense, flags],
 		[unless, Movement.REWIND_EXCURSION in flags, [maybe_update_excursion, d]]
 	])
 
-	state["here"] = state["grid"][state["y"]][state["x"]]
-		
 	if Dinosaur.UPDATE_TAIL in flags:
 		state["tail"].append(prev)
 		if len(state["tail"]) > state["tail_len"]:
@@ -24,7 +22,7 @@ def moveM(state, d, flags=[]):
 			state["tail"] = state["tail"][1:]
 		state["tail_set"].add(prev)
 		
-	return state
+	return pure(state, True)
 	
 def move_bounded(state, dir, flags=[]):
 	flags = set(flags)
@@ -38,24 +36,36 @@ def move_bounded(state, dir, flags=[]):
 		return pure(state, False)
 	if y == 0 and dir == South:
 		return pure(state, False)
-	state = moveM(state, dir, flags)
-	return pure(state, True)
-		
+	return moveM(state, dir, flags)
+
 def move_to(state, c):
 	cx, cy = unpack(c)
+
 	while x(state)[1] > cx:
-		state = moveM(state, West)
+		state, moved = moveM(state, West)
+		if not moved:
+			fatal(state, "Couldn't move")
+
 	while x(state)[1] < cx:
-		state = moveM(state, East)
+		state, moved = moveM(state, East)
+		if not moved:
+			fatal(state, "Couldn't move")
+
 	while y(state)[1] > cy:
-		state = moveM(state, South)
+		state, moved = moveM(state, South)
+		if not moved:
+			fatal(state, "Couldn't move")
+
 	while y(state)[1] < cy:
-		state = moveM(state, North)
+		state, moved= moveM(state, North)
+		if not moved:
+			fatal(state, "Couldn't move")
+
 	return state
 
 def end_excursion(state):
 	excursion = state["excursions"].pop()
 	while excursion != []:
 		d = excursion.pop()
-		state = moveM(state, opposite(d), [Movement.REWIND_EXCURSION])
+		state, _ = moveM(state, opposite(d), [Movement.REWIND_EXCURSION])
 	return state

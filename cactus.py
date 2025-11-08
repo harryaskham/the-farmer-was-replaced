@@ -19,9 +19,9 @@ def swapM(state, d):
 	state, this = here(state)
 	state, that = neighbor_to(state, d)
 	if that == None:
-		return state
+		return pure(state, False)
 	swap(d)
-	return moveM(state, d)
+	return pure(state, True)
 
 def ordinal_neighbors(state):
 	state, [x, y] = xy(state)
@@ -69,11 +69,13 @@ def emplace_cactus(state, dirs=list(Dirs)):
 			cmp = swap_if(d, this, n)
 			state = info(state, ((x, y), d, this["cactus_size"], n["cactus_size"], cmp))
 			if cmp == True:
-				moved = True
-				done = False
-				state = swapM(state, d)
-				break
-			
+				state, swapped = swapM(state, d)
+				if swapped:
+					state, moved = moveM(state, d)
+					if moved:
+						done = False
+						break
+
 	state = end_excursion(state)
 	return pure(state, moved)
 

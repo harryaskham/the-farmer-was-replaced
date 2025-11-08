@@ -17,7 +17,6 @@ def __State__(self, flags=set()):
 	self["y"] = get_pos_y()
 	self["wh"] = get_world_size()
 	self["grid"] = mk_grid()
-	self["here"] = self["grid"][self["y"]][self["x"]]
 	self["ret"] = []
 	self["error"] = None
 	self["apple"] = None

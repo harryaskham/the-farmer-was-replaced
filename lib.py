@@ -2,6 +2,7 @@ from aliases import *
 from application import *
 from cell import *
 from conditional import *
+from compile import *
 from debug import *
 from dict import *
 from error import *

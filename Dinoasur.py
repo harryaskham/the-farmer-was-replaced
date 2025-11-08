@@ -1,1 +1,0 @@
-UPDATE_TAIL = "Dinosaur.UPDATE_TAIL"

@@ -8,6 +8,7 @@ import Companions
 import Dinosaur
 import Log
 import Mode
+import Movement
 import Phase
 import Size
 import Space

@@ -70,7 +70,7 @@ def maze(state, size=None):
 		if not moved:
 			if back == []:
 				break
-			state = moveM(state, back.pop())
+			state, _ = moveM(state, back.pop())
 			
 	state = move_to(state, start_pos)
 	return state

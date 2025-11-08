@@ -19,18 +19,20 @@ def brute(state):
 	[w, h] = [d, d]
 	while True:
 		state, [x, y] = xy(state)
+		moved_x = False
+		moved_y = False
 		if x == 0:
 			xd = East
-		if x == w - 1:
+		elif x == w - 1:
 			xd = West
 		if y == 0:
 			yd = North
-			state = moveM(state, xd)
+			state, moved_x = moveM(state, xd)
 		if y == h - 1:
 			yd = South
-			state = moveM(state, xd)
-		state = moveM(state, yd)
-		if xy(state)[1] == [x, y]:
+			state, moved_x = moveM(state, xd)
+		state, moved_y = moveM(state, yd)
+		if not moved_x and not moved_y:
 			return state
 
 def dumb(state):
@@ -76,7 +78,7 @@ def search_apple(state):
 			return state
 
 		for dir in path:
-			state = moveM(state, dir, [Dinosaur.UPDATE_TAIL])
+			state, _ = moveM(state, dir, [Dinosaur.UPDATE_TAIL])
 
 def dino(state, policies, delay=0):
 	for policy in policies:
