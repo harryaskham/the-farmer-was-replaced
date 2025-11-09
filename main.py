@@ -21,7 +21,11 @@ def main(state=None, flags=MAIN_FLAGS):
     
     if Mode.SIMULATE in flags:
         flags.remove(Mode.SIMULATE)
-        return sim.run_sim(flags)
+        if Mode.TEST in flags and Testing.LOOP in flags: 
+            while True:
+                sim.run_sim(flags)
+        else:
+            sim.run_sim(flags)
         
     if state == None:
         state = State.new(flags)

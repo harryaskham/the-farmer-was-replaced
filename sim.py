@@ -1,6 +1,7 @@
 from dict import *
 from aliases import *
 import flags
+from debug import *
 
 all_items = {}
 for i in Items:
@@ -21,6 +22,6 @@ def run_sim(main_flags=flags.MAIN_FLAGS, name="simulation", globals={}, speedup=
         seed,
         speedup)
         
-    quick_print("sim complete in " + str(t) + " seconds")
+    debug_("sim complete in " + str(t) + " seconds")
     
     return t

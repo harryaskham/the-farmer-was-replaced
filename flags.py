@@ -3,8 +3,9 @@ from aliases import *
 MAIN_FLAGS = set([
     Mode.SIMULATE,
     Mode.TEST,
+    Testing.LOOP,
     Log.DRONE_DETAILS,
-    Log.DEBUG,
+    Log.INFO,
     Size.NORMAL,
     Space.FILL,
     #Phase.COMPANIONS,
