@@ -76,6 +76,11 @@ def do(state, fs):
 def pure(state, x):
     return state, x
 
+def lift2(state, f, ma, mb):
+    state, a = dos(state, [ma])
+    state, b = dos(state, [mb])
+    return pure(state, f, a, b)
+
 def liftA2(state, f, ma, mb):
     state, a = dos(state, [ma])
     state, b = dos(state, [mb])

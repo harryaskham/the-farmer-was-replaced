@@ -8,8 +8,14 @@ def eq(state, a, b):
 def lte(state, a, b):
     return pure(state, a <= b)
 
-def orM(state, a, b):
-    return pure(state, a or b)
+def Or(a, b):
+    return a or b
+
+def And(a, b):
+    return a and b
+
+def Not(a):
+    return not a
     
 def mod(state, a, b):
     return pure(state, a % b)

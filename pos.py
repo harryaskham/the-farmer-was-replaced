@@ -69,16 +69,12 @@ def set_at(state, c, fields, flags=[]):
     for state in states:
         if (x, y) not in state["grid"]:
             if (x, y) in this_state["grid"]:
-                state["grid"][(x, y)] = this_state["grid"][(x, y)]
+                state["grid"][(x, y)] = mk_cell_state(x, y, this_state["grid"][(x, y)])
             else:
                 state["grid"][(x, y)] = mk_cell_state(x, y)
                 
-        if Copy.CELL in flags:
-            state["grid"][(x, y)] = merge(state["grid"][(x, y)], fields)
-        else:
-            for k in fields:
-                state["grid"][(x, y)][k] = fields[k]
-    
+        state["grid"][(x, y)] = merge(state["grid"][(x, y)], fields, None, Copy.CELL in flags)
+
     return states[0]
 
 def get_here(state, key=None):
