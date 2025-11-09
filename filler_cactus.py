@@ -5,23 +5,14 @@ from operators import *
 from filler_utils import *
 
 def cactus_swaps(state):
-    def exists_to(state, dir):
-        state, p = pos_to(state, dir)
-        return pure(state, p != None)
-
-    def noneM(state, x):
-        return pure(state, x == None)
-
-    def not_noneM(state, ma):
-        return pure(state, x != None)
 
     def f(state, dir, op):
         return dos(state, [
             [fmap,
                 [pair, dir],
-                [condM, [bind, [get_to, dir, "cactus_size"], [noneM]],
+                [condM, [bind, [get_to, dir, "cactus_size"], [lift1, is_none]],
                     [pure, None],
-                    [lift2, [op],
+                    [lift2, op,
                         [get_here, "cactus_size"],
                         [get_to, dir, "cactus_size"]
                     ]

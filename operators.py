@@ -2,22 +2,28 @@ from monad import *
 from trace import *
 from strings import *
 
+def lift1(state, f, a):
+    return pure(state, f(a))
+
+def lift2(state, f, a, b):
+    return pure(state, f(a, b))
+
 def EQ(state, a, b):
     return pure(state, a == b)
 
 eq = EQ
 
-def LT(state, a, b):
-    return pure(state, a < b)
+def LT(a, b):
+    return a < b
 
-def LTE(state, a, b):
-    return pure(state, a <= b)
+def LTE(a, b):
+    return a <= b
 
-def GT(state, a, b):
-    return pure(state, a > b)
+def GT(a, b):
+    return a > b
 
-def GTE(state, a, b):
-    return pure(state, a >= b)
+def GTE(a, b):
+    return a >= b
 
 def Or(a, b):
     return a or b
@@ -61,6 +67,12 @@ def fst(xs):
 
 def snd(xs):
     return xs[1]
+
+def is_none(x):
+    return x == None
+
+def is_not_none(x):
+    return not is_none(x)
 
 def fmap(state, f, ma):
     state, a = dos(state, [ma])

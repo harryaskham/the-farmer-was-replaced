@@ -2,6 +2,7 @@ from monad import *
 from aliases import *
 from cell import mk_cell_state
 from operators import flipM
+import test
 
 def top_right(state):
     state, d = wh(state)
@@ -50,7 +51,11 @@ def at(state, c):
 def here(state):
     state, c = xy(state)
     return at(state, c)
-    
+
+def exists_to(state, dir):
+    state, p = pos_to(state, dir)
+    return pure(state, p != None)
+
 def get_at(state, c, key=None):
     if c == None:
         return pure(state, None)
@@ -119,11 +124,25 @@ def pos_to(state, d, c=None):
     x, y = unpack(c)
     state, d = wh(state)
     if d == North and y < d - 1:
-        return pure(state, [x, y+1])
+        return pure(state, (x, y+1))
     if d == South and y > 0:
-        return pure(state, [x, y-1])
+        return pure(state, (x, y-1))
     if d == East and x < d - 1:
-        return pure(state, [x+1, y])
+        return pure(state, (x+1, y))
     if d == West and x > 0:
-        return pure(state, [x-1, y])
+        return pure(state, (x-1, y))
     return unit(state)
+
+def tests(state):
+    expect = test.mk_expect(state)
+
+    expect([xy], (0,0))
+    expect([ixy], (0,0))
+    expect([pos_to, North], (0, 1))
+    expect([pos_to, East], (1,0))
+    expect([pos_to, South], None)
+    expect([pos_to, West], None)
+    expect([get_here, "ground_type"], None)
+    expect([get_here, "entity_type"], None)
+    expect([get_at, (1,0), "entity_type"], None)
+    expect([get_at, (2,0), "entity_type"], None)
