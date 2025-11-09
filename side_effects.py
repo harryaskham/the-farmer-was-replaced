@@ -17,5 +17,7 @@ SIDE_EFFECTS = {
 		[toggle_infected],
 		[bind, [neighbors], [mapM, [toggle_infected]]]
 	]],
-	I.Water: [set_here, { "water": get_water() } ]
+	I.Water: [dos, [
+		[set_here, { "water": get_water() } ]
+	]]
 }

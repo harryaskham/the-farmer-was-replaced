@@ -36,13 +36,13 @@ def sense(state, flags=[]):
 
 	return do_(state, [
 		[cond, companion == None,
-		 [verbose, "no companion"],
-		 [dos, [
-			[debug, "companion/target"],
-			[debug, companion],
-			[bind, [at, companion[1]], [debug]],
-			[set_at, companion[1], {"companion": companion[0]}, [To.CHILDREN]],
-			[set_here, {"companion_at": companion[1]}, [To.CHILDREN]]
-		 ]]
+			[verbose, "no companion"],
+			[dos, [
+				[debug, "companion/target"],
+				[debug, companion],
+				[bind, [at, companion[1]], [debug]],
+				[set_at, companion[1], {"companion": companion[0]}, [To.CHILDREN]],
+				[set_here, {"companion_at": companion[1]}, [To.CHILDREN]]
+			]]
 		]
 	])

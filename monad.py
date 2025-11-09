@@ -95,9 +95,8 @@ def dos(state, xss):
 	v = None
 	for xs in xss:
 		if state["error"] != None:
-			fatal(state, ("Error in do-block:", state["error"]))
-			v = None
-			break
+			state = fatal(state, ("Error in do-block:", state["error"]))
+			return unit(state)
 				
 		state = debug(state, ("do", xs))
 			
@@ -107,13 +106,16 @@ def dos(state, xss):
 		out = aps(xs)
 		if out == None:
 			state_, v = state, None
-		elif "__type__" in out and state["__type__"] == "State":
+		elif "__type__" in out and out["__type__"] == "State":
 			state_, v = out, None
 		else:
+			if len(out) != 2:
+				state = fatal(state, ["Malformed state,v returned:", out])
+				return unit(state)
 			state_, v = out
 			if "__type__" not in state_ or state_["__type__"] != "State":
-				state = error(state, ["Malformed state returned:", state_, v])
-				continue
+				state = fatal(state, ["Malformed state returned:", state_, v])
+				return unit(state)
 				
 		state = state_
 				

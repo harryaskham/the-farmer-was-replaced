@@ -24,7 +24,7 @@ def flood(state, start, tail, tail_len):
 		if len(seen) == d * d:
 			return state, seen
 
-		ns = neighbors_dict(state, px, py)
+		state, ns = neighbors_dict(state, px, py)
 		for dir in ns:
 			[nx, ny] = ns[dir]
 			n_tup = (nx, ny)
@@ -114,7 +114,7 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
 		if p in tail_set:
 			continue
 
-		ns = neighbors_dict(state, px, py)
+		state, ns = neighbors_dict(state, px, py)
 		all_dirs = set([North, South, East, West])
 		dirs = []
 		if tx < px:

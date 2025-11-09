@@ -41,7 +41,7 @@ def maze(state, size=None):
 
 		[x, y] = xy(state)
 		seen.add((x, y))
-		ns = neighbors_dict(state)
+		state, ns = neighbors_dict(state)
 		moved = False
 		
 		ds = []

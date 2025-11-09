@@ -9,21 +9,20 @@ def pumpkin_died(state):
 		return can_harvest() or get_entity_type() == E.Dead_Pumpkin
 	while not done():
 		pass
+	return pure(state, not can_harvest())
+
+def plant_pumpkin(state, do_fertilize=True):
 	return dos(state, [
 		[sense],
-		[pure, not can_harvest()]
-	])
-		
-def plant_pumpkin(state, do_fertilize=True):
-	state, e = et(state)
-	if e == E.Pumpkin:
-		return state
-	return dos(state, [
-		[try_harvest, [E.Dead_Pumpkin]],
-		[cond, do_fertilize,
-			[plantM, E.Pumpkin],
-			[plant_one, E.Pumpkin]],
-		[whenM, [pumpkin_died], [plant_pumpkin, do_fertilize]]
+		[cleanup],
+		[water_to],
+		[plant_one, E.Pumpkin],
+		[when, do_fertilize, [dos, [
+			[fertilize],
+			[maybe_cure]
+		]]],
+		[whenM, [pumpkin_died], [plant_pumpkin, do_fertilize]],
+		[pure, True]
 	])
 
 def Pumpkin(state, x, y, box, otherwise, do_fertilize=True, do_harvest=True):

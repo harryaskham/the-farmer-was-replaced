@@ -38,7 +38,7 @@ def neighbors(state, cx=None, cy=None):
 		ns.append([cx, cy-1])
 	if cy < d - 1:
 		ns.append([cx, cy+1])
-	return ns
+	return pure(state, ns)
 	
 def neighbors_dict(state, cx=None, cy=None):
 	state, d = wh(state)
@@ -55,4 +55,4 @@ def neighbors_dict(state, cx=None, cy=None):
 		ns[South] = (cx, cy-1)
 	if cy < d - 1:
 		ns[North] = (cx, cy+1)
-	return ns
+	return pure(state, ns)

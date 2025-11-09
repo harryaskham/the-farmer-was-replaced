@@ -12,12 +12,13 @@ def fertilize(state, over=None, n=None):
 	if over == None or contains(over, e):
 		i = 0
 		while (
-			fertilizable(et(state))
+			fertilizable(et(state)[1])
 			and not can_harvest()
 			and (n == None or i < n)
 			and num_items(I.Fertilizer) > 0):
 			state = do_(state, [
-				[useM, I.Fertilizer]
+				[useM, I.Fertilizer],
+				[sense]
 			])
 			i += 1
 	return state

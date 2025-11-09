@@ -17,7 +17,8 @@ def filler_cactus(state):
 				one_result = result[(x, y)]
 				((planted, sorted), row) = one_result
 				if x == d - 1:
-					state["grid"][y] = row
+					for cell in row:
+						state["grid"][(x, y)] = cell
 				if planted or sorted:
 					all_done = False
 				

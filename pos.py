@@ -28,9 +28,6 @@ def gt(state):
 
 def at(state, c):
 	x, y = unpack(c)
-	state, d = wh(state)
-	if x < 0 or y < 0 or x >= d or y >= d:
-		return unit(state)
 	if (x, y) in state["grid"]:
 		return pure(state, state["grid"][(x, y)])
 	cell = mk_cell_state(x, y)

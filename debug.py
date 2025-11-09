@@ -40,16 +40,12 @@ def warn(state, msg):
 	return log(state, msg, Log.WARN, prefix)
 	
 def error(state, msg, level=Log.ERROR):
-	return dos(state, [
-		[throw, msg],
-		[log, msg, level]
-	])
+	state = throw(state, msg)
+	return log(state, msg, level)
 	
 def fatal(state, msg):
-	return dos(state, [
-		[error, msg, Log.FATAL],
-		[terminate]
-	])
+	state = error(state, msg, Log.FATAL)
+	return terminate(state)
 	
 def verbose(state, msg, prefix=None):
 	return log(state, msg, Log.VERBOSE, prefix)

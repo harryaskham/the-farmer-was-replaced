@@ -9,5 +9,7 @@ def water_to(state, min=WATER_RANGE[0], max=WATER_RANGE[1], over=None):
 			max = min
 		if get_water() < min:
 			while get_water() < max:
-				state = useM(state, I.Water)
+				state = do_(state, [
+					[useM, I.Water]
+				])
 	return state
