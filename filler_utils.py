@@ -69,10 +69,10 @@ def fill_rows(state, f, handler=None, n=None):
     results[state["id"]] = results0
     return handler(state, results)
 
-def fill_rowsM(state, f, handler):
+def fill_rowsM(state, f, handler, n=None):
         def h(state, results):
                 return dos(state, [
                         [pushret, results],
                         handler
                 ])
-        return fill_rows(state, f, h)
+        return fill_rows(state, f, h, n)

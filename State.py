@@ -29,7 +29,7 @@ def __State__(self, flags=set()):
     self["drone_return"] = {}
     self["treasure"] = None
     self["excursions"] = []
-    
+
     debug_(("self", self))
     
 def State__put(state, kvs, flags=[]):

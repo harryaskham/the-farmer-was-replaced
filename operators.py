@@ -2,11 +2,22 @@ from monad import *
 from trace import *
 from strings import *
 
-def eq(state, a, b):
+def EQ(state, a, b):
     return pure(state, a == b)
 
-def lte(state, a, b):
+eq = EQ
+
+def LT(state, a, b):
+    return pure(state, a < b)
+
+def LTE(state, a, b):
     return pure(state, a <= b)
+
+def GT(state, a, b):
+    return pure(state, a > b)
+
+def GTE(state, a, b):
+    return pure(state, a >= b)
 
 def Or(a, b):
     return a or b
@@ -53,5 +64,9 @@ def snd(xs):
 
 def fmap(state, f, ma):
     state, a = dos(state, [ma])
-    fa = f(a)
-    return pure(state, fa)
+    f = list(f)
+    fa = fa.insert(0, a)
+    b = aps(fa)
+    return pure(state, b)
+
+
