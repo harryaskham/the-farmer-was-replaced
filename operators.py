@@ -64,7 +64,7 @@ def snd(xs):
 
 def fmap(state, f, ma):
     state, a = dos(state, [ma])
-    f = list(f)
+    fa = list(f)
     fa = fa.insert(0, a)
     b = aps(fa)
     return pure(state, b)

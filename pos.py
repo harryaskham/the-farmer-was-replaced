@@ -38,6 +38,8 @@ def get_to(state, dir, key=None):
         
 
 def at(state, c):
+    if c == None:
+        return pure(state, None)
     x, y = unpack(c)
     if (x, y) in state["grid"]:
         return pure(state, state["grid"][(x, y)])
@@ -50,12 +52,19 @@ def here(state):
     return at(state, c)
     
 def get_at(state, c, key=None):
+    if c == None:
+        return pure(state, None)
+
     if key == None:
         return at(state, c)
-    else:
-        state, xs = at(state, c)
-        return pure(state, xs[key])
-    
+
+    state, xs = at(state, c)
+
+    if xs == None or key not in xs:
+        return pure(state, None)
+
+    return pure(state, xs[key])
+
 def set_at(state, c, fields, flags=[]):
     this_state = state
     flags = set(flags)

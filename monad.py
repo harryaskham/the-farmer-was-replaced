@@ -12,6 +12,10 @@ def popret(state):
     v = state["ret"].pop()
     return state, v
 
+def peekret(state):
+    v = state["ret"][-1]
+    return state, v
+
 def clearret(state):
     ret = list(state["ret"])
     state["ret"] = []

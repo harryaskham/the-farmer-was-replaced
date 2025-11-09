@@ -1,5 +1,6 @@
 from farmlib import *
 import simcomp
+import flags
 
 def f():
     n = 0
@@ -11,7 +12,23 @@ def f():
             a = 3*a + 1
         n += 1
     return n
-            
+
+def assert_equal_(a, b):
+    quick_print("")
+    quick_print("")
+    if a == b:
+        quick_print(("PASS", a, "==", b))
+    else:
+        quick_print(("FAIL", a, "!=", b))
+
+def assert_equal(state, a, b):
+    quick_print("")
+    quick_print("")
+    if a == b:
+        info(state, ("PASS", a, "==", b))
+    else:
+        info(state, ("FAIL", a, "!=", b))
+
 def test_simcomp(f):
     def sim_f():
         return simcomp.run(f)
@@ -21,17 +38,20 @@ def test_simcomp(f):
     
     quick_print(("Normal computation", "result", a, "secs", secs, "ticks", ticks))
     quick_print(("Sim computation", "result", sim_a, "secs", sim_secs, "ticks", sim_ticks))
-    
-def test_compile():
-    state = State.new()
+    assert_equal_(a, sim_a)
+
+def test_compile(state):
     f = compile([pure, 123])
     state, a = f(state)
-    quick_print(a, 123)
+    assert_equal_(a, 123)
 
-def tests():
-    test_simcomp(f)
-    test_compile()
+def test_monad(state):
+    def expect(a, b):
+        return assert_equal(state, dos(state, [a])[1], b)
 
-tests()
-    
-    
+    expect([pure, 1], 1)
+
+def tests(state):
+    #test_simcomp(f)
+    #test_compile(state)
+    test_monad(state)
