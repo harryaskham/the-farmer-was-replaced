@@ -4,7 +4,7 @@ MAIN_FLAGS = set([
     Mode.SIMULATE,
     Log.DRONE_DETAILS,
     Log.DEBUG,
-    Size.SMALL,
+   # Size.SMALL,
     #Phase.COMPANIONS,
     #Phase.CROPS,
     #Phase.CARROTS,
