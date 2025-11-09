@@ -74,7 +74,7 @@ def set_box_harvested(state, box):
     [x0, y0, w, h] = box
     for y in range(y0, y0 + h):
         for x in range(x0, x0 + w):
-            state = set_at(state, [x, y], {
+            state = set_at(state, (x, y), {
                 "entity_type": None
             })
     return state        

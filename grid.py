@@ -12,7 +12,7 @@ def coords(box):
     [x0, y0, w, h] = box
     for x in range(x0, x0+w):
         for y in range(y0, y0+h):
-            cs.append([x, y])
+            cs.append((x, y))
     return cs
     
 def corner(box, dir):

@@ -8,7 +8,7 @@ from cactus import *
 
 def get_row(state):
     state, d = wh(state)
-    state, [x, y] = xy(state)
+    state, (x, y) = xy(state)
     cs = []
     for x in range(d):
         state, c = at(state, (x, y))

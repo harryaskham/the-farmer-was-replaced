@@ -18,7 +18,7 @@ def brute(state):
     state, d = wh(state)
     [w, h] = [d, d]
     while True:
-        state, [x, y] = xy(state)
+        state, (x, y) = xy(state)
         moved_x = False
         moved_y = False
         if x == 0:
@@ -43,7 +43,7 @@ def dumb(state):
             return state
     
         (ax, ay) = state["apple"]
-        state, [x, y] = xy(state)
+        state, (x, y) = xy(state)
         
         ds = []
         if x > ax:

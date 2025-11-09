@@ -26,7 +26,7 @@ def moveM(state, d, flags=[]):
 
 def move_bounded(state, dir, flags=[]):
     flags = set(flags)
-    state, [x, y] = xy(state)
+    state, (x, y) = xy(state)
     state, d = wh(state)
     if x == d-1 and dir == East:
         return pure(state, False)

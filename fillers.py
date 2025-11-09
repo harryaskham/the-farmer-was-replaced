@@ -22,7 +22,7 @@ def filler_maze(state, num_drones=16):
     for y in range(n//2, n//2 + n * (d // n), n):
         for x in range(n//2, n//2 + n * (d // n), n):
             ps.append([dos, [
-                [move_to, [x, y]],
+                [move_to, (x, y)],
                 [wait_secsM, 5],
                 [boxloop, [x, y, 1, 1], [maze, n]]
             ]])
@@ -63,7 +63,7 @@ def filler_energy(state):
         cs = []
         for y in range(0, d, gap+1):
             for x in range(0, d, gap+1):
-                cs.append([x, y])
+                cs.append((x, y))
                 if len(cs) == n:
                     break
             if len(cs) == n:

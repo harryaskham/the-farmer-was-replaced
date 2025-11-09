@@ -20,7 +20,7 @@ def Checker(state, x, y, f=[], g=[]):
         return dos(state, [g])
         
 def Checker3(state, f=[], g=[], h=[]):
-    state, [x, y] = xy(state)
+    state, (x, y) = xy(state)
     m = (x + y) % 3
     if m == 0:
         return dos(state, [f])

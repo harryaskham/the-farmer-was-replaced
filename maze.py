@@ -39,7 +39,7 @@ def maze(state, size=None):
             state = try_harvest(state, [E.Treasure])
             break
 
-        [x, y] = xy(state)
+        (x, y) = xy(state)
         seen.add((x, y))
         state, ns = neighbors_dict(state)
         moved = False
@@ -63,7 +63,7 @@ def maze(state, size=None):
             if n in seen:
                 continue
             state = moveM(state, d)
-            if xy(state) != [x, y]:
+            if xy(state) != (x, y):
                 moved = True
                 back.append(opposite(d))
                 break

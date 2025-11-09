@@ -24,7 +24,7 @@ def swapM(state, d):
     return pure(state, True)
 
 def ordinal_neighbors(state):
-    state, [x, y] = xy(state)
+    state, (x, y) = xy(state)
     return pure(state, {
         West: get_at(state, [x-1,y])[1],
         South: get_at(state, [x,y-1])[1],
@@ -52,7 +52,7 @@ def emplace_cactus(state, dirs=list(Dirs)):
     moved = False
     while not done:
         state = sense(state, [Sensing.DIRECTIONAL])
-        state, [x, y] = xy(state)
+        state, (x, y) = xy(state)
         state, this = here(state)
         state, ns = ordinal_neighbors(state)
         
