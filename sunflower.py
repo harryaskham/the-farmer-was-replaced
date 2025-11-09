@@ -41,7 +41,7 @@ def boost_box(state, box, num_flowers=10, boosts=10, force=False, do_fertilize=T
                 break
         if i == num_flowers:
             break
-    state, [hx, hy] = xy(state)
+    state, (hx, hy) = xy(state)
     if (hx, hy) in flowers:
         return Sunflower(state, 7, 7, force, do_fertilize)
     else:

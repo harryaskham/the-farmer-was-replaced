@@ -31,13 +31,13 @@ def neighbors(state, cx=None, cy=None):
         state, cy = y(state)
     ns = []
     if cx > 0:
-        ns.append([cx-1, cy])
+        ns.append((cx-1, cy))
     if cx < d - 1:
-        ns.append([cx+1, cy])
+        ns.append((cx+1, cy))
     if cy > 0:
-        ns.append([cx, cy-1])
+        ns.append((cx, cy-1))
     if cy < d - 1:
-        ns.append([cx, cy+1])
+        ns.append((cx, cy+1))
     return pure(state, ns)
     
 def neighbors_dict(state, cx=None, cy=None):

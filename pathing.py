@@ -26,7 +26,7 @@ def flood(state, start, tail, tail_len):
 
         state, ns = neighbors_dict(state, px, py)
         for dir in ns:
-            [nx, ny] = ns[dir]
+            (nx, ny) = ns[dir]
             n_tup = (nx, ny)
             if n_tup in seen:
                 continue
@@ -56,13 +56,13 @@ def poor_accessible(state, c, start, tail, tail_set, tail_len):
 
 
 def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len=None):
-    state = debug(state, ("path_to", "at", xy(state), "apple", state["apple"], "c", c, "check", check, "tail", tail, "tlen", tail_len))
+    state = debug(state, ("path_to", "at", xy(state)[1], "apple", state["apple"], "c", c, "check", check, "tail", tail, "tlen", tail_len))
     state, d = wh(state)
-    [tx, ty] = c
+    tx, ty = unpack(c)
     c_tup = (tx, ty)
 
     def h(c):
-        [cx, cy] = c
+        cx, cy = unpack(c)
         return abs(tx - cx) + abs(ty - cy)
 
     seen = set()
@@ -135,7 +135,7 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
         for dir in dirs:
             if dir not in ns:
                 continue
-            [nx, ny] = ns[dir]
+            (nx, ny) = ns[dir]
             n_tup = (nx, ny)
             if n_tup in seen:
                 continue
