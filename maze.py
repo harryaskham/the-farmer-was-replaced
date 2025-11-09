@@ -19,7 +19,7 @@ def maze_many(state, size=None):
     return maze(state, size)
 
 def maze(state, size=None):
-    start_pos = xy(state)
+    state, start_pos = xy(state)
     state = sense(state)
     if et(state) not in [E.Hedge, E.Treasure]:
         if size == None:
