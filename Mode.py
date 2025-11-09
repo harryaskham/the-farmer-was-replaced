@@ -1,1 +1,2 @@
 SIMULATE = "Mode.SIMULATE"
+TEST = "Mode.TEST"

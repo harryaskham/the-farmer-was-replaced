@@ -2,6 +2,7 @@ from farmlib import *
 from mains import *
 from progs import *
 import sim
+import test
 
 def init(state):
     return dos(state, [
@@ -24,6 +25,9 @@ def main(state=None, flags=MAIN_FLAGS):
         
     if state == None:
         state = State.new(flags)
+        
+    if Mode.TEST in flags:
+        return test.tests(state)
         
     return dos(state, [
         [init],
