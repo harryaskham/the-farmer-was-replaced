@@ -2,7 +2,7 @@ from farmlib import *
 from mains import *
 from progs import *
 import sim
-import test
+import run_tests
 
 def init(state):
     return dos(state, [
@@ -31,7 +31,7 @@ def main(state=None, flags=MAIN_FLAGS):
         state = State.new(flags)
         
     if Mode.TEST in flags:
-        return test.tests(state)
+        return run_tests.run(state)
         
     return dos(state, [
         [init],

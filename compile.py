@@ -22,3 +22,11 @@ def lift(func):
             fn.append(arg)
         return pure(state, aps(fn))
     return p
+
+
+def tests(state):
+    expect = test.mk_expect(state)
+
+    f = compile([pure, 123])
+    state, a = f(state)
+    return expect(a, 123)

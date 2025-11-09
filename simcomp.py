@@ -31,3 +31,27 @@ def run(f, encode=encoder, decode=decoder):
     r = decode(e, speedup)
     return r    
     
+
+def tests(state):
+    expect = test.mk_expect(state)
+
+    def f():
+        n = 0
+        a = 3498103
+        while a != 1:
+            if a % 2 == 0:
+                a = a / 2
+            else:
+                a = 3*a + 1
+            n += 1
+        return n
+
+    def sim_f():
+        return run(f)
+
+    a, secs, ticks = time_f(f)
+    sim_a, sim_secs, sim_ticks = time_f(sim_f)
+
+    debug(state, ("Normal computation", "result", a, "secs", secs, "ticks", ticks))
+    debug(state, ("Sim computation", "result", sim_a, "secs", sim_secs, "ticks", sim_ticks))
+    expect(state, a, sim_a)
