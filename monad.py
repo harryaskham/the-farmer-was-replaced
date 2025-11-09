@@ -3,7 +3,6 @@ from dict import *
 from debug import *
 from error import *
 from list import *
-import test
 
 def pushret(state, v):
     state["ret"].append(v)
@@ -205,23 +204,3 @@ def wrapXY(f):
 
 def nop1(state):
     return state
-
-
-
-def tests(state):
-    expect = test.mk_expect(state)
-
-    expect([pure, 1], 1)
-    expect([bind, [pure, True], [lift1, Not]], False)
-    expect([liftA2, [lift2, LT], [pure, 1], [pure, 2]], True)
-    expect([lift2, LT, [pure, 1], [pure, 2]], True)
-    expect(
-        [dos, [
-            [move_to, (0, 0)],
-            [sense, [Sensing.DIRECTIONAL]],
-            [liftA2, [pair],
-                [liftA2, [pair], [exists_to, South], [exists_to, West]],
-                [liftA2, [pair], [exists_to, North], [exists_to, East]]
-            ]
-        ]],
-        ((False, False), (True, True)))

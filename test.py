@@ -14,5 +14,6 @@ def assert_equal(state, a, b, msg=None):
 
 def mk_expect(state):
     def expect(a, b):
-        return assert_equal(state, dos(state, [a])[1], b, ("Expect:", a, "->", b))
+        actual = dos(state, [a])
+        return assert_equal(state, actual[1], b, ("Expect:", a, "->", b))
     return expect

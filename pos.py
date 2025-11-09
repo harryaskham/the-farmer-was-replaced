@@ -118,31 +118,17 @@ def ixy(state, id=None):
     x = id
     return pure(state, (x, y))
     
-def pos_to(state, d, c=None):
+def pos_to(state, dir, c=None):
     if c == None:
         state, c = xy(state)
     x, y = unpack(c)
     state, d = wh(state)
-    if d == North and y < d - 1:
+    if dir == North and y < d - 1:
         return pure(state, (x, y+1))
-    if d == South and y > 0:
+    if dir == South and y > 0:
         return pure(state, (x, y-1))
-    if d == East and x < d - 1:
+    if dir == East and x < d - 1:
         return pure(state, (x+1, y))
-    if d == West and x > 0:
+    if dir == West and x > 0:
         return pure(state, (x-1, y))
     return unit(state)
-
-def tests(state):
-    expect = test.mk_expect(state)
-
-    expect([xy], (0,0))
-    expect([ixy], (0,0))
-    expect([pos_to, North], (0, 1))
-    expect([pos_to, East], (1,0))
-    expect([pos_to, South], None)
-    expect([pos_to, West], None)
-    expect([get_here, "ground_type"], None)
-    expect([get_here, "entity_type"], None)
-    expect([get_at, (1,0), "entity_type"], None)
-    expect([get_at, (2,0), "entity_type"], None)

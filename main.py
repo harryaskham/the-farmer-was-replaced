@@ -18,21 +18,31 @@ def init(state):
 
 def main(state=None, flags=MAIN_FLAGS):
     flags = set(flags)
-    
+
+    do_sim = False
     if Mode.SIMULATE in flags:
         flags.remove(Mode.SIMULATE)
-        if Mode.TEST in flags and Testing.LOOP in flags: 
-            while True:
-                sim.run_sim(flags)
-        else:
-            sim.run_sim(flags)
-        
+        do_sim = True
+
+    if Mode.TEST not in flags:
+        sim.run_sim(flags)
+
     if state == None:
         state = State.new(flags)
-        
+
+    def do_tests():
+        if do_sim:
+            sim.run_sim(flags)
+        else:
+            run_tests.run(state)
+
     if Mode.TEST in flags:
-        return run_tests.run(state)
-        
+        if Testing.LOOP in flags:
+            while True:
+                do_tests()
+        else:
+            return do_tests()
+
     return dos(state, [
         [init],
         [when, Phase.PURGE in flags, [dos, [
@@ -82,6 +92,3 @@ def main(state=None, flags=MAIN_FLAGS):
             ]]]
         ]]]
     ])
-
-if __name__ == "__main__":
-    main()
