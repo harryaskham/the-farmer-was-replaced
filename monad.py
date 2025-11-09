@@ -7,11 +7,11 @@ from list import *
 def pushret(state, v):
     state["ret"].append(v)
     return state
-    
+
 def popret(state):
     v = state["ret"].pop()
     return state, v
-    
+
 def clearret(state):
     ret = list(state["ret"])
     state["ret"] = []
@@ -30,17 +30,17 @@ def when(state, p, xs):
     if p:
         return dos(state, [xs])
     return unit(state)
-    
+
 def whenM(state, ps, xs):
     state, p = dos(state, [ps])
     return when(state, p, xs)
-    
+
 def cond(state, c, a, b):
     if c:
         return dos(state, [a])
     else:
         return dos(state, [b])
-    
+
 def condM(state, mc, a, b):
     state, c = dos(state, [mc])
     return cond(state, c, a, b)
@@ -72,14 +72,14 @@ def do(state, fs):
         state_ = aps(xs)
         state = merge(state, state_)
     return state
-    
+
 def pure(state, x):
     return state, x
 
 def lift2(state, f, ma, mb):
     state, a = dos(state, [ma])
     state, b = dos(state, [mb])
-    return pure(state, f, a, b)
+    return pure(state, f(a, b))
 
 def liftA2(state, f, ma, mb):
     state, a = dos(state, [ma])
@@ -89,26 +89,33 @@ def liftA2(state, f, ma, mb):
     f.append(b)
     return dos(state, [f])
 
+def sequence(state, ms):
+    vs = []
+    for m in ms:
+        state, v = dos(state, [m])
+        vs.append(v)
+    return pure(state, vs)
+
 def unit(state):
     return pure(state, None)
-    
+
 def dos(state, xss):
     state = debug(state, ("dos", xss))
-    
+
     if xss == []:
         return unit(state)
-        
+
     v = None
     for xs in xss:
         if state["error"] != None:
             state = fatal(state, ("Error in do-block:", state["error"]))
             return unit(state)
-                
+
         state = debug(state, ("do", xs))
-            
+
         xs = list(xs)
         xs.insert(1, state)
-        
+
         out = aps(xs)
         if out == None:
             state_, v = state, None
@@ -122,14 +129,14 @@ def dos(state, xss):
             if "__type__" not in state_ or state_["__type__"] != "State":
                 state = fatal(state, ["Malformed state returned:", state_, v])
                 return unit(state)
-                
+
         state = state_
-                
+
     return state, v
-    
+
 def do_(state, xss):
     return dos(state, xss)[0]
-    
+
 def chain(xss):
     head = list(xss[0])
     if len(xss) == 1:
@@ -155,10 +162,10 @@ def bind(state, ma, f):
     fa = list(f)
     fa.append(a)
     return dos(state, [fa])
-    
+
 def then(state, g, f):
     return bind(state, f, g)
-    
+
 def mapM(state, f, xs):
     xss = []
     for x in xs:
@@ -166,10 +173,10 @@ def mapM(state, f, xs):
         fx.append(x)
         xss.append(fx)
     return dos(state, xss)
-    
+
 def forM(state, xs, f):
     return mapM(state, f, xs)
-            
+
 def runSXY(state, f):
     f = list(f)
     f.insert(1, state["y"])

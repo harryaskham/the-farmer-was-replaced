@@ -24,4 +24,6 @@ from util import *
 import State
 set_state = State.put
 
+import Map
+
 import Type
