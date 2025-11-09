@@ -4,6 +4,12 @@ from strings import *
 
 def eq(state, a, b):
     return pure(state, a == b)
+
+def lte(state, a, b):
+    return pure(state, a <= b)
+
+def orM(state, a, b):
+    return pure(state, a or b)
     
 def mod(state, a, b):
     return pure(state, a % b)

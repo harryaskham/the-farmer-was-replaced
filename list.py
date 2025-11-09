@@ -1,5 +1,10 @@
 from debug import *
 
+def cons(x, xs):
+    xs = list(xs)
+    xs.insert(0, x)
+    return xs
+
 def contains(xs, x):
     for x_ in xs:
         if x == x_:

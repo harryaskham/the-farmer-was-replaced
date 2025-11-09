@@ -1,6 +1,7 @@
 from monad import *
 from aliases import *
 from cell import mk_cell_state
+from operators import flipM
 
 def top_right(state):
     state, d = wh(state)
@@ -19,12 +20,8 @@ def y(state):
 def xy(state):
     state, sx = x(state)
     state, sy = y(state)
-    return pure(state, [sx, sy])
+    return pure(state, (sx, sy))
 
-def xy_tup(state):
-    state, [x, y] = xy(state)
-    return pure(state, (x, y))
-    
 def wh(state):
     return pure(state, state["wh"])
 
@@ -36,7 +33,7 @@ def gt(state):
 
 def get_to(state, dir, key=None):
     return dos(state, [
-        [bind, [pos_to, dir], [flipM, [get_at, key]]]
+        [bind, [pos_to, dir], [flipM, get_at, key]]
     ])
         
 

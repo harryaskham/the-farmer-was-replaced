@@ -65,13 +65,13 @@ def dumb(state):
             return state
 
 def apple_here(state):
-    return set_state(state, { "apple": xy(state) })
+    return set_state(state, { "apple": xy(state)[1] })
     
 def search_apple(state):
     while True:
         state = sense(state)
         state["tail_len"] += 1
-        state = debug(state, ["apple", state["apple"], "len", state["tail_len"], "pos", xy_tup(state)[1]], 2, "search")
+        state = debug(state, ["apple", state["apple"], "len", state["tail_len"], "pos", xy(state)[1]], 2, "search")
         #state, path = path_to(state, state["apple"])
         state, path = path_to(state, state["apple"], False)
         if path == None:

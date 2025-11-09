@@ -34,3 +34,9 @@ def getattr(xs, key, default=None):
 def setattr(xs, key, value):
     xs[key] = value
     return xs
+
+def collect(kvs):
+    xs = {}
+    for k, v in kvs:
+        xs[k] = v
+    return xs

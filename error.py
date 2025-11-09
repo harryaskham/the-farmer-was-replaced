@@ -1,3 +1,5 @@
+from terminate import *
+
 def throw(state, msg):
     state["error"] = msg
     return state
@@ -12,11 +14,3 @@ def catch(state, f):
 def has_error(state):
     return pure(state, state["error"] != None)
 
-def terminate(state):
-    quick_print("Terminating with state:")
-    quick_print(state)
-    return terminate_()
-    
-def terminate_():
-    quick_print("Terminating")
-    return TERMINATE

@@ -4,8 +4,8 @@ from sense import *
 
 def moveM(state, d, flags=[]):
     flags = set(flags)
-    state, prev = xy_tup(state)
-    
+    state, prev = xy(state)
+
     if not move(d):
         return pure(state, False)
 
@@ -21,9 +21,9 @@ def moveM(state, d, flags=[]):
                 state["tail_set"].remove(state["tail"][0])
             state["tail"] = state["tail"][1:]
         state["tail_set"].add(prev)
-        
+
     return pure(state, True)
-    
+
 def move_bounded(state, dir, flags=[]):
     flags = set(flags)
     state, [x, y] = xy(state)

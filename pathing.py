@@ -12,7 +12,7 @@ def flood(state, start, tail, tail_len):
         state = debug(state, ("search state", st))
         (p, tail, tail_set) = st
         (px, py) = p
-        
+
         accessible.add(p)
 
         if p in tail_set:
@@ -20,7 +20,7 @@ def flood(state, start, tail, tail_len):
         if p in seen:
             continue
         seen.add(p)
-        
+
         if len(seen) == d * d:
             return state, seen
 
@@ -30,7 +30,7 @@ def flood(state, start, tail, tail_len):
             n_tup = (nx, ny)
             if n_tup in seen:
                 continue
-            
+
             next_tail = list(tail)
             next_tail_set = set(tail_set)
             next_tail.append(p)
@@ -39,35 +39,35 @@ def flood(state, start, tail, tail_len):
                 if next_tail[0] in next_tail_set:
                     next_tail_set.remove(next_tail[0])
                 next_tail = next_tail[1:]
-                    
+
             if n_tup in next_tail_set:
                 continue
 
             next_st = ((nx, ny), next_tail, next_tail_set)
             q.append(next_st)
             state = verbose(state, ("next state", next_st))
-            
+
         state = verbose(state, ("q len", len(q)))
-            
+
     return state, seen
 
 def poor_accessible(state, c, start, tail, tail_set, tail_len):
     return path_to(state, c, False, start, tail, tail_set, tail_len)
-        
+
 
 def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len=None):
     state = debug(state, ("path_to", "at", xy(state), "apple", state["apple"], "c", c, "check", check, "tail", tail, "tlen", tail_len))
     state, d = wh(state)
     [tx, ty] = c
     c_tup = (tx, ty)
-    
+
     def h(c):
         [cx, cy] = c
         return abs(tx - cx) + abs(ty - cy)
-    
+
     seen = set()
     if start == None:
-        start = xy_tup(state)
+        state, start = xy(state)
     if tail == None:
         tail = state["tail"]
     if tail_set == None:
@@ -81,10 +81,10 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
 
         (p, tail, tail_set, path) = st
         (px, py) = p
-        
+
         state = debug(state, ("search at", p))
         state = verbose(state, ("search state", st))
-        
+
         if p == c_tup:
             #state, accessible = flood(state, p, tail, tail_len + 1)
             #state = debug(state, ["found path leaving accessible", len(accessible), "of", d * d, "wanting", d * d - (tail_len + 1), "at", p, "tail", tail], 2, "search")
@@ -99,14 +99,14 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
                     state = debug(state, ("found path to", target, "from", p, p2c))
                 if not good:
                     continue
-                    
+
             state = debug(state, ("found path to target", c, "from", start, path))
             return state, path
             #if len(accessible) == d * d:
             #    return state, path
             #else:
             #    continue
-        
+
         if p in seen:
             continue
         seen.add(p)
@@ -131,7 +131,7 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
             all_dirs.remove(North)
         for dir in all_dirs:
             dirs.append(dir)
-            
+
         for dir in dirs:
             if dir not in ns:
                 continue
@@ -140,7 +140,7 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
             if n_tup in seen:
                 continue
 
-                        
+
             next_tail = list(tail)
             next_tail_set = set(tail_set)
             next_tail.append(p)
@@ -149,21 +149,20 @@ def path_to(state, c, check=True, start=None, tail=None, tail_set=None, tail_len
                 if next_tail[0] in next_tail_set:
                     next_tail_set.remove(next_tail[0])
                 next_tail = next_tail[1:]
-                    
+
             if n_tup in next_tail_set:
                 continue
-                
+
             next_path = list(path)
             next_path.append(dir)
-            
+
             #if p == state["apple"] and len(next_path) < tail_len:
             #    continue
-            
+
             next_st = ((nx, ny), next_tail, next_tail_set, next_path)
             q.append(next_st)
             state = verbose(state, ("next state", next_st))
-            
+
         state = verbose(state, ("q len", len(q)))
-            
+
     return state, None
-    

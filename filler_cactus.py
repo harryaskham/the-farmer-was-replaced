@@ -5,40 +5,54 @@ from filler_utils import *
 
 def filler_cactus(state):
 
-    def pred(state, dir):
+    def swap_dir(state):
+        def f(state, dir, op):
+            return dos(state, [
+                [liftA2, [pair],
+                    [pure, dir],
+                    [liftA2, [op],
+                        [get_here, "cactus_size"],
+                        [get_to, dir, "cactus_size"]
+                    ]]
+            ])
+
         return dos(state, [
             [sense, [Sensing.DIRECTIONAL]],
-            [liftA2, [pair],
-                [pure, dir],
-                [liftA2, [lte],
-                    [get_here, "cactus_size"],
-                    [get_to, dir, "cactus_size"]]]
+            [bind,
+                [liftA2, [cons],
+                    [f, South, lte],
+                    [bind, [f, West, lte], [flip, cons, []]]],
+                [collect]]
         ])
-
-    def pred(state, dir):
-        state, c = xy(state)
-        state, a = get_at(state, c, "cactus_size")
-        state, n = pos_to(state, dir, c)
-        state, b = get_at(state, n, "cactus_size")
-        return pure(state, a >= b)
 
     return fill_row(
         state,
         [dos, [
             [sense],
             [plant_one, E.Cactus],
-            [bind, [box], [emplace_cactus]],
-            [get_row]
+            [whileM,
+                [liftA2, [orM],
+                    [bind, [swap_dir], [getattr, West]],
+                    [bind, [swap_dir], [getattr, South]]
+                ],
+                [dos, [
+                    [condM, [bind, [swap_dir], [getattr, West]],
+                        [dos, [
+                            [swapM, West],
+                            [moveM, West],
+                        ]],
+                        [whenM, [bind, [swap_dir], [getattr, South]],
+                            [dos, [
+                                [swapM, West],
+                                [moveM, West],
+                            ]],
+                        ]
+                    ],
+                    [get_row]
+                ]]
+            ]
         ]],
         [dos, [
-            [bind, [popret], [merge_row]],
-            [bind, [top_right], [move_to]],
-            [sense],
-            [start_excursion],
-            [whileM, [pred, West], [dos, [
-                [swapM, West],
-                [moveM, West],
-            ]]],
-            [end_excursion]
+            [bind, [popret], [merge_row]]
         ]]
     )
