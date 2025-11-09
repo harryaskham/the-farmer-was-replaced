@@ -1,37 +1,38 @@
 from aliases import *
 
 MAIN_FLAGS = set([
-	#Mode.SIMULATE, Log.DRONE_DETAILS,
-	#Log.DEBUG,
-	#Size.SMALL,
-	#Phase.COMPANIONS,
-	#Phase.CROPS,
-	#Phase.CARROTS,
-	Phase.CACTUS,
-	#Phase.PUMPKIN,
-	#Phase.ENERGY,
-	#Phase.DINO,
-	#Phase.FLIPS,
-	Space.FILL,
+    Mode.SIMULATE,
+    Log.DRONE_DETAILS,
+    Log.DEBUG,
+    Size.SMALL,
+    #Phase.COMPANIONS,
+    #Phase.CROPS,
+    #Phase.CARROTS,
+    Phase.CACTUS,
+    #Phase.PUMPKIN,
+    #Phase.ENERGY,
+    #Phase.DINO,
+    #Phase.FLIPS,
+    Space.FILL,
 ])
 
 WATER_RANGE = (0.75, 1.0)
 WATER_BEFORE = [
-	E.Pumpkin,
-	E.Sunflower
+    E.Pumpkin,
+    E.Sunflower
 ]
 ALWAYS_HARVEST = [
-	E.Grass,
-	E.Tree,
-	E.Carrot,
-	E.Bush
+    E.Grass,
+    E.Tree,
+    E.Carrot,
+    E.Bush
 ]
 HARVEST_FLAGS = [
-	Companions.RESERVE
+    Companions.RESERVE
 ]
 FERTILIZE = {
-	"entities": ALWAYS_HARVEST,
-	"repeats": 0
+    "entities": ALWAYS_HARVEST,
+    "repeats": 0
 }
 BOOSTS = 3
 

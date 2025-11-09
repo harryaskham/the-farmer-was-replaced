@@ -1,3 +1,3 @@
 def hatM(state, hat):
-	change_hat(hat)
-	return state
+    change_hat(hat)
+    return state

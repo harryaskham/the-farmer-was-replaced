@@ -3,7 +3,7 @@ SMALL = "Size.SMALL"
 NORMAL = "Size.NORMAL"
 
 Sizes = {
-	TINY: 4,
-	SMALL: 8,
-	NORMAL: get_world_size()
+    TINY: 4,
+    SMALL: 8,
+    NORMAL: get_world_size()
 }

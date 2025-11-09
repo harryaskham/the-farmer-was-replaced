@@ -8,86 +8,86 @@ import Size
 import Type
 
 def __State__(self, flags=set()):
-	debug_(("__init__", self, flags))
-	self["flags"] = set(flags)
-	self["id"] = 0
-	self["i"] = 0
-	self["x"] = get_pos_x()
-	self["y"] = get_pos_y()
-	self["wh"] = get_world_size()
-	self["grid"] = {}
-	self["ret"] = []
-	self["error"] = None
-	self["apple"] = None
-	self["tail"] = []
-	self["tail_set"] = set()
-	self["tail_len"] = 0
-	self["num_drones"] = 1
-	self["max_drones"] = max_drones()
-	self["child_handles"] = {}
-	self["child_states"] = {}
-	self["drone_return"] = {}
-	self["treasure"] = None
-	self["excursions"] = []
-	debug_(("self", self))
-	
+    debug_(("__init__", self, flags))
+    self["flags"] = set(flags)
+    self["id"] = 0
+    self["i"] = 0
+    self["x"] = get_pos_x()
+    self["y"] = get_pos_y()
+    self["wh"] = get_world_size()
+    self["grid"] = {}
+    self["ret"] = []
+    self["error"] = None
+    self["apple"] = None
+    self["tail"] = []
+    self["tail_set"] = set()
+    self["tail_len"] = 0
+    self["num_drones"] = 1
+    self["max_drones"] = max_drones()
+    self["child_handles"] = {}
+    self["child_states"] = {}
+    self["drone_return"] = {}
+    self["treasure"] = None
+    self["excursions"] = []
+    debug_(("self", self))
+    
 def State__put(state, kvs, flags=[]):
-	flags = set(flags)
-	states = [state]
-	if To.CHILDREN in flags:
-		for child_id in state["child_states"]:
-			child_state = state["child_states"][child_id]
-			states.append(child_state)
-	for st in states:
-		for k in kvs:
-			st[k] = kvs[k]
-	return state
-	
+    flags = set(flags)
+    states = [state]
+    if To.CHILDREN in flags:
+        for child_id in state["child_states"]:
+            child_state = state["child_states"][child_id]
+            states.append(child_state)
+    for st in states:
+        for k in kvs:
+            st[k] = kvs[k]
+    return state
+    
 def State__get(self, key):
-	return pure(self, self[key])
+    return pure(self, self[key])
 
 def State__fork(self, id):
-	child = dict(self)
-	child["id"] = id
-	child["grid"] = {}
-	for c in self["grid"]:
-		child["grid"][c] = dict(self["grid"][c])
-	child["ret"] = []
-	child["child_handles"] = {}
-	child["child_states"] = {}
-	child["drone_return"] = {}
-	child["excursions"] = []
-	return child
+    child = dict(self)
+    child["id"] = id
+    child["grid"] = {}
+    for c in self["grid"]:
+        child["grid"][c] = dict(self["grid"][c])
+    child["ret"] = []
+    child["child_handles"] = {}
+    child["child_states"] = {}
+    child["drone_return"] = {}
+    child["excursions"] = []
+    return child
 
 State = Type.new(
-	__name__,
-	[Type.field("flags", set(), set)],
-	{
-		"__init__": __State__,
-		"put": State__put,
-		"get": State__get,
-		"fork": State__fork
-	})
-	
+    __name__,
+    [Type.field("flags", set(), set)],
+    {
+        "__init__": __State__,
+        "put": State__put,
+        "get": State__get,
+        "fork": State__fork
+    })
+    
 new = State["new"]
 
 def put(state, kvs, flags=[]):
-	return state["put"](kvs, flags)
-	
+    return state["put"](kvs, flags)
+    
 def get(state, k):
-	return state["get"](k)
-	
+    return state["get"](k)
+    
 def fork(state, id):
-	return state["fork"](id)
-	
+    return state["fork"](id)
+    
 def set_size(state, n=Size.NORMAL):
-	if n in Size.Sizes:
-		n = Size.Sizes[n]
-	set_world_size(n)
-	return new(state["flags"])
-	
+    if n in Size.Sizes:
+        n = Size.Sizes[n]
+    set_world_size(n)
+    return new(state["flags"])
+    
 def drone_id(state):
-	return state["id"]
-	
+    return state["id"]
+    
 def loop_index(state):
-	return state["i"]
+    return state["i"]
