@@ -23,7 +23,7 @@ def progs(state):
             [sense],
             [runSXY,
                 [Box, [12, 0, 10, 1],
-                    [Sunflower, 7, 7, [Sunflowers.FORCE, Sunflowers.WATER]],
+                    [Sunflower, 7, 7, [Sunflowers.WATER]],
                     [runSXY, [Cactus, [12, 1, 10, 9], [nop1]]]
                 ]
             ],

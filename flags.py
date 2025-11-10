@@ -1,11 +1,11 @@
 from aliases import *
 
 MAIN_FLAGS = set([
-    #Mode.SIMULATE,
+    Mode.SIMULATE,
     #Mode.TEST,
     #Testing.LOOP,
     #Log.DRONE_DETAILS,
-    #Log.DEBUG,
+    Log.DEBUG,
     #Size.NORMAL,
     #Size.SMALL,
     Space.FILL,

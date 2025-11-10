@@ -48,7 +48,12 @@ def filler_energy(state):
     def sunflower_at(state, c):
         return spawnM(state, [dos, [
             [move_to, c],
-            [Sunflower, 7, 7, [Sunflowers.FORCE, Harvesting.CURE, Harvesting.UNSAFE]],
+            [Sunflower, 7, 7, [
+                Sunflowers.WATER,
+                Sunflowers.FERTILIZE,
+                Harvesting.CURE,
+                Harvesting.UNSAFE
+            ]],
         ]])
         
     def boost_at(state, c):
