@@ -8,25 +8,21 @@ from filler_utils import *
 from filler_cactus import *
 from filler_pumpkin import *
 
-def filler_maze(state, num_drones=16):
-    d = wh(state)
-    n = d // (num_drones ** 0.5)
-    ps = []
-    for x in range(10):
-        ps.append([dos, [
-            [move_to, [x, d-1]],
-            [Sunflower, 7, 7, False, True]
-        ]])
-    for x in range(0, 6 * (d // 6), 6):
-        ps.append([boxloop, [x, d-2, 6, 1], [boost_solo]])
+def filler_maze(state, num_drones=None):
+    if num_drones == None:
+        num_drones = state["max_drones"]
+    state, d = wh(state)
+    n = d // ((num_drones ** 0.5) // 1)
     for y in range(n//2, n//2 + n * (d // n), n):
         for x in range(n//2, n//2 + n * (d // n), n):
-            ps.append([dos, [
-                [move_to, (x, y)],
-                [wait_secsM, 5],
-                [boxloop, [x, y, 1, 1], [maze, n]]
-            ]])
-    return ps
+            def child(state):
+                return dos(state, [
+                    [move_to, (x, y)],
+                    [wait_secsM, 5],
+                    [boxloop, [x, y, 1, 1], [maze, n]]
+                ])
+            state = spawn(state, [child], [Spawn.BECOME])
+    return state
 
 
 def filler_crops(state):

@@ -1,18 +1,20 @@
 from aliases import *
 
 MAIN_FLAGS = set([
-    Mode.SIMULATE,
+    #Mode.SIMULATE,
     #Mode.TEST,
     #Testing.LOOP,
     #Log.DRONE_DETAILS,
     #Log.DEBUG,
-    Size.NORMAL,
+    #Size.NORMAL,
+    #Size.SMALL,
     Space.FILL,
     #Phase.COMPANIONS,
     #Phase.CROPS,
     #Phase.CARROTS,
     #Phase.CACTUS,
     Phase.PUMPKIN,
+    #Phase.MAZE,
     #Phase.ENERGY,
     #Phase.DINO,
     #Phase.FLIPS,

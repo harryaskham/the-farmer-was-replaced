@@ -24,7 +24,7 @@ def main(state=None, flags=MAIN_FLAGS):
         flags.remove(Mode.SIMULATE)
         do_sim = True
 
-    if Mode.TEST not in flags:
+    if Mode.TEST not in flags and do_sim:
         sim.run_sim(flags)
 
     if state == None:
