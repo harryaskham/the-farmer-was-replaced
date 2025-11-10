@@ -19,18 +19,14 @@ def init(state):
 def main(state=None, flags=MAIN_FLAGS):
     flags = set(flags)
 
-    do_sim = False
     if Mode.SIMULATE in flags:
         flags.remove(Mode.SIMULATE)
-        do_sim = True
-
-    if do_sim:
         sim.run_sim(flags)
 
     if state == None:
         state = State.new(flags)
 
-    def do_tests(state, verbose_before, verbose_after):
+    def do_tests(state, verbose_before=True, verbose_after=False):
         quick_print("Running Tests")
         quick_print("=============")
 
@@ -69,8 +65,8 @@ def main(state=None, flags=MAIN_FLAGS):
 
     if Mode.TEST in flags:
         state = do_(state, [
-            [do_tests, False, False],
-            [when, Testing.LOOP in flags, [forever, [do_tests, False, False]]]
+            [do_tests],
+            [when, Testing.LOOP in flags, [forever, [do_tests]]]
         ])
 
     if Mode.RUN in flags:
@@ -103,3 +99,5 @@ def main(state=None, flags=MAIN_FLAGS):
                 ]]]
             ]]]
         ])
+
+    return unit(state)

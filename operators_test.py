@@ -1,5 +1,6 @@
 from monad import *
 from operators import *
+from compile import *
 from test import *
 
 def run(state):
@@ -7,7 +8,8 @@ def run(state):
         [Tests, __name__],
         [Test, [liftA2, [lift2, LT], [pure, 1], [pure, 2]], True],
         [Test, [lift2, LT, [pure, 1], [pure, 2]], True],
-        [Test, [lift1, is_none, None], True],
-        [Test, [fmap, [lift1, is_none], [pure, None]], True],
+        [Test, [lift([is_none]), None], True],
+        [Test, [fmap, [Add, 1], [pure, 2]], 3],
+        [Test, [fmap, [is_none], [pure, None]], True],
         [Test, [bind, [pure, True], [lift1, Not]], False],
     ])

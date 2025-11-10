@@ -106,8 +106,6 @@ def is_not_none(x):
 def fmap(state, f, ma):
     state, a = dos(state, [ma])
     fa = list(f)
-    fa = fa.insert(0, a)
+    fa.append(a)
     b = aps(fa)
     return pure(state, b)
-
-

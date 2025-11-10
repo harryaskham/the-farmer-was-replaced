@@ -1,4 +1,5 @@
 from farmlib import *
+from test import *
 
 def run(state):
     return do_(state, [
