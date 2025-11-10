@@ -21,7 +21,7 @@ def harvestM(state):
     ])
 
 
-def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
+def try_harvest(state, entities=None, flags=[]):
     flags = set(flags)
     state, e = et(state)
     if not (entities == None or contains(entities, e)):
@@ -59,7 +59,7 @@ def try_harvest(state, entities=None, cure=True, unsafe=False, flags=[]):
             
     if can_harvest():
         return dos(state, [
-            [when, cure, [maybe_cure, entities, unsafe]],
+            [when, Harvesting.CURE in flags, [maybe_cure, entities, Harvesting.UNSAFE in flags]],
             [harvestM]
         ])
 

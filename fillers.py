@@ -32,6 +32,8 @@ def filler_crops(state):
         [Checker3, [plant_one, E.Tree], [plant_one, E.Carrot], [plant_one, E.Grass]],
     ]])
 
+def filler_purge(state):
+    return fill_rows(state, [try_harvest])
 
 def filler_crop(state, e):
     return fill_rows(state, [dos, [
@@ -41,12 +43,12 @@ def filler_crop(state, e):
     ]])
     
 def filler_energy(state):
-    d = wh(state)
+    state, d = wh(state)
     
     def sunflower_at(state, c):
         return spawnM(state, [dos, [
             [move_to, c],
-            [Sunflower, 7, 7, True, True, True]
+            [Sunflower, 7, 7, [Sunflowers.FORCE, Harvesting.CURE, Harvesting.UNSAFE]],
         ]])
         
     def boost_at(state, c):
@@ -128,7 +130,7 @@ def filler_companions(state):
         
     return fill_rows(state, [dos, [
         [sense],
-        [try_harvest, None, False, False, [Companions.AWAIT]],
+        [try_harvest, None, [Companions.AWAIT]],
         [Companion, [Checker3, [plant_one, E.Tree], [plant_one, E.Carrot], [plant_one, E.Grass]]],
         [sense],
         [get_row]

@@ -45,9 +45,7 @@ def main(state=None, flags=MAIN_FLAGS):
 
     return dos(state, [
         [init],
-        [when, Phase.PURGE in flags, [dos, [
-            [run_progs, purges]
-        ]]],
+        [when, Phase.PURGE in flags, [filler_purge]],
         [when, Phase.SCAN in flags, [dos, [
             [farmloop, do_scan, False]
         ]]],
@@ -56,35 +54,17 @@ def main(state=None, flags=MAIN_FLAGS):
             [when, Phase.PROGS in flags, [dos, [
                 [run_progs, progs]
             ]]],
-            [when, Phase.PUMPKIN in flags, [dos, [
-                [when, Space.FILL in flags, [filler_pumpkin]]
-            ]]],
-            [when, Phase.ENERGY in flags, [dos, [
-                [when, Space.FILL in flags, [filler_energy]]
-            ]]],
-            [when, Phase.CROPS in flags, [dos, [
-                [when, Space.FILL in flags, [filler_crops]]
-            ]]],
-            [when, Phase.CARROTS in flags, [dos, [
-                [when, Space.FILL in flags, [filler_crop, E.Carrot]]
-            ]]],
-            [when, Phase.CACTUS in flags, [dos, [
-                [when, Space.FILL in flags, [filler_cactus]]
-            ]]],
-            [when, Phase.COMPANIONS in flags, [dos, [
-                [when, Space.FILL in flags, [filler_companions]]
-            ]]],
-            [when, Phase.MAZE in flags, [dos, [
-                [cond, Space.FILL in flags,
-                    [run_progs, filler_maze],
-                    [dos, [
-                        [try_harvest, [E.Treasure, E.Hedge]],
-                        [farmloop, do_maze]
-                    ]]
-                ]
-            ]]],
+            [when, Space.FILL in flags, [forever, [dos, [
+                [when, Phase.ENERGY in flags, [filler_energy]],
+                [when, Phase.PUMPKIN in flags, [filler_pumpkin]],
+                [when, Phase.CROPS in flags, [filler_crops]],
+                [when, Phase.CARROTS in flags, [filler_crop, E.Carrot]],
+                [when, Phase.CACTUS in flags, [filler_cactus]],
+                [when, Phase.COMPANIONS in flags, [filler_companions]],
+                [when, Phase.MAZE in flags, [filler_maze]]
+            ]]]],
             [when, Phase.DINO in flags, [dos, [
-                #[run_progs, purges],
+                [run_progs, purges],
                 [dino, [dumb, brute, search_apple]]
             ]]],
             [when, Phase.FARM in flags, [dos, [
