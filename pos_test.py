@@ -2,7 +2,7 @@ from pos import *
 import test
 
 def run(state):
-    expect = test.mk_expect(state)
+    expect = test.mk_expect(state, __name__)
 
     expect([xy], (0,0))
     expect([ixy], (0,0))

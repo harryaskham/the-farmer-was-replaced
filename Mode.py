@@ -1,2 +1,3 @@
 SIMULATE = "Mode.SIMULATE"
 TEST = "Mode.TEST"
+RUN = "Mode.RUN"

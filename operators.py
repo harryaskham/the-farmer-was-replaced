@@ -8,6 +8,35 @@ def lift1(state, f, a):
 def lift2(state, f, a, b):
     return pure(state, f(a, b))
 
+def Add(a, b):
+    return a + b
+
+def Sub(a, b):
+    return a - b
+
+def Mul(a, b):
+    return a * b
+
+def Div(a, b):
+    return a / b
+
+def IDiv(a, b):
+    return a // b
+
+def Floor(a):
+    return a // 1
+
+def Ceil(a):
+    af = Floor(a)
+    if a == af:
+        return af
+    else:
+        return af + 1
+
+def Mod(a, b):
+    return a % b
+
+
 def EQ(state, a, b):
     return pure(state, a == b)
 

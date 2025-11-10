@@ -2,7 +2,7 @@ from farmlib import *
 import test
 
 def run(state):
-    expect = test.mk_expect(state)
+    expect = test.mk_expect(state, __name__)
 
     expect(
         [dos, [

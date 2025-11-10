@@ -71,6 +71,10 @@ def untilM(state, cf, a):
         state = dos(state, [a])
     return state
 
+def void(state, ma):
+    state, _ = dos(state, [ma])
+    return state
+
 def do(state, fs):
     for xs in fs:
         state_ = aps(xs)

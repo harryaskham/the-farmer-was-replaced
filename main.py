@@ -24,51 +24,82 @@ def main(state=None, flags=MAIN_FLAGS):
         flags.remove(Mode.SIMULATE)
         do_sim = True
 
-    if Mode.TEST not in flags and do_sim:
+    if do_sim:
         sim.run_sim(flags)
 
     if state == None:
         state = State.new(flags)
 
-    def do_tests():
-        if do_sim:
-            sim.run_sim(flags)
-        else:
-            run_tests.run(state)
+    def do_tests(state, verbose_before=Log.DEBUG in flags, verbose_after=Log.DEBUG in flags):
+        quick_print("Running Tests")
+        quick_print("=============")
+
+        has_debug = Log.DEBUG in flags
+
+        if verbose_before:
+            if not has_debug:
+                state["flags"].add(Log.DEBUG)
+            state, out = run_tests.run(state)
+            if not has_debug:
+                state["flags"].remove(Log.DEBUG)
+
+        if has_debug:
+            state["flags"].remove(Log.DEBUG)
+        state, out = run_tests.run(state)
+        if has_debug:
+            state["flags"].add(Log.DEBUG)
+
+        if verbose_after:
+            if not has_debug:
+                state["flags"].add(Log.DEBUG)
+            state, out = run_tests.run(state)
+            if not has_debug:
+                state["flags"].remove(Log.DEBUG)
+
+        quick_print("Tests Complete")
+        for module_name in state["test_results"]:
+            quick_print("==============")
+            quick_print(module_name)
+            quick_print("-----")
+            for test_name in state["test_results"][module_name]:
+                quick_print(test_name)
+                quick_print(state["test_results"][module_name][test_name])
+
+        return pure(state, out)
 
     if Mode.TEST in flags:
-        if Testing.LOOP in flags:
-            while True:
-                do_tests()
-        else:
-            return do_tests()
+        state = do_(state, [
+            [do_tests],
+            [when, Testing.LOOP in flags, [forever, [do_tests]]]
+        ])
 
-    return dos(state, [
-        [init],
-        [when, Phase.PURGE in flags, [filler_purge]],
-        [when, Phase.SCAN in flags, [dos, [
-            [farmloop, do_scan, False]
-        ]]],
-        [forever, [dos, [
-            [when, Phase.FLIPS in flags, [do_flips]],
-            [when, Phase.PROGS in flags, [dos, [
-                [run_progs, progs]
+    if Mode.RUN in flags:
+        return dos(state, [
+            [init],
+            [when, Phase.PURGE in flags, [filler_purge]],
+            [when, Phase.SCAN in flags, [dos, [
+                [farmloop, do_scan, False]
             ]]],
-            [when, Space.FILL in flags, [forever, [dos, [
-                [when, Phase.ENERGY in flags, [filler_energy]],
-                [when, Phase.PUMPKIN in flags, [filler_pumpkin]],
-                [when, Phase.CROPS in flags, [filler_crops]],
-                [when, Phase.CARROTS in flags, [filler_crop, E.Carrot]],
-                [when, Phase.CACTUS in flags, [filler_cactus]],
-                [when, Phase.COMPANIONS in flags, [filler_companions]],
-                [when, Phase.MAZE in flags, [filler_maze]]
-            ]]]],
-            [when, Phase.DINO in flags, [dos, [
-                [run_progs, purges],
-                [dino, [dumb, brute, search_apple]]
-            ]]],
-            [when, Phase.FARM in flags, [dos, [
-                [bind, [cache_loop, loop], [farmloop]]
+            [forever, [dos, [
+                [when, Phase.FLIPS in flags, [do_flips]],
+                [when, Phase.PROGS in flags, [dos, [
+                    [run_progs, progs]
+                ]]],
+                [when, Space.FILL in flags, [forever, [dos, [
+                    [when, Phase.ENERGY in flags, [filler_energy]],
+                    [when, Phase.PUMPKIN in flags, [filler_pumpkin]],
+                    [when, Phase.CROPS in flags, [filler_crops]],
+                    [when, Phase.CARROTS in flags, [filler_crop, E.Carrot]],
+                    [when, Phase.CACTUS in flags, [filler_cactus]],
+                    [when, Phase.COMPANIONS in flags, [filler_companions]],
+                    [when, Phase.MAZE in flags, [filler_maze]]
+                ]]]],
+                [when, Phase.DINO in flags, [dos, [
+                    [run_progs, purges],
+                    [dino, [dumb, brute, search_apple]]
+                ]]],
+                [when, Phase.FARM in flags, [dos, [
+                    [bind, [cache_loop, loop], [farmloop]]
+                ]]]
             ]]]
-        ]]]
-    ])
+        ])

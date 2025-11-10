@@ -29,6 +29,11 @@ def __State__(self, flags=set()):
     self["drone_return"] = {}
     self["treasure"] = None
     self["excursions"] = []
+    self["args"] = []
+    self["bindings"] = []
+    self["stack"] = []
+    self["test_module_name"] = None
+    self["test_results"] = {}
 
     debug_(("self", self))
     
@@ -58,6 +63,11 @@ def State__fork(self, id):
     child["child_states"] = {}
     child["drone_return"] = {}
     child["excursions"] = []
+    child["stack"] = []
+    child["args"] = []
+    child["bindings"] = []
+    child["test_module_name"] = None
+    child["test_results"] = {}
     return child
 
 State = Type.new(

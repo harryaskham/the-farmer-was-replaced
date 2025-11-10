@@ -2,7 +2,7 @@ from aliases import *
 
 MAIN_FLAGS = set([
     Mode.SIMULATE,
-    #Mode.TEST,
+    Mode.TEST,
     #Testing.LOOP,
     #Log.DRONE_DETAILS,
     Log.DEBUG,

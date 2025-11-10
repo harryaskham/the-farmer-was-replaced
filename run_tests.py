@@ -1,14 +1,21 @@
+from monad import *
+from operators import *
+
+import compile_test
 import monad_test
 import pos_test
 import operators_test
 import e2e_test
-#import simcomp
-#import compile
+
+def run_module(state, module):
+    state["test_results"][module.__name__] = module.run(state)
+    return state
 
 def run(state):
-    #simcomp.tests(state)
-    #compile.tests(state)
-    monad_test.run(state)
-    pos_test.run(state)
-    operators_test.run(state)
-    e2e_test.run(state)
+    return mapM(state, [run_module], [
+        compile_test,
+        monad_test,
+        #operators_test,
+        #pos_test,
+        #e2e_test
+    ])
