@@ -30,7 +30,7 @@ def main(state=None, flags=MAIN_FLAGS):
     if state == None:
         state = State.new(flags)
 
-    def do_tests(state, verbose_before=Log.DEBUG in flags, verbose_after=Log.DEBUG in flags):
+    def do_tests(state, verbose_before, verbose_after):
         quick_print("Running Tests")
         quick_print("=============")
 
@@ -39,20 +39,20 @@ def main(state=None, flags=MAIN_FLAGS):
         if verbose_before:
             if not has_debug:
                 state["flags"].add(Log.DEBUG)
-            state, out = run_tests.run(state)
+            state = run_tests.run(state)
             if not has_debug:
                 state["flags"].remove(Log.DEBUG)
 
         if has_debug:
             state["flags"].remove(Log.DEBUG)
-        state, out = run_tests.run(state)
+        state = run_tests.run(state)
         if has_debug:
             state["flags"].add(Log.DEBUG)
 
         if verbose_after:
             if not has_debug:
                 state["flags"].add(Log.DEBUG)
-            state, out = run_tests.run(state)
+            state = run_tests.run(state)
             if not has_debug:
                 state["flags"].remove(Log.DEBUG)
 
@@ -65,12 +65,12 @@ def main(state=None, flags=MAIN_FLAGS):
                 quick_print(test_name)
                 quick_print(state["test_results"][module_name][test_name])
 
-        return pure(state, out)
+        return unit(state)
 
     if Mode.TEST in flags:
         state = do_(state, [
-            [do_tests],
-            [when, Testing.LOOP in flags, [forever, [do_tests]]]
+            [do_tests, False, False],
+            [when, Testing.LOOP in flags, [forever, [do_tests, False, False]]]
         ])
 
     if Mode.RUN in flags:

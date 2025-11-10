@@ -170,12 +170,13 @@ def then(state, g, f):
     return bind(state, f, g)
 
 def mapM(state, f, xs):
-    xss = []
+    out = []
     for x in xs:
         fx = list(f)
         fx.append(x)
-        xss.append(fx)
-    return dos(state, xss)
+        state, v = dos(state, [fx])
+        out.append(v)
+    return pure(state, out)
 
 def forM(state, xs, f):
     return mapM(state, f, xs)

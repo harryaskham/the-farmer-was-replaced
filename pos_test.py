@@ -1,22 +1,25 @@
+from monad import *
+from operators import *
 from pos import *
-import test
+from test import *
 
 def run(state):
-    expect = test.mk_expect(state, __name__)
-
-    expect([xy], (0,0))
-    expect([ixy], (0,0))
-    expect([pos_to, North], (0, 1))
-    expect([pos_to, East], (1,0))
-    expect([pos_to, South], None)
-    expect([pos_to, West], None)
-    expect([exists_to, North], True)
-    expect([exists_to, East], True)
-    expect([exists_to, South], False)
-    expect([exists_to, West], False)
-    expect([get_here, "ground_type"], None)
-    expect([get_here, "entity_type"], None)
-    expect([get_at, (1,0), "entity_type"], None)
-    expect([get_at, (2,0), "entity_type"], None)
-    expect([get_at, None], None)
-    expect([get_at, None, "entity_type"], None)
+    return do_(state, [
+        [Tests, __name__],
+        [Test, [xy], (0,0)],
+        [Test, [ixy], (0,0)],
+        [Test, [pos_to, North], (0, 1)],
+        [Test, [pos_to, East], (1,0)],
+        [Test, [pos_to, South], None],
+        [Test, [pos_to, West], None],
+        [Test, [exists_to, North], True],
+        [Test, [exists_to, East], True],
+        [Test, [exists_to, South], False],
+        [Test, [exists_to, West], False],
+        [Test, [get_here, "ground_type"], None],
+        [Test, [get_here, "entity_type"], None],
+        [Test, [get_at, (1,0), "entity_type"], None],
+        [Test, [get_at, (2,0), "entity_type"], None],
+        [Test, [get_at, None], None],
+        [Test, [get_at, None, "entity_type"], None],
+    ])

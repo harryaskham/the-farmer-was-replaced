@@ -17,7 +17,7 @@ def run(state):
     ]], 2)
     AddF = defun(["a", "b"], [liftA2, [AddM], [read, "a"], [read, "b"]])
 
-    return dos(state, [
+    return do_(state, [
         [Tests, __name__],
         [Test, [lift_not, True], False],
         [Test, [id_, 1], 1],

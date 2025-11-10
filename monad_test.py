@@ -4,7 +4,7 @@ from compile import *
 from test import *
 
 def run(state):
-    return dos(state, [
+    return do_(state, [
         [Tests, __name__],
         [Test, [pure, 1], 1],
         [Test, [pure, None], None],

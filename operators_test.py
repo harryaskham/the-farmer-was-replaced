@@ -1,11 +1,13 @@
+from monad import *
 from operators import *
-import test
+from test import *
 
 def run(state):
-    expect = test.mk_expect(state, __name__)
-
-    expect([liftA2, [lift2, LT], [pure, 1], [pure, 2]], True)
-    expect([lift2, LT, [pure, 1], [pure, 2]], True)
-    expect([lift1, is_none, None], True)
-    expect([fmap, [lift1, is_none], [pure, None]], True)
-    expect([bind, [pure, True], [lift1, Not]], False)
+    return do_(state, [
+        [Tests, __name__],
+        [Test, [liftA2, [lift2, LT], [pure, 1], [pure, 2]], True],
+        [Test, [lift2, LT, [pure, 1], [pure, 2]], True],
+        [Test, [lift1, is_none, None], True],
+        [Test, [fmap, [lift1, is_none], [pure, None]], True],
+        [Test, [bind, [pure, True], [lift1, Not]], False],
+    ])
