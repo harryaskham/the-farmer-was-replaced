@@ -5,7 +5,7 @@ def loop(state, x, y):
     return [
         [debug, ""],
         [when, x == 0 and y == 8, [dos, [
-            [spawnM, [farmloop, loop]]
+            [spawn_, [farmloop, loop]]
         ]]],
         [sense],
         [bind, [here], [debug]],
@@ -64,7 +64,7 @@ def do_flips(state):
     return dos(state, [
         [forM, range(32),
             [constM,
-                [spawn,
+                [spawn_,
                     [dos, [
                         [bind, [ixy], [move_to]],
                         [forever, [do_a_flipM]]

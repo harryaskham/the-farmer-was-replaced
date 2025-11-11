@@ -69,5 +69,5 @@ def progs(state):
 def run_progs(state, mk_fs):
     ps = mk_fs(state)
     for p in ps:
-        state = must_spawn(state, p)
+        state, _ = must_spawn(state, p)
     return wait_all(state)

@@ -52,7 +52,9 @@ def State__put(state, kvs, flags=[]):
 def State__get(self, key):
     return pure(self, self[key])
 
-def State__fork(self, id):
+def State__fork(self, id=None):
+    if id == None:
+        id = num_drones()
     child = dict(self)
     child["id"] = id
     child["grid"] = {}
@@ -88,7 +90,7 @@ def put(state, kvs, flags=[]):
 def get(state, k):
     return state["get"](k)
     
-def fork(state, id):
+def fork(state, id=None):
     return state["fork"](id)
     
 def set_size(state, n=Size.NORMAL):

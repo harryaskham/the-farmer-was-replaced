@@ -6,19 +6,12 @@ def Sunflower(state, min_petals=7, max_petals=15, flags=[Sunflowers.WATER]):
     flags = set(flags)
 
     def valid_sunflower(state):
-        return dos(state, [
-            [bind, [get_here, "petals"], [pushret]],
-            [condM, [lift1, [is_none], [peekret]],
-                [dos, [
-                    [popret],
-                    [pure, False]
-                ]],
-                [lift2, [And],
-                    [lift2, [GTE], [peekret], [pure(min_petals)]],
-                    [lift2, [LTE], [popret], [pure(max_petals)]]
-                ]
-            ]
-        ])
+        state, p_here = get_here(state, "petals")
+        return pure(
+            state,
+            p_here != None
+            and p_here >= min_petals
+            and p_here <= max_petals)
 
     return dos(state, [
         [sense],
@@ -30,7 +23,7 @@ def Sunflower(state, min_petals=7, max_petals=15, flags=[Sunflowers.WATER]):
         [when, Sunflowers.FERTILIZE in flags, [fertilize]]
     ])
         
-def boost(state, n=1, min_petals=7, max_petals=15, flags=[Sunflowers.WATER, Harvesting.CURE, Harvesting.UNSAFE]):
+def boost(state, n=1, min_petals=7, max_petals=15, flags=[Sunflowers.WATER, Sunflowers.FERTILIZE, Harvesting.CURE]):
     flags = set(flags)
     for _ in range(n):
         state = do_(state, [
@@ -40,7 +33,7 @@ def boost(state, n=1, min_petals=7, max_petals=15, flags=[Sunflowers.WATER, Harv
         ]) 
     return state
     
-def boost_box(state, box, num_flowers=10, boosts=10, flags=[Sunflowers.WATER, Harvesting.CURE, Harvesting.UNSAFE]):
+def boost_box(state, box, num_flowers=10, boosts=10, flags=[Sunflowers.WATER, Sunflowers.FERTILIZE, Harvesting.CURE]):
     flags = set(flags)
     i = 0
     [x0, y0, w, h] = box

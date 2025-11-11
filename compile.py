@@ -14,8 +14,11 @@ def defun(args, body):
         ])
 
     return compile([dos, [
+        [push_bindings, {"__call__": True}],
         [mapM, [bind_i], range(len(args))],
-        body
+        [bind, body, [pushret]],
+        [pop_bindings],
+        [popret]
     ]])
 
 read = get_binding

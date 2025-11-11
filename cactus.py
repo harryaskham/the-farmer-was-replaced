@@ -40,41 +40,54 @@ def swap_if(d, a, b):
     if ca == None or cb == None:
         return None
     return {
-        West: ca < cb,
+        West: ca <= cb,
         South: ca < cb,
         East: ca > cb,
         North: ca > cb
     }[d]
 
-def emplace_cactus(state, dirs=list(Dirs)):
-    state = start_excursion(state)
-    done = False
-    moved = False
-    while not done:
-        state = sense(state, [Sensing.DIRECTIONAL])
-        state, (x, y) = xy(state)
-        state, this = here(state)
-        state, ns = ordinal_neighbors(state)
-        
-        done = True
-        for d in dirs:
-            if d not in ns:
-                continue
-                
-            n = ns[d]
-            if n == None:
-                continue
-                
-            cmp = swap_if(d, this, n)
-            state = info(state, ((x, y), d, this["cactus_size"], n["cactus_size"], cmp))
-            if cmp == True:
-                state, swapped = swapM(state, d)
-                if swapped:
-                    state, moved = moveM(state, d)
-                    if moved:
-                        done = False
-                        break
+def emplace_cactus(state, dirs=None):
+    if dirs == None:
+        dirs = list(Dirs)
 
+    def go(state):
+        done = False
+        moved = False
+        i = -1
+        while not done:
+            i += 1
+            if i > 100:
+                break
+            state = sense(state, [Sensing.DIRECTIONAL])
+            state, (x, y) = xy(state)
+            state, this = here(state)
+            state, ns = ordinal_neighbors(state)
+
+            done = True
+            for d in dirs:
+                if d not in ns:
+                    continue
+
+                n = ns[d]
+                if n == None:
+                    continue
+
+                cmp = swap_if(d, this, n)
+                state = info(state, ((x, y), d, this["cactus_size"], n["cactus_size"], cmp))
+                if cmp == True:
+                    state, swapped = swapM(state, d)
+                    if swapped:
+                        state, moved = moveM(state, d)
+                        if moved:
+                            done = False
+                            break
+
+        if moved:
+            return go(state)
+        return pure(state, moved)
+
+    state = start_excursion(state)
+    state, moved = go(state)
     state = end_excursion(state)
     return pure(state, moved)
 

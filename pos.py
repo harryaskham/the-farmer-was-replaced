@@ -106,7 +106,12 @@ def opposite(d):
         East: West,
         West: East
     }[d]
-    
+
+def i2(state, id=None):
+    if id == None:
+        id = state["id"]
+    return pure(state, id % 2 == 0)
+
 def ixy(state, id=None):
     if id == None:
         id = state["id"]

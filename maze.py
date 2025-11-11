@@ -7,13 +7,13 @@ from drones import *
 
 def maze_many(state, size=None):
     state = move_to(state, [wh(state)-1, wh(state)-1])
-    state = spawnM(state, [maze, size], 12)
+    state = spawn_(state, [maze, size], 12)
     
     state = move_to(state, [0, wh(state)-1])
-    state = spawnM(state, [maze, size], 8)
+    state = spawn_(state, [maze, size], 8)
     
     state = move_to(state, [wh(state)-1, 0])
-    state = spawnM(state, [maze, size], 4)
+    state = spawn_(state, [maze, size], 4)
     
     state = move_to(state, [0, 0])
     return maze(state, size)

@@ -21,7 +21,7 @@ def filler_maze(state, num_drones=None):
                     [wait_secsM, 5],
                     [boxloop, [x, y, 1, 1], [maze, n]]
                 ])
-            state = spawn(state, [child], [Spawn.BECOME])
+            state = spawn_(state, [child], [Spawn.BECOME])
     return state
 
 
@@ -46,7 +46,7 @@ def filler_energy(state):
     state, d = wh(state)
     
     def sunflower_at(state, c):
-        return spawnM(state, [dos, [
+        return spawn_(state, [dos, [
             [move_to, c],
             [Sunflower, 7, 7, [
                 Sunflowers.WATER,
@@ -57,9 +57,9 @@ def filler_energy(state):
         ]])
         
     def boost_at(state, c):
-        return spawnM(state, [dos, [
+        return spawn_(state, [dos, [
             [move_to, c],
-            [forever, [boost, 10, True, True, 15, 15, True, True]]
+            [forever, [boost, 10, 15, 15]]
         ]])
 
     def spaced(n=32, gap=1):

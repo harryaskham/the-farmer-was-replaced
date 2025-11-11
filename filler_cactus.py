@@ -32,37 +32,79 @@ def cactus_swaps(state):
 
 def filler_cactus(state):
 
-    def maybe_swap(state):
+    def handle_dir(state, dir):
         return dos(state, [
-            [then, [let, "d2s"], [cactus_swaps]],
-            [let, "swap_dir", None],
             [forM, Dirs, [dos, [
-                [whenM, [fmap, [is_none], [read, "swap_dir"]], [dos, [
+                [whenM, [then, [lift(is_none)], [read, "swap_dir"]], [dos, [
                     [then, [let, "swap?"], [bind, [read, "d2s"], [getattr, dir]]],
                     [whenM, [read, "swap?"], [dos, [
                         [let, "swap_dir", dir]
                     ]]]
                 ]]]
-            ]]],
+            ]]]
+        ])
+
+    def maybe_swap(state):
+        return dos(state, [
+            [then, [let, "d2s"], [cactus_swaps]],
+            [let, "swap_dir", None],
+            [mapM, [handle_dir], Dirs],
             [condM, [bind, [read, "swap_dir"], [is_none]],
                 [unit],
                 [dos, [
-                    [swapM, dir],
-                    [moveM, dir],
+                    [bind, [read, "swap_dir"], [swapM]],
+                    [bind, [read, "swap_dir"], [moveM]],
                     [pure, True]
                 ]]
             ]
         ])
 
+    def harv(state):
+        return pure(state, state["i"] % 2 == 1)
+
+    def assume(state):
+        state, c0 = pos_to(state, South)
+        state, c1 = pos_to(state, North)
+        state, c2 = pos_to(state, East)
+        state, c3 = pos_to(state, West)
+        for c in [c0, c1, c2, c3]:
+            if c != None:
+                state = set_at(state, c, {"entity_type": E.Cactus})
+        return state
+
+    state, d = wh(state)
+    state = move_to(state, (d//2, d//2))
+    while True:
+        for y in range(d):
+            for x in range(d):
+                def f(state):
+                    return dos(state, [
+                        [move_to, (x, y)],
+                        [plant_one, E.Cactus],
+                        [assume],
+                        [emplace_cactus]
+                    ])
+                state = spawn_(state, [f], [Spawn.AWAIT])
+        state = do_(state, [
+            [wait_all],
+            [try_harvest]
+        ])
+    return state
+
     return fill_row(
         state,
         [dos, [
-            [sense],
-            [plant_one, E.Cactus],
-            [maybe_swap],
-            [bind, [get_row], [pushret]]
+            [condM, [harv],
+                [try_harvest],
+                [dos, [
+                    [plant_one, E.Cactus],
+                    [assume],
+                    [sense, [Sensing.DIRECTIONAL]],
+                    [emplace_cactus],
+                ]]
+            ],
+            [get_here]
         ]],
-        [dos, [
-            [bind, [popret], [merge_row]]
-        ]]
+        [merge_cell],
+        [Spawn.INHERIT, Spawn.BECOME]
     )

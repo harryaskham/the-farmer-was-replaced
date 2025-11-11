@@ -19,11 +19,13 @@ def must_spawn(state, f, flags=[]):
         
     if Spawn.BECOME in flags:
         return spawn(state, f, flags)
-        
-    n = len(state["child_handles"])
-    while len(state["child_handles"]) == n:
-        state = spawn(state, f)
-    return state
+
+    while not spawn(state, f)[1]:
+        pass
+    return pure(state, True)
+
+def spawn_(state, f, flags=[]):
+    return spawn(state, f, flags)[0]
 
 def spawnM(state, f, flags=[]):
     state = info(state, ["Spawning with flags", flags, "program", f])
@@ -49,10 +51,10 @@ def spawnM(state, f, flags=[]):
     child_state["id"] = num_drones()
     child = spawn_drone(spawn_inner)
     if child == None:
-        return error(state, ["Failed to spawn drone"])
+        return pure(state, False)
     state["child_states"][child_state["id"]] = child_state
     state["child_handles"][child_state["id"]] = child
-    return state
+    return pure(state, True)
 
 spawn = spawnM
     
