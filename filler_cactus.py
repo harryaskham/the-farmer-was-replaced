@@ -106,5 +106,5 @@ def filler_cactus(state):
             [get_here]
         ]],
         [merge_cell],
-        [Spawn.INHERIT, Spawn.BECOME]
+        [Spawn.FORK, Spawn.BECOME]
     )

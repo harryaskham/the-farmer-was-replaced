@@ -7,6 +7,7 @@ from cactus import *
 from filler_utils import *
 from filler_cactus import *
 from filler_pumpkin import *
+from filler_energy import *
 
 def filler_maze(state, num_drones=None):
     if num_drones == None:
@@ -42,85 +43,6 @@ def filler_crop(state, e):
         [plant_one, e]
     ]])
     
-def filler_energy(state):
-    state, d = wh(state)
-    
-    def sunflower_at(state, c):
-        return spawn_(state, [dos, [
-            [move_to, c],
-            [Sunflower, 7, 7, [
-                Sunflowers.WATER,
-                Sunflowers.FERTILIZE,
-                Harvesting.CURE,
-                Harvesting.UNSAFE
-            ]],
-        ]])
-        
-    def boost_at(state, c):
-        return spawn_(state, [dos, [
-            [move_to, c],
-            [forever, [boost, 10, 15, 15]]
-        ]])
-
-    def spaced(n=32, gap=1):
-        cs = []
-        for y in range(0, d, gap+1):
-            for x in range(0, d, gap+1):
-                cs.append((x, y))
-                if len(cs) == n:
-                    break
-            if len(cs) == n:
-                break
-        return cs
-        
-    def sunflower_row(n=10):
-        cs = []
-        for x in range(n):
-            cs.append([x, d-1])
-        return cs
-        
-    def planter(state, y):
-        return dos(state, [
-            [boxloop, [0, y, d, 1], [dos, [
-                [Sunflower, 7, 15]
-            ]]]
-        ])
-
-    def harvester(state, y):
-        state["petal_threshold"] = 15
-        
-        def decr(state):
-            state["petal_threshold"] -= 1
-            return state
-            
-        def reset(state):
-            state["petal_threshold"] = 15
-            return state
-            
-        def do_harv(state):
-            state, h = get_here(state)
-            petals = h["petals"]
-            return pure(state, petals != None and petals >= state["petal_threshold"])
-
-        return dos(state, [
-            [boxloop, [0, y, d, 1], [dos, [
-                [sense],
-                [whenM, [do_harv], [dos, [
-                    [try_harvest],
-                    [reset]
-                ]]],
-                [whenM, [bind, [xy], [eq, [d-1, y]]], [decr]]
-            ]]]
-        ])
-        
-    return dos(state, [
-        [mapM, [sunflower_at], sunflower_row()],
-        [wait_all],
-        [mapM, [boost_at], spaced()[1:]],
-        [forever, [boost]]
-    ])
-
-
 def filler_companions(state):
     
     def handler(state, results):

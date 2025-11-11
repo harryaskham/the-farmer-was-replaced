@@ -8,7 +8,6 @@ ALL = "Log.ALL"
 
 AIR = "Log.AIR"
 DRONE_DETAILS = "Log.DRONE_DETAILS"
-ROOT_DRONE_ONLY = "Log.ROOT_DRONE_ONLY"
 
 Levels = {
     FATAL: 0,

@@ -40,15 +40,20 @@ def spawnM(state, f, flags=[]):
     if become:
         return do_(state, [f])
 
-    if Spawn.INHERIT in flags:
-        child_state = State.fork(state)
+    if Spawn.FORK in flags:
+        state, child_state = State.fork(state)
+    elif Spawn.SHARE in flags:
+        state, child_state = State.share(state)
     else:
         child_state = State.new(state["flags"])
+        child_state["id"] = num_drones() + 1
+
+    if child_state["id"] in state["child_handles"]:
+        return fatal(state, ("Drone ID collision on spawn:", child_state["id"], "state:", state, "child_state:", child_state))
 
     def spawn_inner():
         return dos(child_state, [f])
 
-    child_state["id"] = num_drones()
     child = spawn_drone(spawn_inner)
     if child == None:
         return pure(state, False)

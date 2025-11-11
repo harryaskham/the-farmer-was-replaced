@@ -11,6 +11,7 @@ from functional import *
 from grid import *
 from hat import *
 from list import *
+from locking import *
 from maybe import *
 from monad import *
 from operators import *

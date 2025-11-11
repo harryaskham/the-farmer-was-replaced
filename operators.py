@@ -36,6 +36,13 @@ def Ceil(a):
 def Mod(a, b):
     return a % b
 
+def In(x, xs):
+    if xs == None:
+        fatal_(("In", x, None))
+    return x in xs
+
+def NotIn(x, xs):
+    return x not in xs
 
 def EQ(state, a, b):
     return pure(state, a == b)

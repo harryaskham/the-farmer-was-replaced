@@ -58,7 +58,7 @@ def try_harvest(state, entities=None, flags=[]):
         return state
             
     if can_harvest():
-        return dos(state, [
+        return do_(state, [
             [when, Harvesting.CURE in flags, [maybe_cure, entities, Harvesting.UNSAFE in flags]],
             [harvestM]
         ])

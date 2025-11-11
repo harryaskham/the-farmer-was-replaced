@@ -1,11 +1,14 @@
 from dict import *
 from aliases import *
 import flags
+import sim_overrides
 from debug import *
 
 all_items = {}
 for i in Items:
     all_items[i] = 10**10
+for i in sim_overrides.items:
+    all_items[i] = sim_overrides.items[i]
     
 def run_sim(main_flags=flags.MAIN_FLAGS, name="simulation", globals={}, speedup=2048, seed=random() * 100000 // 1, unlocks=Unlocks, items=all_items):
     main_flags = set(main_flags)

@@ -2,6 +2,16 @@ from lib import *
 from harvest import *
 from measure import *
 
+def fast_sunflower(state, min_petals=7, max_petals=15):
+    return dos(state, [
+        [Sunflower, min_petals, max_petals, [
+            Sunflowers.WATER,
+            Sunflowers.FERTILIZE,
+            Harvesting.CURE,
+            Harvesting.UNSAFE
+        ]]
+    ])
+
 def Sunflower(state, min_petals=7, max_petals=15, flags=[Sunflowers.WATER]):
     flags = set(flags)
 

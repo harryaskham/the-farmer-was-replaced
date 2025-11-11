@@ -1,9 +1,18 @@
 from flags import *
 from aliases import *
 from error import *
+from strings import *
 
-def log(state, msg, level=Log.DEBUG, prefix=None):
-    if Log.ROOT_DRONE_ONLY in state["flags"] and state["id"] != 0:
+def log_drone_info(state, level):
+    return log(
+        state,
+        join([str(level), str(state["id"]), str((state["x"], state["y"]))], " | "),
+        level,
+        None,
+        True)
+
+def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
+    if ONLY_LOG_DRONES != None and state["id"] not in ONLY_LOG_DRONES:
         return state
 
     debug_level = 0
@@ -24,10 +33,9 @@ def log(state, msg, level=Log.DEBUG, prefix=None):
     
     if Log.AIR in state["flags"]:
         print(msg)
-        
-    if Log.DRONE_DETAILS in state["flags"]:
-        quick_print("")
-        quick_print([level, state["id"], (state["x"], state["y"])])
+
+    if (Log.DRONE_DETAILS in state["flags"]) and (not hide_drone_info):
+        state = log_drone_info(state, level)
 
     quick_print([level, msg])
 
@@ -63,7 +71,11 @@ def shim_state():
         "id": "_",
         "x": "_",
         "y": "_",
-        "error": None
+        "error": None,
+        "locks": {
+            "__locked__": False,
+            "__lockers__": set()
+        }
     }
     return state
     

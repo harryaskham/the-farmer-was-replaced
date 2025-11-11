@@ -1,6 +1,7 @@
 from lib import *
 from pos import *
 from cell import *
+from locking import *
 
 NE = [North, East]
 NW = [North, West]
@@ -56,3 +57,41 @@ def neighbors_dict(state, cx=None, cy=None):
     if cy < d - 1:
         ns[North] = (cx, cy+1)
     return pure(state, ns)
+
+def print_grid(state, level=Log.INFO):
+    d = get_world_size()
+    rows = [""]
+    for k in ["id", "petal_counts"]:
+        rows.append(join([k, " = ", str(state[k])]))
+    for y in range(d):
+        rows.append(print_row(state, y, d))
+    return lines(state, level, rows)
+
+def print_row(state, y, d):
+    row = []
+    for x in range(d):
+        row.append(print_cell(state, (x, d - y - 1)))
+    return join(row)
+
+def print_cell(state, c):
+    if c not in state["grid"]:
+        return "? "
+    def print_sunflower():
+        if state["grid"][c]["petals"] == None:
+            return "s?"
+        return "s" + str(state["grid"][c]["petals"] - 7)
+
+    return {
+        None: ". ",
+        E.Grass: "g ",
+        E.Bush: "b ",
+        E.Tree: "t ",
+        E.Carrot: "c ",
+        E.Sunflower: print_sunflower(),
+        E.Cactus: "c ",
+        E.Pumpkin: "p ",
+        E.Dead_Pumpkin: "px",
+        E.Hedge: "h ",
+        E.Treasure: "$ ",
+        E.Apple: "A ",
+    }[state["grid"][c]["entity_type"]]

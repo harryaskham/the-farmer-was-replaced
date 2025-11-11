@@ -51,6 +51,42 @@ def fill_row(state, f, handler=None, flags=[], n=None):
             state = apply(state, handler, cell_results)
     return state
 
+def fill_grid(
+    state,
+    f,
+    cell_handler=None,
+    final_handler=None,
+    flags=[Spawn.FORK, Spawn.BECOME],
+    n=None):
+    flags = set(flags)
+
+    if n == None:
+        n = state["max_drones"]
+
+    state, d = wh(state)
+
+    def p(y):
+        return [boxloop, [0, y, d, 1], f, [0, y], False]
+
+    for y in range(1, min(d, n)):
+        state = spawn_(state, p(y), flags)
+
+    state, results0 = dos(state, [p(0)])
+    state, results = wait_all(state)
+    results[state["id"]] = results0
+
+    if cell_handler != None:
+        for i in results:
+            box_results = results[i]
+            for c in box_results:
+                cell_results = box_results[c]
+                state = cell_handler(state, cell_results)
+
+    if final_handler != None:
+        state = final_handler(state)
+
+    return state
+
 def fill_rows(state, f, handler=None, n=None):
     if n == None:
         n = state["max_drones"]

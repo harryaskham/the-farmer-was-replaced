@@ -5,9 +5,8 @@ MAIN_FLAGS = set([
     #Mode.TEST,
     Mode.RUN,
     #Testing.LOOP,
-    #Log.DRONE_DETAILS,
-    #Log.ROOT_DRONE_ONLY,
-    #Log.DEBUG,
+    Log.DRONE_DETAILS,
+    #Log.INFO,
     #Size.NORMAL,
     #Size.SMALL,
     Space.FILL,
@@ -15,13 +14,15 @@ MAIN_FLAGS = set([
     #Phase.COMPANIONS,
     #Phase.CROPS,
     #Phase.CARROTS,
-    Phase.CACTUS,
+    #Phase.CACTUS,
     #Phase.PUMPKIN,
     #Phase.MAZE,
-    #Phase.ENERGY,
+    Phase.ENERGY,
     #Phase.DINO,
     #Phase.FLIPS,
 ])
+
+ONLY_LOG_DRONES = set([1, 4])
 
 WATER_RANGE = (0.75, 1.0)
 WATER_BEFORE = [
