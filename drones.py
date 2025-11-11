@@ -3,7 +3,7 @@ from debug import *
     
 def update_drone_state(state):
     state["num_drones"] = num_drones()
-    return state
+    return unit(state)
     
 def can_spawn(state):
     return dos(state, [
@@ -18,11 +18,11 @@ def must_spawn(state, f, flags=[]):
         flags.remove(Spawn.AWAIT)
         
     if Spawn.BECOME in flags:
-        return spawnM(state, f, flags)
+        return spawn(state, f, flags)
         
     n = len(state["child_handles"])
     while len(state["child_handles"]) == n:
-        state = spawnM(state, f)
+        state = spawn(state, f)
     return state
 
 def spawnM(state, f, flags=[]):
@@ -36,9 +36,8 @@ def spawnM(state, f, flags=[]):
     state, can = can_spawn(state)
     become = Spawn.BECOME in flags and not can
     if become:
-        state, v = dos(state, [f])
-        return state
-    
+        return do_(state, [f])
+
     if Spawn.INHERIT in flags:
         child_state = State.fork(state)
     else:

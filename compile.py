@@ -7,26 +7,6 @@ def push_args(state, args):
     state["args"].append(args)
     return state
 
-def push_bindings(state, kvs={}):
-    state["bindings"].append(kvs)
-
-def pop_bindings(state):
-    kvs = state["bindings"].pop()
-    return pure(state, kvs)
-
-def push_binding(state, name, value):
-    state["bindings"][-1][name] = value
-    return state
-
-def get_binding(state, name):
-    i = len(state["bindings"])-1
-    while i >= 0:
-        bs = state["bindings"][i]
-        if name in bs:
-            return pure(state, bs[name])
-        i -= 1
-    return fatal(state, ("Unknown binding:", name))
-
 def defun(args, body):
     def bind_i(state, i):
         return dos(state, [

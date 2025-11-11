@@ -61,7 +61,7 @@ def fill_rows(state, f, handler=None, n=None):
     def p(y):
         return [boxloop, [0, y, d, 1], f, [0, y], False]
     for y in range(1, min(d, n)):
-        state = spawnM(state, p(y))
+        state = spawn(state, p(y))
     state, results0 = dos(state, [p(0)])
     if handler == None:
         return state

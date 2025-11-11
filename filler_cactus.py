@@ -6,42 +6,51 @@ from filler_utils import *
 
 def cactus_swaps(state):
 
-    def f(state, dir, op):
+    def dir_to_swap_required(state, dir, op):
         return dos(state, [
-            [fmap,
-                [pair, dir],
-                [condM, [bind, [get_to, dir, "cactus_size"], [lift1, is_none]],
+            [liftA2, [pairM],
+                [condM, [fmap, [lift(is_none)], [get_to, dir, "cactus_size"]],
                     [pure, None],
-                    [lift2, op,
+                    [liftA2, [lift(op)],
                         [get_here, "cactus_size"],
                         [get_to, dir, "cactus_size"]
                     ]
-                ]
+                ],
+                [pure, dir]
             ]
         ])
 
     return dos(state, [
         [sense, [Sensing.DIRECTIONAL]],
         [then, [Map.from_list], [sequence, [
-            [f, South, LTE],
-            [f, West, LTE],
-            [f, North, GT],
-            [f, West, GT]
+            [dir_to_swap_required, South, LTE],
+            [dir_to_swap_required, West, LTE],
+            [dir_to_swap_required, North, GT],
+            [dir_to_swap_required, West, GT]
         ]]]
     ])
 
 def filler_cactus(state):
 
-    def maybe_swap(state, dir):
+    def maybe_swap(state):
         return dos(state, [
-            [condM, [popret], [pushret, True],
-                [condM, [bind, [cactus_swaps], [getattr, dir]],
-                    [dos, [
-                        [swapM, dir],
-                        [moveM, dir],
-                        [pushret, True]
-                    ]],
-                    [pushret, False]]
+            [then, [let, "d2s"], [cactus_swaps]],
+            [let, "swap_dir", None],
+            [forM, Dirs, [dos, [
+                [whenM, [fmap, [is_none], [read, "swap_dir"]], [dos, [
+                    [then, [let, "swap?"], [bind, [read, "d2s"], [getattr, dir]]],
+                    [whenM, [read, "swap?"], [dos, [
+                        [let, "swap_dir", dir]
+                    ]]]
+                ]]]
+            ]]],
+            [condM, [bind, [read, "swap_dir"], [is_none]],
+                [unit],
+                [dos, [
+                    [swapM, dir],
+                    [moveM, dir],
+                    [pure, True]
+                ]]
             ]
         ])
 
@@ -50,13 +59,10 @@ def filler_cactus(state):
         [dos, [
             [sense],
             [plant_one, E.Cactus],
-            [pushret, False],
-            [mapM, [maybe_swap], Dirs],
-            [popret],
-            [get_row]
+            [maybe_swap],
+            [bind, [get_row], [pushret]]
         ]],
         [dos, [
             [bind, [popret], [merge_row]]
-        ]],
-        1
+        ]]
     )

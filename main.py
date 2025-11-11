@@ -5,7 +5,7 @@ import sim
 import run_tests
 
 def init(state):
-    return dos(state, [
+    return do_(state, [
         [when, Size.SMALL in state["flags"], [dos, [
             [State.set_size, Size.SMALL]
         ]]],
@@ -13,7 +13,7 @@ def init(state):
             [State.set_size, Size.TINY]
         ]]],
         [hatM, Hats.Straw_Hat],
-        [move_to, [0, 0]]
+        [move_to, (0, 0)]
     ])
 
 def main(state=None, flags=MAIN_FLAGS):

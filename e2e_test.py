@@ -8,9 +8,9 @@ def run(state):
             [dos, [
                 [move_to, (0, 0)],
                 [sense, [Sensing.DIRECTIONAL]],
-                [liftA2, [pair],
-                    [liftA2, [pair], [exists_to, South], [exists_to, West]],
-                    [liftA2, [pair], [exists_to, North], [exists_to, East]]
+                [liftA2, [pairM],
+                    [liftA2, [pairM], [exists_to, South], [exists_to, West]],
+                    [liftA2, [pairM], [exists_to, North], [exists_to, East]]
                 ]
             ]],
             ((False, False), (True, True))]

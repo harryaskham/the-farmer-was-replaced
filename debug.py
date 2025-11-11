@@ -3,6 +3,9 @@ from aliases import *
 from error import *
 
 def log(state, msg, level=Log.DEBUG, prefix=None):
+    if Log.ROOT_DRONE_ONLY in state["flags"] and state["id"] != 0:
+        return state
+
     debug_level = 0
     for l in Log.Levels:
         if l in state["flags"]:

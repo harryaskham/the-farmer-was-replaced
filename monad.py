@@ -4,6 +4,27 @@ from debug import *
 from error import *
 from list import *
 
+def push_bindings(state, kvs={}):
+    state["bindings"].append(kvs)
+    return state
+
+def pop_bindings(state):
+    kvs = state["bindings"].pop()
+    return pure(state, kvs)
+
+def push_binding(state, name, value):
+    state["bindings"][-1][name] = value
+    return state
+
+def get_binding(state, name):
+    i = len(state["bindings"])-1
+    while i >= 0:
+        bs = state["bindings"][i]
+        if name in bs:
+            return pure(state, bs[name])
+        i -= 1
+    return fatal(state, ("Unknown binding:", name))
+
 def pushret(state, v):
     state["ret"].append(v)
     return state
@@ -109,6 +130,7 @@ def dos(state, xss):
         return unit(state)
 
     v = None
+    state = push_bindings(state)
     for xs in xss:
         if state["error"] != None:
             state = fatal(state, ("Error in do-block:", state["error"]))
@@ -135,6 +157,7 @@ def dos(state, xss):
 
         state = state_
 
+    state = pop_bindings(state)
     return state, v
 
 def do_(state, xss):

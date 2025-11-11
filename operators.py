@@ -87,8 +87,11 @@ def pureM(state, f):
 def do_a_flipM(state):
     do_a_flip()
     return unit(state)
-    
-def pair(state, a, b):
+
+def pair(a, b):
+    return (a, b)
+
+def pairM(state, a, b):
     return pure(state, (a, b))
 
 def fst(xs):
