@@ -1,10 +1,6 @@
 from lib import *
 from loops import *
-from maze import *
 from drones import *
-from sunflower import *
-from pumpkin import *
-from cactus import *
 
 def get_row(state):
     state, d = wh(state)
