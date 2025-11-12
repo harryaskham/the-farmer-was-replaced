@@ -69,3 +69,28 @@ def end_excursion(state):
         d = excursion.pop()
         state, _ = moveM(state, opposite(d), [Movement.REWIND_EXCURSION])
     return state
+
+def move_toward(state, c, flags=[]):
+    cx, cy = unpack(c)
+
+    if x(state)[1] > cx:
+        state, moved = moveM(state, West, flags)
+        if moved:
+            return pure(state, True)
+
+    if x(state)[1] < cx:
+        state, moved = moveM(state, East, flags)
+        if moved:
+            return pure(state, True)
+
+    if y(state)[1] > cy:
+        state, moved = moveM(state, South, flags)
+        if moved:
+            return pure(state, True)
+
+    if y(state)[1] < cy:
+        state, moved = moveM(state, North, flags)
+        if moved:
+            return pure(state, True)
+
+    return pure(state, False)

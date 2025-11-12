@@ -11,7 +11,20 @@ def set_apple(state):
     return set_state(state, {
         "apple": measure()
     })
-    
+
+def tail_follow(state):
+    state = sense(state)
+    state["tail_len"] += 1
+    moved = True
+    while moved:
+        if manhattan(xy(state)[1], state["apple"]) <= 1:
+            state, moved = move_toward(state, state["apple"], [Dinosaur.UPDATE_TAIL])
+            state = sense(state)
+            state["tail_len"] += 1
+        else:
+            state, moved = move_toward(state, state["tail"][-1], [Dinosaur.UPDATE_TAIL])
+    return state
+
 def brute(state):
     xd = East
     yd = North

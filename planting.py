@@ -12,13 +12,13 @@ def tillable(e):
         E.Sunflower,
         E.Cactus
     ], e)
-    
+
 def untillable(e):
     return contains([
         None,
         E.Grass
     ], e)
-    
+
 def plantable(e):
     return e != Entities.Grass
 
@@ -37,11 +37,10 @@ def maybe_untill(state, e=None):
             "ground_type": G.Grassland
         })
     return state
-        
-def maybe_plant(state, e, water=False):
+
+def maybe_plant(state, e):
     if plantable(e) and et(state)[1] != e:
-        if water:
-            state = water_to(state, WATER_RANGE[0], WATER_RANGE[1], WATER_BEFORE)
+        state = water_to(state)
         plant(e)
         return dos(state, [
             [set_here, {"entity_type": e}],
@@ -54,9 +53,9 @@ def plant_one(state, e, unused=None):
     return dos(state, [
         [maybe_till, e],
         [maybe_untill, e],
-        [maybe_plant, e, True]
+        [maybe_plant, e]
     ])
-    
+
 def plantM(state, e, unused=None):
     state, planted = plant_one(state, e)
     return dos(state, [
@@ -64,5 +63,3 @@ def plantM(state, e, unused=None):
         [maybe_cure],
         [pure, planted]
     ])
-
-        

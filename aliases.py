@@ -6,6 +6,7 @@ Dirs = [North, East, South, West]
 import Copy
 import Companions
 import Dinosaur
+import Execution
 import Harvesting
 import Log
 import Mode

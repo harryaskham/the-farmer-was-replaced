@@ -1,0 +1,2 @@
+NORMAL = "Execution.NORMAL"
+SIMULATION = "Execution.SIMULATION"

@@ -2,7 +2,7 @@ from farmlib import *
 
 def purges(state, n_drones=16):
     state, n = wh(state)
-    every = n // n_drones
+    every = max(1, n // n_drones)
     ps = []
     for y in range(0, n, every):
         ps.append([boxloop, [0, y, n, every], [try_harvest], [0, y], False])
