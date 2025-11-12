@@ -106,13 +106,13 @@ def fill_rowsM(state, f, handler, n=None):
                 ])
         return fill_rows(state, f, h, n)
 
-def oscillate(state, ltr, rtl, loop=True):
+def oscillate(state, ltr, rtl, loop=True, flags=[]):
     state, d = wh(state)
     def p(y):
         b = row_box(d, y)
         inner = [dos, [
-            [boxloop, b, ltr, [0, y], False, False],
-            [boxloop, b, rtl, [d-1, y], False, True]
+            [boxloop, b, ltr, [0, y], False, False, flags],
+            [boxloop, b, rtl, [d-1, y], False, True, flags]
         ]]
         if loop:
             return [forever, inner]

@@ -9,7 +9,7 @@ MAIN_FLAGS = set([
     #Log.DRONE_DETAILS,
     #Log.DEBUG,
     #Size.NORMAL,
-    #Space.FILL,
+    Space.FILL,
     #Phase.PURGE,
     #Phase.COMPANIONS,
     #Phase.CROPS,
@@ -17,8 +17,8 @@ MAIN_FLAGS = set([
     #Phase.CACTUS,
     #Phase.PUMPKIN,
     #Phase.MAZE,
-    #Phase.ENERGY,
-    Phase.DINO,
+    Phase.ENERGY,
+    #Phase.DINO,
     #Phase.FLIPS,
 ])
 

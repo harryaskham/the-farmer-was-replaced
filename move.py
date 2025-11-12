@@ -58,26 +58,26 @@ def move_bounded(state, dir, flags=[]):
         return pure(state, False)
     return moveM(state, dir, flags)
 
-def move_to(state, c):
+def move_to(state, c, flags=[]):
     cx, cy = unpack(c)
 
     while x(state)[1] > cx:
-        state, moved = moveM(state, West)
+        state, moved = moveM(state, West, flags)
         if not moved:
             fatal(state, "Couldn't move")
 
     while x(state)[1] < cx:
-        state, moved = moveM(state, East)
+        state, moved = moveM(state, East, flags)
         if not moved:
             fatal(state, "Couldn't move")
 
     while y(state)[1] > cy:
-        state, moved = moveM(state, South)
+        state, moved = moveM(state, South, flags)
         if not moved:
             fatal(state, "Couldn't move")
 
     while y(state)[1] < cy:
-        state, moved= moveM(state, North)
+        state, moved= moveM(state, North, flags)
         if not moved:
             fatal(state, "Couldn't move")
 

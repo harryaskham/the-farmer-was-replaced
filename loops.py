@@ -4,7 +4,7 @@ from move import *
 def nop_f(state, _, _):
     return [const, state]
         
-def traverse_farm(state, f, box=None, start=None, reverse=False):
+def traverse_farm(state, f, box=None, start=None, reverse=False, flags=[]):
     state, d = wh(state)
         
     if box == None:
@@ -13,7 +13,7 @@ def traverse_farm(state, f, box=None, start=None, reverse=False):
     if start == None:
         start = box[:2]
 
-    state = move_to(state, start)
+    state = move_to(state, start, flags)
 
     res = {}
     for yi in range(box[3]):
@@ -34,17 +34,17 @@ def traverse_farm(state, f, box=None, start=None, reverse=False):
             res[(x, y)] = out
     return state, res
     
-def boxloop(state, box, f, start=None, loop=True, reverse=False):
+def boxloop(state, box, f, start=None, loop=True, reverse=False, flags=[]):
     def g(state, x, y):
         return [f]
-    return farmloop(state, g, loop, False, box, start, reverse)
+    return farmloop(state, g, loop, False, box, start, reverse, flags)
 
-def farmloop(state, f, loop=True, scan=False, box=None, start=None, reverse=False):
+def farmloop(state, f, loop=True, scan=False, box=None, start=None, reverse=False, flags=[]):
     if scan:
-        state, out = traverse_farm(state, nop3, box, start, reverse)
+        state, out = traverse_farm(state, nop3, box, start, reverse, flags)
         
     def go(state):
-        return traverse_farm(state, f, box, start, reverse)
+        return traverse_farm(state, f, box, start, reverse, flags)
         
     while True:
         state, out = go(state)
