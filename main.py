@@ -6,12 +6,7 @@ import run_tests
 
 def init(state):
     return do_(state, [
-        [when, Size.SMALL in state["flags"], [dos, [
-            [State.set_size, Size.SMALL]
-        ]]],
-        [when, Size.TINY in state["flags"], [dos, [
-            [State.set_size, Size.TINY]
-        ]]],
+        [State.set_size],
         [hatM, Hats.Straw_Hat],
         [move_to, (0, 0)]
     ])

@@ -28,4 +28,7 @@ def run(state):
         [Test, [AddM, 1, 2], 3],
         [Test, [AddXY, 1, 2], 3],
         [Test, [AddF, 1, 2], 3],
+        [Test,
+            [bind, [Lambda_, [liftA2, [AddM], [pure, 1], [arg, 0]]], [flap, 5]],
+            6]
     ])

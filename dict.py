@@ -25,6 +25,12 @@ def values(xs):
         vs.append(xs[k])
     return vs
 
+def keys(xs):
+    ks = []
+    for k in xs:
+        ks.append(k)
+    return ks
+
 def getattr(xs, key, default=None):
     if key in xs:
         return xs[key]

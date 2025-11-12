@@ -109,3 +109,19 @@ def fill_rowsM(state, f, handler, n=None):
                         handler
                 ])
         return fill_rows(state, f, h, n)
+
+def oscillate(state, ltr, rtl, loop=True):
+    state, d = wh(state)
+    def p(y):
+        b = row_box(d, y)
+        inner = [dos, [
+            [boxloop, b, ltr, [0, y], False, False],
+            [boxloop, b, rtl, [d-1, y], False, True]
+        ]]
+        if loop:
+            return [forever, inner]
+        else:
+            return inner
+    for y in range(d-1, 0, -1):
+        state = spawn_(state, p(y), [Spawn.FORK, Spawn.AWAIT])
+    return dos(state, [p(0)])

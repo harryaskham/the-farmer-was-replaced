@@ -12,6 +12,9 @@ def box(state):
     state, d = wh(state)
     return pure(state, [0, 0, d, d])
 
+def row_box(d, y):
+    return [0, y, d, 1]
+
 def x(state):
     return pure(state, state["x"])
     

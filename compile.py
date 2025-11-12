@@ -7,6 +7,18 @@ def push_args(state, args):
     state["args"].append(args)
     return state
 
+def lambda(state, args, body):
+    return pure(state, defun(args, body))
+
+def Lambda(state, args, body):
+    return pure(state, [defun(args, body)])
+
+def lambda_(state, body):
+    return pure(state, compile(body))
+
+def Lambda_(state, body):
+    return pure(state, [compile(body)])
+
 def defun(args, body):
     def bind_i(state, i):
         return dos(state, [

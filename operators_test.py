@@ -12,4 +12,6 @@ def run(state):
         [Test, [fmap, [Add, 1], [pure, 2]], 3],
         [Test, [fmap, [is_none], [pure, None]], True],
         [Test, [bind, [pure, True], [lift1, Not]], False],
+        [Test, [lift([Mod]), 8, 5], 3],
+        [Test, [lift([Mod]), -3, 5], 2],
     ])

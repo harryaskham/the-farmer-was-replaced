@@ -63,8 +63,8 @@ def State__put(state, kvs, flags=[]):
 def State__get(self, key):
     return pure(self, self[key])
 
-def State__fork(self):
-    child = self["share"]()
+def State__fork(self, id):
+    self, child = self["share"](id)
 
     child["grid"] = {}
     for c in self["grid"]:
@@ -76,11 +76,11 @@ def State__fork(self):
 
     return pure(self, child)
 
-def State__share(self):
+def State__share(self, id):
     self = Lock(self, "State__share")
 
     child = dict(self)
-    child["id"] = num_drones() + 1
+    child["id"] = id
 
     child["ret"] = []
     child["args"] = []
@@ -99,7 +99,7 @@ def State__share(self):
     child["tail_set"] = set()
 
     self = Unlock(self, "State__share")
-    return child
+    return pure(self, child)
 
 State = Type.new(
     __name__,
@@ -120,18 +120,29 @@ def put(state, kvs, flags=[]):
 def get(state, k):
     return state["get"](k)
     
-def share(state):
-    return state["share"]()
+def share(state, id):
+    return state["share"](id)
 
 def fork(state):
     return state["fork"]()
     
-def set_size(state, n=Size.NORMAL):
+def set_size(state, n=None):
+    if n == None:
+        for flag in state["flags"]:
+            if flag in Size.Sizes:
+                n = Size.Sizes[flag]
+                break
+        if n == None:
+            return state
+
     if n in Size.Sizes:
         n = Size.Sizes[n]
+
     set_world_size(n)
-    return new(state["flags"])
-    
+    state["grid"] = {}
+    state["wh"] = get_world_size()
+    return state
+
 def drone_id(state):
     return state["id"]
     

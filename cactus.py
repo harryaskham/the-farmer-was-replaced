@@ -40,13 +40,40 @@ def swap_if(d, a, b):
     if ca == None or cb == None:
         return None
     return {
-        West: ca <= cb,
+        West: ca < cb,
         South: ca < cb,
         East: ca > cb,
         North: ca > cb
     }[d]
 
-def emplace_cactus(state, dirs=None):
+def swap_once(state, dirs=None):
+    if dirs == None:
+        dirs = list(Dirs)
+
+    state = sense(state, [Sensing.DIRECTIONAL])
+    state, (x, y) = xy(state)
+    state, this = here(state)
+    state, ns = ordinal_neighbors(state)
+
+    swapped = False
+    for d in dirs:
+        if d not in ns:
+            continue
+
+        n = ns[d]
+        if n == None:
+            continue
+
+        cmp = swap_if(d, this, n)
+        state = info(state, ((x, y), d, this["cactus_size"], n["cactus_size"], cmp))
+        if cmp == True:
+            state, swapped = swapM(state, d)
+            if swapped:
+                break
+
+    return pure(state, swapped)
+
+def emplace_once(state, dirs=None):
     if dirs == None:
         dirs = list(Dirs)
 
@@ -86,9 +113,22 @@ def emplace_cactus(state, dirs=None):
             return go(state)
         return pure(state, moved)
 
-    state = start_excursion(state)
+    state, start = xy(state)
     state, moved = go(state)
-    state = end_excursion(state)
+    state = move_to(state, start)
+    return pure(state, moved)
+
+def emplace_cactus(state, dirs=None):
+    done = False
+    moved = False
+    while not done:
+        state, moved_now = emplace_once(state, dirs)
+        if moved_now:
+            moved = True
+            continue
+        if not moved_now:
+            done = True
+            break
     return pure(state, moved)
 
 def Cactus(state, x, y, box, otherwise):
@@ -104,7 +144,7 @@ def Cactus(state, x, y, box, otherwise):
             [dos, [
                 [do_harvest],
                 [plant_one, E.Cactus],
-                [emplace_cactus, box]
+                [emplace_cactus]
             ]],
             otherwise
         ]

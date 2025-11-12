@@ -1,12 +1,12 @@
 from aliases import *
 
 MAIN_FLAGS = set([
-    #Mode.SIMULATE,
+    Mode.SIMULATE,
     #Mode.TEST,
     Mode.RUN,
     #Testing.LOOP,
     Log.DRONE_DETAILS,
-    #Log.INFO,
+    #Log.DEBUG,
     #Size.NORMAL,
     #Size.SMALL,
     Space.FILL,
@@ -14,10 +14,10 @@ MAIN_FLAGS = set([
     #Phase.COMPANIONS,
     #Phase.CROPS,
     #Phase.CARROTS,
-    #Phase.CACTUS,
+    Phase.CACTUS,
     #Phase.PUMPKIN,
     #Phase.MAZE,
-    Phase.ENERGY,
+    #Phase.ENERGY,
     #Phase.DINO,
     #Phase.FLIPS,
 ])

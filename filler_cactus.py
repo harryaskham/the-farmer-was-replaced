@@ -4,6 +4,17 @@ from cactus import *
 from operators import *
 from filler_utils import *
 
+def assume(state):
+    state, c0 = pos_to(state, South)
+    state, c1 = pos_to(state, North)
+    state, c2 = pos_to(state, East)
+    state, c3 = pos_to(state, West)
+    for c in [c0, c1, c2, c3]:
+        if c != None:
+            state = set_at(state, c, {"entity_type": E.Cactus})
+    return state
+
+
 def cactus_swaps(state):
 
     def dir_to_swap_required(state, dir, op):
@@ -31,6 +42,22 @@ def cactus_swaps(state):
     ])
 
 def filler_cactus(state):
+    return do_(state, [
+        [oscillate,
+            [dos, [[plant_one, E.Cactus], [assume], [whileM, [swap_once], [nop1]]]],
+            [dos, [
+                [assume],
+                [whileM, [swap_once], [nop1]]
+                #[cond, state["y"] % 2 == 0,
+                #    [swap_once, [East, West]],
+                #    [swap_once, [North, South]]
+                #]
+            ]],
+            False
+        ],
+        #[wait_all],
+        [harvestM]
+    ])
 
     def handle_dir(state, dir):
         return dos(state, [
@@ -61,16 +88,6 @@ def filler_cactus(state):
 
     def harv(state):
         return pure(state, state["i"] % 2 == 1)
-
-    def assume(state):
-        state, c0 = pos_to(state, South)
-        state, c1 = pos_to(state, North)
-        state, c2 = pos_to(state, East)
-        state, c3 = pos_to(state, West)
-        for c in [c0, c1, c2, c3]:
-            if c != None:
-                state = set_at(state, c, {"entity_type": E.Cactus})
-        return state
 
     state, d = wh(state)
     state = move_to(state, (d//2, d//2))

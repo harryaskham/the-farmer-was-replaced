@@ -182,8 +182,21 @@ def run(state, ma):
 def apply(state, f, args):
     fa = list(f)
     for arg in args:
-        fa.append(args)
+        fa.append(arg)
     return run(state, fa)
+
+def ap(state, f, arg):
+    return apply(state, f, [arg])
+
+def flap(state, arg, f):
+    return apply(state, f, [arg])
+
+def apM(state, mf, arg):
+    state, f = dos(state, [mf])
+    return apply(state, f, args)
+
+def flapM(state, arg, mf):
+    return apM(state, mf, arg)
 
 def bind(state, ma, f):
     state = debug(state, ("bind", ma, f))
