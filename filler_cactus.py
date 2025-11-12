@@ -42,22 +42,33 @@ def cactus_swaps(state):
     ])
 
 def filler_cactus(state):
-    return do_(state, [
+    def sel(state):
+        return pure(state, (state["i"] + state["y"]) % 2 == 0)
+
+    state = do_(state, [
         [oscillate,
-            [dos, [[plant_one, E.Cactus], [assume], [whileM, [swap_once], [nop1]]]],
+            [dos, [
+                [plant_one, E.Cactus],
+                [assume],
+                [condM, [sel],
+                    [whileM, [swap_once, [East, West]], [nop1]],
+                    [whileM, [swap_once, [North, South]], [nop1]],
+                ]
+            ]],
             [dos, [
                 [assume],
-                [whileM, [swap_once], [nop1]]
-                #[cond, state["y"] % 2 == 0,
-                #    [swap_once, [East, West]],
-                #    [swap_once, [North, South]]
-                #]
+                [condM, [sel],
+                    [whileM, [swap_once, [East, West]], [nop1]],
+                    [whileM, [swap_once, [North, South]], [nop1]],
+                ]
             ]],
             False
         ],
         #[wait_all],
         [harvestM]
     ])
+    state["i"] += 1
+    return state
 
     def handle_dir(state, dir):
         return dos(state, [
