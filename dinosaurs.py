@@ -20,20 +20,20 @@ def tail_follow(state):
     dir = North
     rot = CW
     while True:
-        moved = False
-        #state, moved = move_toward(state, state["apple"], [Dinosaur.UPDATE_TAIL])
-        state, moved = move_toward(state, state["apple"])
+        #state = sense(state)
+        state, moved = move_toward(state, state["apple"], [Movement.FAST])
         if not moved:
             for _ in range(5):
-                state, moved = moveM(state, dir)
-                #state, moved = moveM(state, dir, [Dinosaur.UPDATE_TAIL])
+                state, moved = moveM(state, dir, [Movement.FAST])
                 if moved:
                     break
                 dir = rot[dir]
             rot_i += 1
-            rot = Rots[rot_i % 2]
+            rot = Rots[(rot_i % 4) // 2]
+
         if not moved:
             return state
+
         state, c = xy(state)
         if c == state["apple"]:
             state = sense(state)

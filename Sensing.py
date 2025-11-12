@@ -1,1 +1,2 @@
 DIRECTIONAL = "Sensing.DIRECTIONAL"
+FAST = "Sensing.FAST"

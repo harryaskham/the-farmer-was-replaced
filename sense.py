@@ -3,24 +3,29 @@ from debug import *
 from measure import *
 import State
 
-def sense(state, flags=[]):
-    flags = set(flags)
+def sense_position(state):
     x = get_pos_x()
     y = get_pos_y()
+    return do_(state, [
+        [State.put, {
+            "x": x,
+            "y": y,
+        }]
+    ])
+
+def sense(state, flags=[]):
+    flags = set(flags)
+    state = sense_position(state)
     e = get_entity_type()
     g = get_ground_type()
 
     state = do_(state, [
-        [State.put, {
-            "x": x,
-            "y": y,
-        }],
         [set_here, {
             "entity_type": e,
             "ground_type": g
         }],
     ])
-    
+
     state = measureM(state)
     
     if Sensing.DIRECTIONAL in flags:

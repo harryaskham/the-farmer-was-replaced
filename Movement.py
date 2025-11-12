@@ -1,1 +1,2 @@
+FAST = "Movement.FAST"
 REWIND_EXCURSION = "Movement.REWIND_EXCURSION"

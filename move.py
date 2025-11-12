@@ -25,6 +25,10 @@ def moveM(state, d, flags=[]):
     if not move(d):
         return pure(state, False)
 
+    if Movement.FAST in flags:
+        state = sense_position(state)
+        return pure(state, True)
+
     state = do_(state, [
         [sense, flags],
         [unless, Movement.REWIND_EXCURSION in flags, [maybe_update_excursion, d]]
