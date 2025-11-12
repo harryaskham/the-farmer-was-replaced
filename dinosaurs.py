@@ -15,15 +15,29 @@ def set_apple(state):
 def tail_follow(state):
     state = sense(state)
     state["tail_len"] += 1
-    moved = True
-    while moved:
-        if manhattan(xy(state)[1], state["apple"]) <= 1:
-            state, moved = move_toward(state, state["apple"], [Dinosaur.UPDATE_TAIL])
+
+    rot_i = 0
+    dir = North
+    rot = CW
+    while True:
+        moved = False
+        #state, moved = move_toward(state, state["apple"], [Dinosaur.UPDATE_TAIL])
+        state, moved = move_toward(state, state["apple"])
+        if not moved:
+            for _ in range(5):
+                state, moved = moveM(state, dir)
+                #state, moved = moveM(state, dir, [Dinosaur.UPDATE_TAIL])
+                if moved:
+                    break
+                dir = rot[dir]
+            rot_i += 1
+            rot = Rots[rot_i % 2]
+        if not moved:
+            return state
+        state, c = xy(state)
+        if c == state["apple"]:
             state = sense(state)
             state["tail_len"] += 1
-        else:
-            state, moved = move_toward(state, state["tail"][-1], [Dinosaur.UPDATE_TAIL])
-    return state
 
 def brute(state):
     xd = East
@@ -101,6 +115,7 @@ def dino(state, policies, delay=0):
             [set_state, { "tail": [] }],
             [set_state, { "tail_set": set() }],
             [set_state, { "tail_len": 0 }],
+            [apple_here],
             [policy],
             [wait_secsM, delay],
             [hatM, Hats.Straw_Hat],

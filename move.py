@@ -2,6 +2,22 @@ from lib import *
 from excursion import *
 from sense import *
 
+CW = {
+    North: East,
+    East: South,
+    South: West,
+    West: North
+}
+
+CCW = {
+    North: West,
+    West: South,
+    South: East,
+    East: North
+}
+
+Rots = [CW, CCW]
+
 def moveM(state, d, flags=[]):
     flags = set(flags)
     state, prev = xy(state)

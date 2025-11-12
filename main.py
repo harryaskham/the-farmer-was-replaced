@@ -57,7 +57,7 @@ def main(state=None, flags=MAIN_FLAGS):
                     [when, Phase.MAZE in flags, [filler_maze]]
                 ]]]],
                 [when, Phase.DINO in flags, [dos, [
-                    [run_progs, purges],
+                    #[run_progs, purges],
                     [dino, [tail_follow]],
                     #[dino, [dumb, brute, search_apple]],
                 ]]],
