@@ -27,6 +27,7 @@ def maze(state, size=None):
             state, size = wh(state)
         use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
         state = do_(state, [
+            [harvestM],
             [plant_one, E.Bush],
             [useM, I.Weird_Substance, use_n],
         ])
