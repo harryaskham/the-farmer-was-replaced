@@ -16,8 +16,8 @@ MAIN_FLAGS = set([
     #Phase.CARROTS,
     #Phase.CACTUS,
     #Phase.PUMPKIN,
-    #Phase.MAZE,
-    Phase.ENERGY,
+    Phase.MAZE,
+    #Phase.ENERGY,
     #Phase.DINO,
     #Phase.FLIPS,
 ])

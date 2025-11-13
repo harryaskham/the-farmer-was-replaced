@@ -7,7 +7,7 @@ from drones import *
 
 def maze_many(state, size=None):
     state = move_to(state, [wh(state)-1, wh(state)-1])
-    state = spawn_(state, [maze, size], 12)
+    state = spawn_(state, [maze, size], [Spawn.FORK])
     
     state = move_to(state, [0, wh(state)-1])
     state = spawn_(state, [maze, size], 8)
@@ -21,9 +21,10 @@ def maze_many(state, size=None):
 def maze(state, size=None):
     state, start_pos = xy(state)
     state = sense(state)
+    state, e = et(state)
     if et(state) not in [E.Hedge, E.Treasure]:
         if size == None:
-            size = wh(state)
+            state, size = wh(state)
         use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
         state = do_(state, [
             [plant_one, E.Bush],
@@ -36,10 +37,12 @@ def maze(state, size=None):
         state = sense(state)
         
         if et(state) == E.Treasure:
-            state = try_harvest(state, [E.Treasure])
+            state = do_(state, [
+                [try_harvest, [E.Treasure]]
+            ])
             break
 
-        (x, y) = xy(state)
+        state, (x, y) = xy(state)
         seen.add((x, y))
         state, ns = neighbors_dict(state)
         moved = False
@@ -62,8 +65,8 @@ def maze(state, size=None):
             n = ns[d]
             if n in seen:
                 continue
-            state = moveM(state, d)
-            if xy(state) != (x, y):
+            state, _ = moveM(state, d)
+            if xy(state)[1] != (x, y):
                 moved = True
                 back.append(opposite(d))
                 break
@@ -72,5 +75,4 @@ def maze(state, size=None):
                 break
             state, _ = moveM(state, back.pop())
             
-    state = move_to(state, start_pos)
-    return state
+    return move_to(state, start_pos)

@@ -123,8 +123,8 @@ def get(state, k):
 def share(state, id):
     return state["share"](id)
 
-def fork(state):
-    return state["fork"]()
+def fork(state, id):
+    return state["fork"](id)
     
 def set_size(state, n=None):
     if n == None:

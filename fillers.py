@@ -17,7 +17,7 @@ def filler_maze(state, num_drones=None):
                     [wait_secsM, 5],
                     [boxloop, [x, y, 1, 1], [maze, n]]
                 ])
-            state = spawn_(state, [child], [Spawn.BECOME])
+            state = spawn_(state, [child], [Spawn.FORK, Spawn.BECOME])
     return state
 
 
