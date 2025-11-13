@@ -6,7 +6,7 @@ from filler_energy import *
 
 def filler_maze(state, num_drones=None):
     if num_drones == None:
-        num_drones = state["max_drones"]
+        num_drones = 16
     state, d = wh(state)
     n = d // ((num_drones ** 0.5) // 1)
     for y in range(n//2, n//2 + n * (d // n), n):
