@@ -1,8 +1,8 @@
 from farmlib import *
-from filler_utils import *
 from filler_cactus import *
-from filler_pumpkin import *
 from filler_energy import *
+from filler_pumpkin import *
+from filler_utils import *
 
 def filler_maze(state, num_drones=None):
     if num_drones == None:
@@ -20,7 +20,6 @@ def filler_maze(state, num_drones=None):
             state = spawn_(state, [child], [Spawn.FORK, Spawn.BECOME])
     return state
 
-
 def filler_crops(state):
     return fill_rows(state, [dos, [
         [sense],
@@ -37,9 +36,9 @@ def filler_crop(state, e):
         [try_harvest],
         [plant_one, e]
     ]])
-    
+
 def filler_companions(state):
-    
+
     def handler(state, results):
         state, d = wh(state)
         for result in values(results):
@@ -49,7 +48,7 @@ def filler_companions(state):
                     for c in row:
                         state["grid"][(c["x"], c["y"])] = c
         return state
-        
+
     return fill_rows(state, [dos, [
         [sense],
         [try_harvest, None, [Companions.AWAIT]],
