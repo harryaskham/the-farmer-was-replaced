@@ -19,7 +19,8 @@ def maze(state, size=None):
             [plant_one, E.Bush],
             [useM, I.Weird_Substance, use_n],
         ])
-    state = Lock(state, "mk_maze")
+
+    state = Unlock(state, "mk_maze")
 
     seen = set()
 
