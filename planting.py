@@ -64,7 +64,12 @@ def plantM(state, e, flags=[]):
     flags = set(flags)
     state, planted = plant_one(state, e, flags)
     return dos(state, [
-        [when, Growing.FERTILIZE in flags, [fertilize]],
-        [when, Harvesting.CURE in flags, [maybe_cure, [e], Harvesting.UNSAFE in flags]],
+        [when, Growing.FERTILIZE in flags, [dos, [
+            [fertilize, None, 1],
+            [when, Growing.AWAIT in flags, [fertilize]]
+        ]]],
+        [when, Harvesting.CURE in flags, [dos, [
+            [maybe_cure, [e], Harvesting.UNSAFE in flags],
+        ]]],
         [pure, planted]
     ])

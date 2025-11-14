@@ -1,2 +1,3 @@
 WATER = "Growing.WATER"
 FERTILIZE = "Growing.FERTILIZE"
+AWAIT = "Growing.AWAIT"

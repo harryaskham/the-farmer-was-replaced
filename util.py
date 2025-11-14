@@ -11,3 +11,9 @@ def toggle(flags, flag):
     else:
         flags.add(flag)
     return flags
+
+def without(flags, flag):
+    flags = set(flags)
+    if flag in flags:
+        flags.remove(flag)
+    return flags

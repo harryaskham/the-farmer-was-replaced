@@ -21,6 +21,9 @@ def harvestM(state, flags=[]):
         }, flags]]
     ])
 
+def gatherM(state, flags=[]):
+    return try_harvest(state, None, flags)
+
 def try_harvest(state, entities=None, flags=[]):
     flags = set(flags)
     state, e = et(state)

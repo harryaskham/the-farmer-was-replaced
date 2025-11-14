@@ -37,4 +37,7 @@ def maybe_cure(state, over=None, unsafe=False):
             ])
     return state
 
-    
+def cureM(state, flags=[]):
+    return dos(state, [
+        [maybe_cure, None, Harvesting.UNSAFE in flags],
+    ])

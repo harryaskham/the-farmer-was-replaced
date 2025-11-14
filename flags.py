@@ -2,7 +2,7 @@ from aliases import *
 
 MAIN_FLAGS = set([
     #Mode.SIMULATE,
-    #Size.TINY,
+    #Size.SMALL,
     #Mode.TEST,
     Mode.RUN,
     #Testing.LOOP,
@@ -22,7 +22,8 @@ MAIN_FLAGS = set([
     #Phase.FLIPS,
 ])
 
-ONLY_LOG_DRONES = set([1, 4])
+ONLY_LOG_DRONES = set([1, 2])
+#ONLY_LOG_DRONES = set([1])
 
 WATER_RANGE = (0.75, 1.0)
 WATER_BEFORE = [
