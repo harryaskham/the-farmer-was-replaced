@@ -5,24 +5,11 @@ from sense import *
 from move import *
 from drones import *
 
-def maze_many(state, size=None):
-    state = move_to(state, [wh(state)-1, wh(state)-1])
-    state = spawn_(state, [maze, size], [Spawn.FORK])
-    
-    state = move_to(state, [0, wh(state)-1])
-    state = spawn_(state, [maze, size], 8)
-    
-    state = move_to(state, [wh(state)-1, 0])
-    state = spawn_(state, [maze, size], 4)
-    
-    state = move_to(state, [0, 0])
-    return maze(state, size)
-
 def maze(state, size=None):
     state, start_pos = xy(state)
     state = sense(state)
     state, e = et(state)
-    if et(state) not in [E.Hedge, E.Treasure]:
+    if et(state)[1] not in [E.Hedge, E.Treasure]:
         if size == None:
             state, size = wh(state)
         use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
@@ -37,7 +24,7 @@ def maze(state, size=None):
     while True:
         state = sense(state)
         
-        if et(state) == E.Treasure:
+        if et(state)[1] == E.Treasure:
             state = do_(state, [
                 [try_harvest, [E.Treasure]]
             ])
@@ -48,7 +35,7 @@ def maze(state, size=None):
         state, ns = neighbors_dict(state)
         moved = False
         
-        ds = []
+        ds = []       
         if state["treasure"][0] < x:
             ds.append(West)
         if state["treasure"][0] > x:

@@ -26,11 +26,11 @@ def sense(state, flags=[]):
         }],
     ])
 
-    state = measureM(state)
+    state = measureM(state) #, None, None, [To.CHILDREN])
     
     if Sensing.DIRECTIONAL in flags:
         for dir in Dirs:
-            state = measureM(state, None, dir)
+            state = measureM(state, None, dir)#, [To.CHILDREN])
         
     if Companions.UPDATE not in flags:
         return state

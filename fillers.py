@@ -6,16 +6,16 @@ from filler_energy import *
 
 def filler_maze(state, num_drones=None):
     if num_drones == None:
-        num_drones = 16
+        num_drones = max_drones()
     state, d = wh(state)
     n = d // ((num_drones ** 0.5) // 1)
     for y in range(n//2, n//2 + n * (d // n), n):
         for x in range(n//2, n//2 + n * (d // n), n):
             def child(state):
                 return dos(state, [
-                    [move_to, (x, y)],
+                    [move_to, (d - 1 - x, d - 1 - y)],
                     [wait_secsM, 30],
-                    [boxloop, [x, y, 1, 1], [maze, n]]
+                    [boxloop, [d-1-x, d-1-y, 1, 1], [maze, n]]
                 ])
             state = spawn_(state, [child], [Spawn.FORK, Spawn.BECOME])
     return state
