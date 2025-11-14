@@ -6,10 +6,9 @@ from move import *
 from drones import *
 
 def maze(state, size=None):
-    state, start_pos = xy(state)
     state = sense(state)
     state, e = et(state)
-    if et(state)[1] not in [E.Hedge, E.Treasure]:
+    if e not in [E.Hedge, E.Treasure]:
         if size == None:
             state, size = wh(state)
         use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
@@ -20,51 +19,24 @@ def maze(state, size=None):
         ])
 
     seen = set()
-    back = []
-    state = sense(state)
-    while True:
-        # state = sense(state)
-        
+
+    def go(state, dir=None):
+        state = sense(state)
+        state, e = et(state)
+
         if state["treasure"] == None:
-            break
-            
-        if et(state)[1] == E.Treasure:
-            state = do_(state, [
-                [try_harvest, [E.Treasure]]
-            ])
-            break
+            return state
+
+        if e == E.Treasure:
+            return do_(state, [[try_harvest, [E.Treasure]]])
 
         state, (x, y) = xy(state)
         seen.add((x, y))
         state, ns = neighbors_dict(state)
-        moved = False
-        
-        ds = []       
-        if state["treasure"][0] < x:
-            ds.append(West)
-        if state["treasure"][0] > x:
-            ds.append(East)
-        if state["treasure"][1] < y:
-            ds.append(South)
-        if state["treasure"][1] > y:
-            ds.append(North)
-        for d in [North, East, South, West]:
-            ds.append(d)
-            
-        for d in ds:
-            if d not in ns:
-                continue
-            n = ns[d]
+        for d, n in items(ns):
             if n in seen:
                 continue
-            state, _ = moveM(state, d)
-            if xy(state)[1] != (x, y):
-                moved = True
-                back.append(opposite(d))
-                break
-        if not moved:
-            if back == []:
-                break
-            state, _ = moveM(state, back.pop())
-            
-    return move_to(state, start_pos)
+            continuation = [whenM, [moveM, d, [Movement.FAST]], [go, d]]
+            state, _ = spawn(state, continuation, [Spawn.FORK, Spawn.AWAIT])
+
+    return go(state)

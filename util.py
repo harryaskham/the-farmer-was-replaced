@@ -17,3 +17,8 @@ def without(flags, flag):
     if flag in flags:
         flags.remove(flag)
     return flags
+
+def with(flags, flag):
+    flags = set(flags)
+    flags.add(flag)
+    return flags

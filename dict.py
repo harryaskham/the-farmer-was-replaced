@@ -31,6 +31,12 @@ def keys(xs):
         ks.append(k)
     return ks
 
+def items(xs):
+    kvs = []
+    for k in xs:
+        kvs.append((k, xs[k]))
+    return kvs
+
 def getattr(xs, key, default=None):
     if key in xs:
         return xs[key]

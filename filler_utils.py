@@ -111,19 +111,23 @@ OSCILLATE_FLAGS = [Spawn.FORK, Spawn.BECOME, Movement.LOOP]
 def oscillate(state, ltr, rtl, flags=OSCILLATE_FLAGS):
     state, d = wh(state)
     flags = set(flags)
-    p_flags = without(flags, Movement.LOOP)
+    ltr_flags = without(flags, Movement.LOOP)
+    rtl_flags = toggle(ltr_flags, Movement.REVERSE)
+
     def p(y):
         b = row_box(d, y)
         inner = [dos, [
-            [box_do, b, ltr, p_flags],
-            [box_do, b, rtl, toggle(p_flags, Movement.REVERSE)]
+            [box_do, b, ltr, ltr_flags],
+            [box_do, b, rtl, rtl_flags]
         ]]
         if Movement.LOOP in flags:
             return [forever, inner]
         else:
             return inner
+
     for y in range(d-1, 0, -1):
         state = spawn_(state, p(y), flags)
         if Spawn.SERIAL in flags:
             state, _ = wait_all(state)
+
     return dos(state, [p(0)])

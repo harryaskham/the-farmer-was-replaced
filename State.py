@@ -1,7 +1,4 @@
-from pos import x, y, wh
-from monad import dos, when, pure
-from hat import hatM
-from move import move_to
+from monad import pure
 from debug import debug_
 from locking import Lock, Unlock
 import To
@@ -11,7 +8,7 @@ import Type
 def __State__(self, flags=set()):
     debug_(("__init__", self, flags))
 
-    self["id"] = num_drones()
+    self["id"] = 1
 
     self["flags"] = set(flags)
     self["locks"] = {
@@ -74,8 +71,6 @@ def State__fork(self, id):
     for p in self["petal_counts"]:
         child["petal_counts"][p] = self["petal_counts"][p]
 
-    child["treasure"] = None
-
     return pure(self, child)
 
 def State__share(self, id):
@@ -96,9 +91,13 @@ def State__share(self, id):
     child["drone_return"] = {}
 
     child["excursions"] = []
+    for e in self["excursions"]:
+        child["excursions"].append(list(e))
 
     child["tail"] = []
     child["tail_set"] = set()
+
+    child["treasure"] = None
 
     self = Unlock(self, "State__share")
     return pure(self, child)
