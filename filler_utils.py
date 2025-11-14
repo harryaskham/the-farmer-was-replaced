@@ -106,18 +106,23 @@ def fill_rowsM(state, f, handler, n=None):
                 ])
         return fill_rows(state, f, h, n)
 
-def oscillate(state, ltr, rtl, loop=True, flags=[]):
+OSCILLATE_FLAGS = [Spawn.FORK, Spawn.BECOME, Movement.LOOP]
+
+def oscillate(state, ltr, rtl, flags=OSCILLATE_FLAGS):
     state, d = wh(state)
+    flags = set(flags)
     def p(y):
         b = row_box(d, y)
         inner = [dos, [
-            [boxloop, b, ltr, [0, y], False, False, flags],
-            [boxloop, b, rtl, [d-1, y], False, True, flags]
+            [box_do, b, ltr, flags],
+            [box_do, b, rtl, toggle(flags, Movement.REVERSE)]
         ]]
-        if loop:
+        if Movement.LOOP in flags:
             return [forever, inner]
         else:
             return inner
     for y in range(d-1, 0, -1):
-        state = spawn_(state, p(y), [Spawn.FORK, Spawn.AWAIT])
+        state = spawn_(state, p(y), flags)
+        if Spawn.SERIAL in flags:
+            state, _ = wait_all(state)
     return dos(state, [p(0)])

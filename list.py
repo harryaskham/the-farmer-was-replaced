@@ -24,4 +24,4 @@ def unpack(xs):
         return xs[0], xs[1], xs[2]
     if len(xs) == 4:
         return xs[0], xs[1], xs[2], xs[3]
-    return fatal_("unpack: too many elements")
+    return fatal_(("unpack: too many elements", xs))

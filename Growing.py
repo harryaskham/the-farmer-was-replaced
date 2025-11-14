@@ -1,0 +1,2 @@
+WATER = "Growing.WATER"
+FERTILIZE = "Growing.FERTILIZE"

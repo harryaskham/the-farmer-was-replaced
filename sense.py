@@ -26,11 +26,11 @@ def sense(state, flags=[]):
         }],
     ])
 
-    state = measureM(state) #, None, None, [To.CHILDREN])
+    state = measureM(state, None, None, flags)
     
     if Sensing.DIRECTIONAL in flags:
         for dir in Dirs:
-            state = measureM(state, None, dir)#, [To.CHILDREN])
+            state = measureM(state, None, dir, flags)
         
     if Companions.UPDATE not in flags:
         return state
@@ -46,8 +46,8 @@ def sense(state, flags=[]):
                 [debug, "companion/target"],
                 [debug, companion],
                 [bind, [at, companion[1]], [debug]],
-                [set_at, companion[1], {"companion": companion[0]}, [To.CHILDREN]],
-                [set_here, {"companion_at": companion[1]}, [To.CHILDREN]]
+                [set_at, companion[1], {"companion": companion[0]}, flags],
+                [set_here, {"companion_at": companion[1]}, flags]
             ]]
         ]
     ])

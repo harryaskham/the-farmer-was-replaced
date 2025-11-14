@@ -35,13 +35,13 @@ def Checker0(state, x, y, f):
 def Checker1(state, x, y, g):
     return Checker(state, x, y, [], g)
     
-def Companion(state, otherwise=[unit]):
+def Companion(state, otherwise=[unit], flags=[]):
     def handle_companion(state, c):
         return dos(state, [
             [debug, ("companion here?", c)],
             [cond, c == None,
                 otherwise,
-                [plant_one, c]
+                [plant_one, c, flags]
             ]
         ])
         

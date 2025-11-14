@@ -1,2 +1,4 @@
 FAST = "Movement.FAST"
+LOOP = "Movement.LOOP"
+REVERSE = "Movement.REVERSE"
 REWIND_EXCURSION = "Movement.REWIND_EXCURSION"

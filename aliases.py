@@ -7,6 +7,7 @@ import Copy
 import Companions
 import Dinosaur
 import Execution
+import Growing
 import Harvesting
 import Log
 import Mode

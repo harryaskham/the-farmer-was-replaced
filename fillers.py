@@ -1,5 +1,6 @@
 from farmlib import *
 from filler_cactus import *
+from filler_companions import *
 from filler_energy import *
 from filler_pumpkin import *
 from filler_utils import *
@@ -37,22 +38,3 @@ def filler_crop(state, e):
         [plant_one, e]
     ]])
 
-def filler_companions(state):
-
-    def handler(state, results):
-        state, d = wh(state)
-        for result in values(results):
-            for x, y in result:
-                row = result[(x, y)]
-                if x == d - 1:
-                    for c in row:
-                        state["grid"][(c["x"], c["y"])] = c
-        return state
-
-    return fill_rows(state, [dos, [
-        [sense],
-        [try_harvest, None, [Companions.AWAIT]],
-        [Companion, [Checker3, [plant_one, E.Tree], [plant_one, E.Carrot], [plant_one, E.Grass]]],
-        [sense],
-        [get_row]
-    ]], handler)

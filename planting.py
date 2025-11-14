@@ -38,28 +38,33 @@ def maybe_untill(state, e=None):
         })
     return state
 
-def maybe_plant(state, e):
-    if plantable(e) and et(state)[1] != e:
-        state = water_to(state)
-        plant(e)
-        return dos(state, [
-            [set_here, {"entity_type": e}],
-            [sense],
-            [pure, True]
-        ])
-    return pure(state, False)
+def maybe_plant(state, e, flags=[]):
+    flags = set(flags)
+    return dos(state, [
+        [cond, plantable(e) and et(state)[1] != e,
+            [dos, [
+                [when, Growing.WATER in flags, [water_to]],
+                [lift([plant]), e],
+                [set_here, {"entity_type": e}],
+                [sense, flags],
+                [pure, True]
+            ]],
+            [pure, False]
+        ]
+    ])
 
-def plant_one(state, e, unused=None):
+def plant_one(state, e, flags=[]):
     return dos(state, [
         [maybe_till, e],
         [maybe_untill, e],
-        [maybe_plant, e]
+        [maybe_plant, e, flags]
     ])
 
-def plantM(state, e, unused=None):
-    state, planted = plant_one(state, e)
+def plantM(state, e, flags=[]):
+    flags = set(flags)
+    state, planted = plant_one(state, e, flags)
     return dos(state, [
-        [fertilize],
-        [maybe_cure],
+        [when, Growing.FERTILIZE in flags, [fertilize]],
+        [when, Harvesting.CURE in flags, [maybe_cure, [e], Harvesting.UNSAFE in flags]],
         [pure, planted]
     ])

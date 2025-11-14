@@ -5,14 +5,14 @@ from measure import *
 def fast_sunflower(state, min_petals=7, max_petals=15):
     return dos(state, [
         [Sunflower, min_petals, max_petals, [
-            Sunflowers.WATER,
-            Sunflowers.FERTILIZE,
+            Growing.WATER,
+            Growing.FERTILIZE,
             Harvesting.CURE,
             Harvesting.UNSAFE
         ]]
     ])
 
-def Sunflower(state, min_petals=7, max_petals=15, flags=[Sunflowers.WATER]):
+def Sunflower(state, min_petals=7, max_petals=15, flags=[Growing.WATER]):
     flags = set(flags)
 
     def valid_sunflower(state):
@@ -25,15 +25,15 @@ def Sunflower(state, min_petals=7, max_petals=15, flags=[Sunflowers.WATER]):
 
     return dos(state, [
         [sense],
-        [when, Sunflowers.WATER in flags, [water_to]],
+        [when, Growing.WATER in flags, [water_to]],
         [untilM, [valid_sunflower], [dos, [
             [harvestM],
             [plant_one, E.Sunflower]
         ]]],
-        [when, Sunflowers.FERTILIZE in flags, [fertilize]]
+        [when, Growing.FERTILIZE in flags, [fertilize]]
     ])
         
-def boost(state, n=1, min_petals=7, max_petals=15, flags=[Sunflowers.WATER, Sunflowers.FERTILIZE, Harvesting.CURE]):
+def boost(state, n=1, min_petals=7, max_petals=15, flags=[Growing.WATER, Growing.FERTILIZE, Harvesting.CURE]):
     flags = set(flags)
     for _ in range(n):
         state = do_(state, [
@@ -43,7 +43,7 @@ def boost(state, n=1, min_petals=7, max_petals=15, flags=[Sunflowers.WATER, Sunf
         ]) 
     return state
     
-def boost_box(state, box, num_flowers=10, boosts=10, flags=[Sunflowers.WATER, Sunflowers.FERTILIZE, Harvesting.CURE]):
+def boost_box(state, box, num_flowers=10, boosts=10, flags=[Growing.WATER, Growing.FERTILIZE, Harvesting.CURE]):
     flags = set(flags)
     i = 0
     [x0, y0, w, h] = box

@@ -1,15 +1,15 @@
 from lib import *
 from move import *
-            
-def nop_f(state, _, _):
+
+def nop_f(state, a, b):
     return [const, state]
-        
+
 def traverse_farm(state, f, box=None, start=None, reverse=False, flags=[]):
     state, d = wh(state)
-        
+
     if box == None:
         box = [0, 0, d-1, d-1]
-    
+
     if start == None:
         start = box[:2]
 
@@ -33,7 +33,17 @@ def traverse_farm(state, f, box=None, start=None, reverse=False, flags=[]):
             state, out = dos(state, xss)
             res[(x, y)] = out
     return state, res
-    
+
+def box_do(state, box, f, flags=[]):
+    flags = set(flags)
+    loop = Movement.LOOP in flags
+    reverse = Movement.REVERSE in flags
+    if reverse:
+        start = corner(box, NE)
+    else:
+        start = corner(box, SW)
+    return boxloop(state, box, f, start, loop, reverse, flags)
+
 def boxloop(state, box, f, start=None, loop=True, reverse=False, flags=[]):
     def g(state, x, y):
         return [f]
@@ -42,10 +52,10 @@ def boxloop(state, box, f, start=None, loop=True, reverse=False, flags=[]):
 def farmloop(state, f, loop=True, scan=False, box=None, start=None, reverse=False, flags=[]):
     if scan:
         state, out = traverse_farm(state, nop3, box, start, reverse, flags)
-        
+
     def go(state):
         return traverse_farm(state, f, box, start, reverse, flags)
-        
+
     while True:
         state, out = go(state)
         state["i"] += 1

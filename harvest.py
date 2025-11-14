@@ -4,7 +4,8 @@ from planting import *
 from fertilizer import *
 from move import *
 
-def harvestM(state):
+def harvestM(state, flags=[]):
+    flags = set(flags)
     harvest()
     state, c_at = get_here(state, "companion_at")
     return dos(state, [
@@ -14,19 +15,18 @@ def harvestM(state):
             "petals": None,
             "cactus_size": None,
             "companion_at": None
-        }, [To.CHILDREN]],
+        }, flags],
         [when, c_at != None, [set_at, c_at, {
             "companion": None
-        }, [To.CHILDREN]]]
+        }, flags]]
     ])
-
 
 def try_harvest(state, entities=None, flags=[]):
     flags = set(flags)
     state, e = et(state)
     if not (entities == None or contains(entities, e)):
         return state
-        
+
     state, c_at = get_here(state, "companion_at")
     if c_at != None:
         state, cn = at(state, c_at)
@@ -40,23 +40,23 @@ def try_harvest(state, entities=None, flags=[]):
         ):
             state, h = xy(state)
             state = do_(state, [
-                [move_to, c_at],
-                [plant_one, companion],
-                [sense, [Companions.Update]],
+                [move_to, c_at, flags],
+                [plant_one, companion, flags],
+                [sense, flags],
                 [move_to, h],
             ])
-            
+
     is_companion = e != None and get_here(state, "companion")[1] == e
-    
+
     if Companions.AWAIT in flags:
         state, c_at = get_here(state, "companion_at")
         state, cn = at(state, c_at)
-        if cn["companion"] == None or cn["entity_type"] == cn["companion"]:
+        if cn != None and (cn["companion"] == None or cn["entity_type"] == cn["companion"]):
             return state
 
     if Companions.RESERVE in flags and is_companion:
         return state
-            
+
     if can_harvest():
         return do_(state, [
             [when, Harvesting.CURE in flags, [maybe_cure, entities, Harvesting.UNSAFE in flags]],
@@ -64,12 +64,12 @@ def try_harvest(state, entities=None, flags=[]):
         ])
 
     return state
-    
+
 def wait_for_harvest(state, delay=0.5):
     while not can_harvest():
         wait_secs(delay)
     return state
-        
+
 def set_box_harvested(state, box):
     [x0, y0, w, h] = box
     for y in range(y0, y0 + h):
@@ -77,8 +77,8 @@ def set_box_harvested(state, box):
             state = set_at(state, (x, y), {
                 "entity_type": None
             })
-    return state        
-        
+    return state
+
 def cleanup(state):
     return try_harvest(state, [E.Dead_Pumpkin])
 

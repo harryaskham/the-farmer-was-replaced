@@ -5,5 +5,5 @@ def useM(state, item, amount=1):
     use_item(item, amount)
     if item in SIDE_EFFECTS:
         xs = SIDE_EFFECTS[item]
-        return dos(state, [xs])
+        return do_(state, [xs])
     return state
