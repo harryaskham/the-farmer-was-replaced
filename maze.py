@@ -21,9 +21,13 @@ def maze(state, size=None):
 
     seen = set()
     back = []
+    state = sense(state)
     while True:
-        state = sense(state)
+        # state = sense(state)
         
+        if state["treasure"] == None:
+            break
+            
         if et(state)[1] == E.Treasure:
             state = do_(state, [
                 [try_harvest, [E.Treasure]]

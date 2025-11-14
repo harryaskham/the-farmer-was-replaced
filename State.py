@@ -74,6 +74,8 @@ def State__fork(self, id):
     for p in self["petal_counts"]:
         child["petal_counts"][p] = self["petal_counts"][p]
 
+    child["treasure"] = None
+
     return pure(self, child)
 
 def State__share(self, id):
