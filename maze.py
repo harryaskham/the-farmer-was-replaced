@@ -6,6 +6,8 @@ from move import *
 from drones import *
 
 def maze(state, size=None):
+    state = Lock(state, "mk_maze")
+
     state = sense(state)
     state, e = et(state)
     if e not in [E.Hedge, E.Treasure]:
@@ -17,6 +19,7 @@ def maze(state, size=None):
             [plant_one, E.Bush],
             [useM, I.Weird_Substance, use_n],
         ])
+    state = Lock(state, "mk_maze")
 
     seen = set()
 
