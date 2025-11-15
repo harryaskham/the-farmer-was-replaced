@@ -83,11 +83,12 @@ def move_to(state, c, flags=[]):
 
     return state
 
-def end_excursion(state):
+def end_excursion(state, flags=[]):
+    flags = with(flags, Movement.REWIND_EXCURSION)
     excursion = state["excursions"].pop()
     while excursion != []:
         d = excursion.pop()
-        state, _ = moveM(state, opposite(d), [Movement.REWIND_EXCURSION])
+        state, _ = moveM(state, opposite(d), flags)
     return state
 
 def move_toward(state, c, flags=[]):

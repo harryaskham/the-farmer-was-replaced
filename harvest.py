@@ -41,12 +41,12 @@ def try_harvest(state, entities=None, flags=[]):
             and companion != None
             and planted != companion
         ):
-            state, h = xy(state)
             state = do_(state, [
+                [start_excursion],
                 [move_to, c_at, flags],
-                [plant_one, companion, flags],
+                [plantM, companion, flags],
                 [sense, flags],
-                [move_to, h],
+                [end_excursion, flags]
             ])
 
     is_companion = e != None and get_here(state, "companion")[1] == e
