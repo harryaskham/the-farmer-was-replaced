@@ -40,7 +40,8 @@ def maze(state, size=None):
         for d, n in items(ns):
             if n in seen:
                 continue
-            continuation = [whenM, [moveM, d, [Movement.FAST]], [go, d]]
-            state, _ = spawn(state, continuation, [Spawn.FORK, Spawn.AWAIT])
+            def continuation(state):
+                    return dos(state, [whenM, [moveM, d, [Movement.FAST]], [go, d]])
+            state, _ = spawn(state, [continuation], [Spawn.FORK, Spawn.AWAIT])
 
     return go(state)
