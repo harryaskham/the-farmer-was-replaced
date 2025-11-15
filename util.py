@@ -22,3 +22,10 @@ def with(flags, flag):
     flags = set(flags)
     flags.add(flag)
     return flags
+
+def defaults(flags)
+    flags = set(flags)
+    def get():
+        return flags
+    return get
+        
