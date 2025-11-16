@@ -21,34 +21,30 @@ def maze(state, size=None):
         ])
 
     state = Unlock(state, "mk_maze")
-    
+
     seen = set()
 
     def add_seen(state, c):
         state = Lock(state, "seen")
         x = c not in seen
         if x:
-            seen.add(c) 
+            seen.add(c)
         state = Unlock(state, "seen")
         return pure(state, x)
 
+    state, _ = add_seen(state, (x, y))
+
+    def check_done(state, e):
+        return pure(state, e == E.Treasure or e != E.Hedge or state["treasure"] == None)
+
     def go(state):
         state = sense(state)
-        state, e = et(state)
-        state, (x, y) = xy(state)
-
-        if (e not in [E.Hedge, E.Treasure]) or (state["treasure"] == None):
-            return pure(state, False)
-
-        if (x, y) == state["treasure"]:
+        state, done = with_et(state, check_done)
+        if done:
             return dos(state, [
                 [try_harvest, [E.Treasure]],
-                [pure, True]
+                [pure, done]
             ])
-
-        state, cont = add_seen(state, (x, y))
-        if not cont:
-            return pure(state, False)
 
         def next(dir):
             def continuation(state):
@@ -63,22 +59,28 @@ def maze(state, size=None):
 
         state, ns = neighbors_dict(state)
         ins = items(ns)
-        done = False
+        ds = []
         for dir, n in ins:
-            if n in seen:
+            state, cont = add_seen(state, n)
+            if not cont:
                 continue
-            if dir == ins[-1][0]:
-                state, done = next(dir)(state)
-            else:
-                state = spawn_(
-                    state,
-                    [next(dir)],
-                    #[Spawn.SHARE, Spawn.AWAIT, Spawn.BECOME]) 
-                    [Spawn.CLONE, Spawn.AWAIT, Spawn.BECOME]) 
+            ds.append(dir)
 
-        return pure(state, done)
+        if len(ds) == 0:
+            return pure(state, False)
 
-    state, done = go(state)
-    state, rs = wait_all(state)
-    done = done or any(values(rs))
-    return pure(state, done)
+        for dir in ds[:-1]:
+            state = spawn_(
+                state,
+                [next(dir)],
+                [Spawn.FORK, Spawn.AWAIT])
+
+        return next(ds[-1])(state)
+
+    state, _ = go(state)
+    while True:
+        wait_secs(1)
+        state, done = with_et(state, check_done)
+        if done:
+            break
+    return state

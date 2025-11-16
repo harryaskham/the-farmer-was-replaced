@@ -1,5 +1,6 @@
 from monad import *
 from aliases import *
+from locking import *
 from cell import mk_cell_state
 from operators import flipM
 import test
@@ -140,3 +141,21 @@ def pos_to(state, dir, c=None):
     if dir == West and x > 0:
         return pure(state, (x-1, y))
     return unit(state)
+
+def with_cell(state, c, f):
+    state = Lock(state, ("cell", c))
+
+    state, result = dos(state, [
+        [bind, [get_at, c], [f]]
+    ])
+
+    state = Unlock(state, ("cell", c))
+    return pure(state, result)
+
+def with_here(state, f):
+    return with_cell(state, (state["x"], state["y"]), f)
+
+def with_et(state, f):
+    def g(state, cell):
+        return f(state, cell["entity_type"])
+    return with_here(state, g)
