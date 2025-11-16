@@ -19,7 +19,8 @@ FLAGS = [
     #Harvesting.UNSAFE,
 ]
 
-def filler_companions(state, flags=FLAGS):
+def filler_companions(state, flags=defaults(FLAGS)):
+    flags = flags()
     f = [dos, [
         [gatherM, flags],
         [sense, flags],

@@ -1,7 +1,7 @@
 from farmlib import *
 from filler_utils import *
 
-def filler_maze(state, num_drones=None):
+def filler_maze(state):
     return dos(state, [
         [bind, [wh], [maze]]
     ])

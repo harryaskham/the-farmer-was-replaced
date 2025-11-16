@@ -1,3 +1,5 @@
+import flags
+
 def floor(x):
     return x // 1
 
@@ -23,9 +25,11 @@ def with(flags, flag):
     flags.add(flag)
     return flags
 
-def defaults(flags)
-    flags = set(flags)
+def defaults(xs=None):
+    if xs == None:
+        xs = flags.MAIN_FLAGS
+    xs = set(xs)
     def get():
-        return flags
+        return xs
     return get
         

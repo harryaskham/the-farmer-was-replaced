@@ -21,27 +21,64 @@ def maze(state, size=None):
         ])
 
     state = Unlock(state, "mk_maze")
-
+    
     seen = set()
 
-    def go(state, dir=None):
+    def add_seen(state, c):
+        state = Lock(state, "seen")
+        x = c not in seen
+        if x:
+            seen.add(c) 
+        state = Unlock(state, "seen")
+        return pure(state, x)
+
+    def go(state):
         state = sense(state)
         state, e = et(state)
-
-        if state["treasure"] == None:
-            return state
-
-        if e == E.Treasure:
-            return do_(state, [[try_harvest, [E.Treasure]]])
-
         state, (x, y) = xy(state)
-        seen.add((x, y))
+
+        if (e not in [E.Hedge, E.Treasure]) or (state["treasure"] == None):
+            return pure(state, False)
+
+        if (x, y) == state["treasure"]:
+            return dos(state, [
+                [try_harvest, [E.Treasure]],
+                [pure, True]
+            ])
+
+        state, cont = add_seen(state, (x, y))
+        if not cont:
+            return pure(state, False)
+
+        def next(dir):
+            def continuation(state):
+                return dos(state, [
+                    [condM,
+                        [moveM, dir, [Movement.FAST]],
+                        [go],
+                        [pure, False]
+                    ]
+                ])
+            return continuation
+
         state, ns = neighbors_dict(state)
-        for d, n in items(ns):
+        ins = items(ns)
+        done = False
+        for dir, n in ins:
             if n in seen:
                 continue
-            def continuation(state):
-                    return dos(state, [whenM, [moveM, d, [Movement.FAST]], [go, d]])
-            state, _ = spawn(state, [continuation], [Spawn.FORK, Spawn.AWAIT])
+            if dir == ins[-1][0]:
+                state, done = next(dir)(state)
+            else:
+                state = spawn_(
+                    state,
+                    [next(dir)],
+                    #[Spawn.SHARE, Spawn.AWAIT, Spawn.BECOME]) 
+                    [Spawn.CLONE, Spawn.AWAIT, Spawn.BECOME]) 
 
-    return go(state)
+        return pure(state, done)
+
+    state, done = go(state)
+    state, rs = wait_all(state)
+    done = done or any(values(rs))
+    return pure(state, done)

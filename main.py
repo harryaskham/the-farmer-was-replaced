@@ -7,11 +7,17 @@ import test_main
 import run_tests
 
 def init(state):
-    return do_(state, [
-        [State.set_size],
-        [hatM, Hats.Straw_Hat],
-        [move_to, (0, 0)]
-    ])
+    return do_(
+        state,
+        [
+            [State.set_size],
+            [hatM, Hats.Straw_Hat],
+            [sense],
+            [try_harvest, [E.Hedge, E.Treasure]],
+            [move_to, (0, 0), [Movement.FAST]],
+        ],
+    )
+
 
 def main(state=None, flags=MAIN_FLAGS):
     flags = set(flags)
