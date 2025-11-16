@@ -41,6 +41,7 @@ def __State__(self, flags=set()):
     self["tail_set"] = set()
     self["tail_len"] = 0
     self["petal_counts"] = {}
+    self["maze_seen"] = set()
     self["treasure"] = None
 
     debug_(("self", self))
@@ -71,6 +72,10 @@ def State__fork(self, id):
     for p in self["petal_counts"]:
         child["petal_counts"][p] = self["petal_counts"][p]
 
+    child["maze_seen"] = set()
+    for c in self["maze_seen"]:
+        child["maze_seen"].add(c)
+ 
     return pure(self, child)
 
 def State__share(self, id):
@@ -96,8 +101,6 @@ def State__share(self, id):
 
     child["tail"] = []
     child["tail_set"] = set()
-
-    child["treasure"] = None
 
     self = Unlock(self, "State__share")
     return pure(self, child)

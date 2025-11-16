@@ -97,7 +97,8 @@ def wait_all(state):
     vs = {}
     child_ids = []
     for child_id in state["child_handles"]:
-        child_ids.append(child_id)
+        if child_id != state["id"]:
+            child_ids.append(child_id)
 
     for child_id in child_ids:
         state, (_, v) = wait_for_child(state, child_id)

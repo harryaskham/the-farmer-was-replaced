@@ -2,6 +2,7 @@ def wait_secs(secs):
     t = get_time()
     while get_time() < t + secs:
         pass
+    return True
 
 def wait_secsM(state, secs):
     if secs > 0:
