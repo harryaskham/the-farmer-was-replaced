@@ -42,7 +42,7 @@ def __State__(self, flags=set()):
     self["tail_len"] = 0
     self["petal_counts"] = {}
     self["maze_seen"] = set()
-    self["treasure"] = None
+    self["treasure"] = [None, None]
 
     debug_(("self", self))
     
@@ -152,3 +152,25 @@ def drone_id(state):
     
 def loop_index(state):
     return state["i"]
+
+def set_treasure(state, c):
+    state = Lock(state, "treasure")
+    if c == None:
+        c = (None, None)
+    state["treasure"][0] = c[0]
+    state["treasure"][1] = c[1]
+    state = Unlock(state, "treasure")
+    return state
+
+def get_treasure(state):
+    [x, y] = state["treasure"]
+    if (x == None) or (y == None):
+        return pure(state, None)
+    return pure(state, (x, y))
+
+def clear_treasure(state):
+    return set_treasure(state, (None, None))
+
+def has_treasure(state):
+    state, t = get_treasure(state)
+    return pure(state, t != [None, None])

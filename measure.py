@@ -20,7 +20,7 @@ def measureM(state, key=None, dir=None, flags=[]):
             [when, e == E.Cactus, [set_at, c, {"cactus_size": m}]],
             [when, e == E.Sunflower, [set_at, c, {"petals": m}]],
             [when, e == E.Apple and dir == None, [State.put, {"apple": m}]],
-            [when, e == E.Hedge or E.Treasure, [State.put, {"treasure": m}, flags]]
+            [when, e in [E.Hedge, E.Treasure], [State.set_treasure, m]]
         ])
     else:
         state = set_at(state, c, {key: m})
