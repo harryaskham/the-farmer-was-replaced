@@ -25,6 +25,7 @@ def maze(state, size=None):
             [harvestM],
             [plant_one, E.Bush],
             [useM, I.Weird_Substance, use_n],
+            [sense]
         ])
 
     state["maze_seen"] = set()
@@ -37,12 +38,12 @@ def maze(state, size=None):
     def next(dir):
         def continuation(state):
             return do_(state, [
-                [whenM, [moveM, dir, [Movement.FAST]], [go]]
+                #[whenM, [moveM, dir, [Movement.FAST]], [go]]
+                [whenM, [moveM, dir], [go]]
             ])
         return continuation
 
     def go(state):
-        state = sense(state)
         state, (x, y) = xy(state)
         state, seen = add_seen(state, (x, y))
         if seen:

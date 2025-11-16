@@ -15,6 +15,10 @@ def map(f, xs):
     for x in xs:
         ys.append(f(x))
     return ys
+
+def bimap(f, g, xs):
+    a, b = xs
+    return (f(a), g(b))
     
 def foldl(f, acc, xs):
     if xs == []:
