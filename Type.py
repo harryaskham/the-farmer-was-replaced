@@ -34,7 +34,7 @@ def method_call(self, method, args):
     args.insert(0, self)
     return applyN(method, args)
 
-def new(name, fields=[], methods={}, dataclass=False):
+def new(name, fields=[], methods={}, classmethods={}, dataclass=False):
     def nop_handler(self_args):
         debug_(("nop_handler", self_args))
         return None
@@ -80,43 +80,42 @@ def new(name, fields=[], methods={}, dataclass=False):
             return method_call(self, method, args)
         return mkF(handler)
 
-    Self = {
-        "__type__": Type,
-        "name": name,
-        "fields": fields,
-        "methods": methods,
-        "dataclass": dataclass
-    }
-    
-    def ctor_handler(args):
-        verbose_(("ctor_handler", args))
-
+    def ctor_handler(Self_args):
+        Self, args = Self_args[0], Self_args[1:]
+        verbose_(("ctor_handler", Self, args))
         self = {"__type__": Self}
-
         for method_name in methods:
             method = methods[method_name]
             self[method_name] = bound_method(self, method)
-
         applyN(self["__init__"], args)
-
         return self
 
-    ctor = mkF(ctor_handler)
+    classmethods["new"] = mkF(ctor_handler)
 
-    Self["__new__"] = ctor
-    
+    Self = {
+        "name": name,
+        "fields": fields,
+        "methods": methods,
+        "classmethods": classmethods,
+        "dataclass": dataclass
+    }
+    for method_name in classmethods:
+        method = classmethods[method_name]
+        Self[method_name] = bound_method(Self, method)
+
     return Self
 
-def __Type__(self, name, fields=[], methods={}, dataclass=False):
+def __Type__(self, name, fields=[], methods={}, classmethods={}, dataclass=False):
     self["T"] = self["make"]()
+    self["T"]["__type__"] = Type
 
 def __Type__make(self):
-    return new(self["name"], self["fields"], self["methods"], self["dataclass"])
-
-def __Type__new__(self_args):
-    self, args = self_args[0], self_args[1:]
-    return applyN(self["T"]["__new__"], args)
-Type__new = mkF(__Type__new__)
+    return new(
+        self["name"],
+        self["fields"],
+        self["methods"],
+        self["classmethods"],
+        self["dataclass"])
 
 Type = new(
     "Type",
@@ -124,11 +123,11 @@ Type = new(
         field("name"),
         field("fields", []),
         field("methods", {}),
+        field("classmethods", {}),
         field("dataclass", False)
     ],
     {
         "__init__": __Type__,
-        "new": Type__new
     },
     True
 )
@@ -144,7 +143,8 @@ def Builtin(name):
         "name": name,
         "fields": [],
         "methods": {},
-        "dataclass": false
+        "classmethods": {},
+        "dataclass": False
     }
 
 NoneType = Builtin("None")
