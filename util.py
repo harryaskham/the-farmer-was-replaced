@@ -25,11 +25,21 @@ def with(flags, flag):
     flags.add(flag)
     return flags
 
-def defaults(xs=None):
+def default(xs, d):
     if xs == None:
-        xs = flags.MAIN_FLAGS
-    xs = set(xs)
+        return d
+    return xs
+
+def defaults(xs, d):
+    if xs == None:
+        return d
+    return frozenset(xs)
+
+def frozenset(xs=None):
+    if xs == None:
+        xs = set()
+    else:
+        xs = set(xs)
     def get():
         return xs
     return get
-        

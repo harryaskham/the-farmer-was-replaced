@@ -14,7 +14,7 @@ def init(state):
             [hatM, Hats.Straw_Hat],
             [sense],
             [try_harvest, [E.Hedge, E.Treasure]],
-            [move_to, (0, 0), [Movement.FAST]],
+            [move_to, (0, 0)],
         ],
     )
 

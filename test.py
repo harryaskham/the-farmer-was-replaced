@@ -35,3 +35,6 @@ def Test(state, a, b, test_name=None):
   state, result = assert_equal(state, actual, b, ("Expect:", a, "->", b))
   state["test_results"][module_name][test_name] = result
   return state
+
+def Test_(state, a, b, test_name=None):
+  return Test(state, pure(state, a), b, test_name)

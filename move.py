@@ -18,34 +18,47 @@ CCW = {
 
 Rots = [CW, CCW]
 
-def moveM(state, d, flags=[]):
-    flags = set(flags)
-    state, prev = xy(state)
+MOVE_FLAGS = frozenset([
+    Movement.FAST,
+])
 
-    if not move(d):
-        return pure(state, False)
+def moveM(state, d, flags=None):
+    flags = defaults(flags, MOVE_FLAGS)()
+
+    if Movement.UNBOUNDED in flags:
+        move_fn = lift([move])
+    else:
+        move_fn = move_bounded
+
+    state, prev = xy(state)
+    state, moved = move_fn(state, d)
 
     if Movement.FAST in flags:
-        state = sense_position(state)
-        return pure(state, True)
+        if moved:
+            state, (state["x"], state["y"]) = pos_to(state, d)
+        state, ce = current_excursion(state)
+        if ce != None:
+            state = warn(state, "Fast movement with active excursion")
+        return pure(state, moved)
 
-    state = do_(state, [
+    return dos(state, [
         [sense, flags],
         [unless, Movement.REWIND_EXCURSION in flags, [maybe_update_excursion, d]]
+        [when, Dinosaur.UPDATE_TAIL in flags, [update_dinosaur_tail, prev, d]],
+        [pure, moved]
     ])
 
-    if Dinosaur.UPDATE_TAIL in flags:
-        state["tail"].append(prev)
-        if len(state["tail"]) > state["tail_len"]:
-            if state["tail"][0] in state["tail_set"]:
-                state["tail_set"].remove(state["tail"][0])
-            state["tail"] = state["tail"][1:]
-        state["tail_set"].add(prev)
+def update_dinosaur_tail(state, prev, d):
+    state["tail"].append(prev)
+    if len(state["tail"]) > state["tail_len"]:
+        if state["tail"][0] in state["tail_set"]:
+            state["tail_set"].remove(state["tail"][0])
+        state["tail"] = state["tail"][1:]
+    state["tail_set"].add(prev)
+    return state
 
-    return pure(state, True)
-
-def move_bounded(state, dir, flags=[]):
-    flags = set(flags)
+def move_bounded(state, dir, flags=None):
+    flags = defaults(flags, MOVE_FLAGS)()
     state, (x, y) = xy(state)
     state, d = wh(state)
     if x == d-1 and dir == East:
@@ -56,9 +69,9 @@ def move_bounded(state, dir, flags=[]):
         return pure(state, False)
     if y == 0 and dir == South:
         return pure(state, False)
-    return moveM(state, dir, flags)
+    return moveM(state, dir, without(flags, Movement.UNBOUNDED))
 
-def move_to(state, c, flags=[]):
+def move_to(state, c, flags=None):
     cx, cy = unpack(c)
 
     while x(state)[1] > cx:
@@ -83,15 +96,17 @@ def move_to(state, c, flags=[]):
 
     return state
 
-def end_excursion(state, flags=[]):
+def end_excursion(state, flags=None):
+    flags = defaults(flags, MOVE_FLAGS)()
     flags = with(flags, Movement.REWIND_EXCURSION)
+
     excursion = state["excursions"].pop()
     while excursion != []:
         d = excursion.pop()
         state, _ = moveM(state, opposite(d), flags)
     return state
 
-def move_toward(state, c, flags=[]):
+def move_toward(state, c, flags=None):
     cx, cy = unpack(c)
 
     if x(state)[1] > cx:

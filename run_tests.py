@@ -9,6 +9,7 @@ import e2e_test
 
 def run(state):
     return do_(state, [
+        [Type_test.run],
         [compile_test.run],
         [monad_test.run],
         [operators_test.run],

@@ -84,6 +84,9 @@ def info_(msg):
     
 def debug_(msg):
     return debug(shim_state(), msg)
+
+def verbose_(msg):
+    return verbose(shim_state(), msg)
     
 def warn_(msg):
     return warn(shim_state(), msg)

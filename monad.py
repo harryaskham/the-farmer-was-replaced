@@ -127,8 +127,18 @@ def sequence(state, ms):
 def unit(state):
     return pure(state, None)
 
+def x_repr(x):
+    return str(x)
+
+def do_repr(xs):
+    ss = []
+    for x in xs:
+        ss.append(x_repr(x))
+    return join(ss, " ")
+
 def dos(state, xss):
-    state = debug(state, ("dos", xss))
+    quick_print(repr(xss))
+    state = verbose(state, ("dos", xss))
 
     if xss == []:
         return unit(state)

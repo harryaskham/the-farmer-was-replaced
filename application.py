@@ -24,3 +24,9 @@ def aps(xs):
         return xs[0](xs[1], xs[2], xs[3], xs[4], xs[5], xs[6], xs[7])
     if len(xs) == 9:
         return xs[0](xs[1], xs[2], xs[3], xs[4], xs[5], xs[6], xs[7], xs[8])
+
+def applyN(f, args):
+    fa = [f]
+    for arg in args:
+        fa.append(arg)
+    return aps(fa)

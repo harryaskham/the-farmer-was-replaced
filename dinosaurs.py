@@ -21,10 +21,10 @@ def tail_follow(state):
     rot = CW
     while True:
         #state = sense(state)
-        state, moved = move_toward(state, state["apple"], [Movement.FAST])
+        state, moved = move_toward(state, state["apple"])
         if not moved:
             for _ in range(5):
-                state, moved = moveM(state, dir, [Movement.FAST])
+                state, moved = moveM(state, dir)
                 if moved:
                     break
                 dir = rot[dir]
@@ -65,17 +65,17 @@ def brute(state):
 def dumb(state):
     while True:
         state = sense(state)
-    
+
         if state["apple"] == None:
             return state
-    
+
         (ax, ay) = state["apple"]
         state, (x, y) = xy(state)
-        
+
         ds = []
         if x > ax:
             ds.append(West)
-        if x < ax: 
+        if x < ax:
             ds.append(East)
         if y < ay:
             ds.append(North)
@@ -93,7 +93,7 @@ def dumb(state):
 
 def apple_here(state):
     return set_state(state, { "apple": xy(state)[1] })
-    
+
 def search_apple(state):
     while True:
         state = sense(state)

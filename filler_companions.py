@@ -1,6 +1,6 @@
 from farmlib import *
 
-FLAGS = [
+COMPANION_FLAGS = [
     Spawn.SHARE,
     Spawn.BECOME,
     #Spawn.SERIAL,
@@ -19,8 +19,8 @@ FLAGS = [
     #Harvesting.UNSAFE,
 ]
 
-def filler_companions(state, flags=defaults(FLAGS)):
-    flags = flags()
+def filler_companions(state, flags=None):
+    flags = defaults(flags, COMPANION_FLAGS)()
     f = [dos, [
         [gatherM, flags],
         [sense, flags],

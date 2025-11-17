@@ -1,6 +1,5 @@
 from debug import *
 from monad import *
-from debug import *
 from time import *
 
 def lines(state, level, msgs):
@@ -13,7 +12,7 @@ def lines(state, level, msgs):
 
 def Metalock(state):
     if state["locks"]["__locked__"]:
-        debug(state, ("Drone", state["id"], "waiting for global lock"))
+        verbose(state, ("Drone", state["id"], "waiting for global lock"))
         wait_secs(0.1)
         return pure(state, False)
 
@@ -49,19 +48,19 @@ def TryLock(state, key):
     success = False
     if key not in locks:
         locks[key] = [state["id"], 1]
-        debug(state, ("Drone", state["id"], "acquired new lock", key, locks[key]))
+        verbose(state, ("Drone", state["id"], "acquired new lock", key, locks[key]))
         success = True
     elif locks[key][0] == None:
-        debug(state, ("Drone", state["id"], "acquired existing lock", key, locks[key]))
+        verbose(state, ("Drone", state["id"], "acquired existing lock", key, locks[key]))
         locks[key][0] = state["id"]
         locks[key][1] = 1
         success = True
     elif locks[key][0] == state["id"]:
-        debug(state, ("Drone", state["id"], "already has lock, incrementing", key, locks[key]))
+        verbose(state, ("Drone", state["id"], "already has lock, incrementing", key, locks[key]))
         locks[key][1] += 1
         success = True
     else:
-        state = debug(state, ("Drone", state["id"], "waiting for lock", key, locks[key]))
+        state = verbose(state, ("Drone", state["id"], "waiting for lock", key, locks[key]))
         success = False
 
     state = Metaunlock(state)
@@ -89,14 +88,14 @@ def TryUnlock(state, key):
     elif locks[key][0] != state["id"]:
         state = fatal(state, ("Lock", key, "held by other drone:", locks[key]))
     else:
-        debug(state, ("Drone", state["id"], "released lock", key, locks[key]))
+        verbose(state, ("Drone", state["id"], "released lock", key, locks[key]))
         if locks[key][1] == 1:
             locks[key][0] = None
             locks[key][1] = None
-            debug(state, ("Drone", state["id"], "released lock", key, locks[key]))
+            verbose(state, ("Drone", state["id"], "released lock", key, locks[key]))
         else:
             locks[key][1] -= 1
-            debug(state, ("Drone", state["id"], "decremented lock", key, locks[key]))
+            verbose(state, ("Drone", state["id"], "decremented lock", key, locks[key]))
 
     state = Metaunlock(state)
     return pure(state, True)
