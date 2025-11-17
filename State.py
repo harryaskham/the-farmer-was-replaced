@@ -107,7 +107,7 @@ def State__share(self, id):
 
 State = new(
     Type,
-    __name__,
+    "State",
     [Field("flags", set(), set)],
     {
         "__init__": __State__,

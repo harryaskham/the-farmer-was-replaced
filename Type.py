@@ -88,18 +88,16 @@ def __new__(Self_args):
     verbose_(("__new__", Self_args))
     Self, args = Self_args[0], Self_args[1:]
 
-    self = {
-        "__type__": Self,
-        "__init__": mk_init(Self)
-    }
-
-    if "__str__" not in Self["methods"]:
-        Self["methods"]["__str__"] = default__str__
+    self = {"__type__": Self}
 
     for method_name, method in items(Self["methods"]):
-        if method_name != "__init__":
-            self[method_name] = bound_method(self, method)
+        self[method_name] = bound_method(self, method)
 
+    if "__str__" not in self:
+        self["__str__"] = bound_method(self, default__str__)
+
+    init = mk_init(Self)
+    self["__init__"] = bound_method(self, init)
     applyN(self["__init__"], args)
 
     return self
@@ -127,8 +125,12 @@ def default__str__(self):
 
 def __Typelist__(self_args):
     self, name, fields, methods, classmethods, dataclass = self_args
+
     for method_name, method in items(self["classmethods"]):
         self[method_name] = bound_method(self, method)
+
+    if "__str__" not in self:
+        self["__str__"] = bound_method(self, Type__str__)
 
 __Type__ = mkF(__Typelist__)
 
