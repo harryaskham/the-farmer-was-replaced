@@ -61,7 +61,7 @@ def do_maze(state, x, y):
     
     
 def do_flips(state):
-    return dos(state, [
+    return do(state, [
         [forM, range(32),
             [constM,
                 [spawn_,

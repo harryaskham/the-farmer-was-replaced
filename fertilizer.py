@@ -28,7 +28,7 @@ def maybe_cure(state, over=None, unsafe=False):
     if over == None or contains(over, e):
         state, infected = get_here(state, "infected")
         if infected:
-            return dos(state, [
+            return do(state, [
                 [useM, I.Weird_Substance],
                 [unless, unsafe, [dos, [
                     [useM, I.Fertilizer],
@@ -38,6 +38,6 @@ def maybe_cure(state, over=None, unsafe=False):
     return state
 
 def cureM(state, flags=[]):
-    return dos(state, [
+    return do(state, [
         [maybe_cure, None, Harvesting.UNSAFE in flags],
     ])

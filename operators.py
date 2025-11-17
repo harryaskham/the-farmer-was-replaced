@@ -73,15 +73,15 @@ def mod(state, a, b):
     return pure(state, a % b)
     
 def eqM(state, a, b):
-    state, ax = dos(state, [a])
-    state, bx = dos(state, [b])
+    state, ax = do(state, [a])
+    state, bx = do(state, [b])
     return pure(state, eq(ax, bx))
     
 def flipM(state, f, a, b):
     return f(state, b, a)
 
 def forever(state, f):
-    return dos(state, [
+    return do(state, [
         [whileM, [pure, True], f]
     ])
 
@@ -111,7 +111,7 @@ def is_not_none(x):
     return not is_none(x)
 
 def fmap(state, f, ma):
-    state, a = dos(state, [ma])
+    state, a = do(state, [ma])
     fa = list(f)
     fa.append(a)
     b = aps(fa)

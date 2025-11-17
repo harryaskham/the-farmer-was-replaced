@@ -8,7 +8,7 @@ def harvestM(state, flags=[]):
     flags = set(flags)
     harvest()
     state, c_at = get_here(state, "companion_at")
-    return dos(state, [
+    return do(state, [
         [set_here, {
             "entity_type": None,
             "infected": False,

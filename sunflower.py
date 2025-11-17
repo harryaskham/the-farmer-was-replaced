@@ -3,7 +3,7 @@ from harvest import *
 from measure import *
 
 def fast_sunflower(state, min_petals=7, max_petals=15):
-    return dos(state, [
+    return do(state, [
         [Sunflower, min_petals, max_petals, [
             Growing.WATER,
             Growing.FERTILIZE,
@@ -23,7 +23,7 @@ def Sunflower(state, min_petals=7, max_petals=15, flags=[Growing.WATER]):
             and p_here >= min_petals
             and p_here <= max_petals)
 
-    return dos(state, [
+    return do(state, [
         [sense],
         [when, Growing.WATER in flags, [water_to]],
         [untilM, [valid_sunflower], [dos, [
@@ -63,7 +63,7 @@ def boost_box(state, box, num_flowers=10, boosts=10, flags=[Growing.WATER, Growi
         return boost(state, boosts, flags)
         
 def boost_solo(state):
-    return dos(state, [
+    return do(state, [
         [try_harvest],
         [Sunflower]
     ])

@@ -41,7 +41,7 @@ def moveM(state, d, flags=None):
             state = warn(state, "Fast movement with active excursion")
         return pure(state, moved)
 
-    return dos(state, [
+    return do(state, [
         [sense, flags],
         [unless, Movement.REWIND_EXCURSION in flags, [maybe_update_excursion, d]]
         [when, Dinosaur.UPDATE_TAIL in flags, [update_dinosaur_tail, prev, d]],

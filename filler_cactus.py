@@ -15,7 +15,7 @@ def assume(state):
 def cactus_swaps(state):
 
     def dir_to_swap_required(state, dir, op):
-        return dos(state, [
+        return do(state, [
             [liftA2, [pairM],
                 [condM, [fmap, [lift(is_none)], [get_to, dir, "cactus_size"]],
                     [pure, None],
@@ -28,7 +28,7 @@ def cactus_swaps(state):
             ]
         ])
 
-    return dos(state, [
+    return do(state, [
         [sense, [Sensing.DIRECTIONAL]],
         [then, [Map.from_list], [sequence, [
             [dir_to_swap_required, South, LTE],
@@ -68,7 +68,7 @@ def filler_cactus(state):
     return state
 
     def handle_dir(state, dir):
-        return dos(state, [
+        return do(state, [
             [forM, Dirs, [dos, [
                 [whenM, [then, [lift(is_none)], [read, "swap_dir"]], [dos, [
                     [then, [let, "swap?"], [bind, [read, "d2s"], [getattr, dir]]],
@@ -80,7 +80,7 @@ def filler_cactus(state):
         ])
 
     def maybe_swap(state):
-        return dos(state, [
+        return do(state, [
             [then, [let, "d2s"], [cactus_swaps]],
             [let, "swap_dir", None],
             [mapM, [handle_dir], Dirs],
@@ -103,7 +103,7 @@ def filler_cactus(state):
         for y in range(d):
             for x in range(d):
                 def f(state):
-                    return dos(state, [
+                    return do(state, [
                         [move_to, (x, y)],
                         [plant_one, E.Cactus],
                         [assume],

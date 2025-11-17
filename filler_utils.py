@@ -35,7 +35,7 @@ def fill_row(state, f, handler=None, flags=[], n=None):
         return [boxloop, [0, y, d, 1], f, [0, y], False]
     for y in range(1, min(d, n)):
         state = spawn_(state, p(y), flags)
-    state, results0 = dos(state, [p(0)])
+    state, results0 = do(state, [p(0)])
     if handler == None:
         return state
     state, results = wait_all(state)
@@ -67,7 +67,7 @@ def fill_grid(
     for y in range(1, min(d, n)):
         state = spawn_(state, p(y), flags)
 
-    state, results0 = dos(state, [p(0)])
+    state, results0 = do(state, [p(0)])
     state, results = wait_all(state)
     results[state["id"]] = results0
 
@@ -91,7 +91,7 @@ def fill_rows(state, f, handler=None, n=None):
         return [boxloop, [0, y, d, 1], f, [0, y], False]
     for y in range(1, min(d, n)):
         state = spawn_(state, p(y))
-    state, results0 = dos(state, [p(0)])
+    state, results0 = do(state, [p(0)])
     if handler == None:
         return state
     state, results = wait_all(state)
@@ -100,7 +100,7 @@ def fill_rows(state, f, handler=None, n=None):
 
 def fill_rowsM(state, f, handler, n=None):
         def h(state, results):
-                return dos(state, [
+                return do(state, [
                         [pushret, results],
                         handler
                 ])
@@ -130,4 +130,4 @@ def oscillate(state, ltr, rtl, flags=OSCILLATE_FLAGS):
         if Spawn.SERIAL in flags:
             state, _ = wait_all(state)
 
-    return dos(state, [p(0)])
+    return do(state, [p(0)])

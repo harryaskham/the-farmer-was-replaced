@@ -51,7 +51,7 @@ def maze(state, size=None):
         state, t = State.get_treasure(state)
         state, c = xy(state)
         if t == c:
-            return dos(state, [
+            return do(state, [
                 [harvestM],
                 [pure, True]
             ])

@@ -139,7 +139,7 @@ def Cactus(state, x, y, box, otherwise):
             state = set_box_harvested(state, box)
         return state
         
-    return dos(state, [
+    return do(state, [
         [Box, x, y, box,
             [dos, [
                 [do_harvest],

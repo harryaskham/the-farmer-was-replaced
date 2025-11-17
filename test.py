@@ -31,7 +31,7 @@ def Test(state, a, b, test_name=None):
     test_i = len(state["test_results"][module_name])
     test_name = module_name + "__" + str(test_i)
 
-  state, actual = dos(state, [a])
+  state, actual = do(state, [a])
   state, result = assert_equal(state, actual, b, ("Expect:", a, "->", b))
   state["test_results"][module_name][test_name] = result
   return state

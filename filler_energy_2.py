@@ -56,7 +56,7 @@ def filler_energy_2(state):
         return state
 
     def cell_fn(state):
-        return dos(state, [
+        return do(state, [
             [harvest_if_biggest],
             [plant_tracked],
             [get_here]
@@ -73,7 +73,7 @@ def filler_energy_2(state):
 
     def harvest_pass(state):
         def cell_fn(state):
-            return dos(state, [
+            return do(state, [
                 [try_harvest],
                 [get_here]
             ])
@@ -92,7 +92,7 @@ def filler_energy_2(state):
             [harvest_pass]
         ])
 
-    return dos(state, [
+    return do(state, [
         [forever, [dos, [
             [fill_grid,
                 [cell_fn],

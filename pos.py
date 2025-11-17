@@ -37,7 +37,7 @@ def gt(state):
     return get_here(state, "ground_type")
 
 def get_to(state, dir, key=None):
-    return dos(state, [
+    return do(state, [
         [bind, [pos_to, dir], [flipM, get_at, key]]
     ])
         
@@ -145,7 +145,7 @@ def pos_to(state, dir, c=None):
 def with_cell(state, c, f):
     state = Lock(state, ("cell", c))
 
-    state, result = dos(state, [
+    state, result = do(state, [
         [bind, [get_at, c], [f]]
     ])
 

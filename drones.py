@@ -7,7 +7,7 @@ def update_drone_state(state):
 
 def can_spawn(state):
     state = Lock(state, "can_spawn")
-    state, can = dos(state, [
+    state, can = do(state, [
         [update_drone_state],
         [pure, state["num_drones"] < state["max_drones"]]
     ])
@@ -33,7 +33,7 @@ def spawnM(state, f, flags=[]):
     state, can = can_spawn(state)
     if Spawn.BECOME in flags and not can:
         state = Unlock(state, "spawn")
-        return dos(state, [f])
+        return do(state, [f])
 
     if Spawn.AWAIT in flags:
         state = Unlock(state, "spawn")
@@ -65,7 +65,7 @@ def spawnM(state, f, flags=[]):
                              "state:", state, "child_state:", child_state))
 
     def spawn_inner():
-        return dos(child_state, [f])
+        return do(child_state, [f])
 
     spawned = False
     child = spawn_drone(spawn_inner)

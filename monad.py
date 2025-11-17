@@ -51,54 +51,54 @@ def identity(x):
     return x
 
 def identityM(state, x):
-    return dos(state, [x])
+    return do(state, [x])
 
 def constM(state, a, _):
-    return dos(state, [a])
+    return do(state, [a])
 
 def when(state, p, xs):
     if p:
-        return dos(state, [xs])
+        return do(state, [xs])
     return unit(state)
 
 def whenM(state, ps, xs):
-    state, p = dos(state, [ps])
+    state, p = do(state, [ps])
     return when(state, p, xs)
 
 def cond(state, c, a, b):
     if c:
-        return dos(state, [a])
+        return do(state, [a])
     else:
-        return dos(state, [b])
+        return do(state, [b])
 
 def condM(state, mc, a, b):
-    state, c = dos(state, [mc])
+    state, c = do(state, [mc])
     return cond(state, c, a, b)
 
 def unless(state, c, a):
     if c:
         return state
-    return dos(state, [a])
+    return do(state, [a])
 
 def whileM(state, cf, a):
     v = None
     while True:
-        state, c = dos(state, [cf])
+        state, c = do(state, [cf])
         if c == False:
             break
-        state, v = dos(state, [a])
+        state, v = do(state, [a])
     return pure(state, v)
 
 def untilM(state, cf, a):
     while True:
-        state, c = dos(state, [cf])
+        state, c = do(state, [cf])
         if c == True:
             break
         state = do_(state, [a])
     return state
 
 def void(state, ma):
-    state, _ = dos(state, [ma])
+    state, _ = do(state, [ma])
     return state
 
 def do(state, fs):
@@ -111,17 +111,17 @@ def pure(state, x):
     return state, x
 
 def liftA2(state, f, ma, mb):
-    state, a = dos(state, [ma])
-    state, b = dos(state, [mb])
+    state, a = do(state, [ma])
+    state, b = do(state, [mb])
     f = list(f)
     f.append(a)
     f.append(b)
-    return dos(state, [f])
+    return do(state, [f])
 
 def sequence(state, ms):
     vs = []
     for m in ms:
-        state, v = dos(state, [m])
+        state, v = do(state, [m])
         vs.append(v)
     return pure(state, vs)
 
@@ -204,7 +204,7 @@ def flap(state, arg, f):
     return apply(state, f, [arg])
 
 def apM(state, mf, arg):
-    state, f = dos(state, [mf])
+    state, f = do(state, [mf])
     return apply(state, f, args)
 
 def flapM(state, arg, mf):
@@ -212,10 +212,10 @@ def flapM(state, arg, mf):
 
 def bind(state, ma, f):
     state = debug(state, ("bind", ma, f))
-    state, a = dos(state, [ma])
+    state, a = do(state, [ma])
     fa = list(f)
     fa.append(a)
-    return dos(state, [fa])
+    return do(state, [fa])
 
 def then(state, g, f):
     return bind(state, f, g)
@@ -225,7 +225,7 @@ def mapM(state, f, xs):
     for x in xs:
         fx = list(f)
         fx.append(x)
-        state, v = dos(state, [fx])
+        state, v = do(state, [fx])
         out.append(v)
     return pure(state, out)
 
@@ -236,14 +236,14 @@ def runSXY(state, f):
     f = list(f)
     f.insert(1, state["y"])
     f.insert(1, state["x"])
-    return dos(state, [f])
+    return do(state, [f])
 
 def runSXY1(state, f, otherwise):
     f = list(f)
     f.insert(1, state["y"])
     f.insert(1, state["x"])
     f.append(otherwise)
-    return dos(state, [f])
+    return do(state, [f])
 
 def runSXY2(state, f, a, b=[]):
     f = list(f)
@@ -251,7 +251,7 @@ def runSXY2(state, f, a, b=[]):
     f.insert(1, state["x"])
     f.append(a)
     f.append(b)
-    return dos(state, [f])
+    return do(state, [f])
 
 def wrapXY(f):
     def g(state, x, y):

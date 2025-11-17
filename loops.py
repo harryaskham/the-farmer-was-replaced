@@ -27,7 +27,7 @@ def traverse_farm(state, f, box=None, start=None, reverse=False, flags=[]):
 
             state = move_to(state, (x, y))
             xss = f(state, x, y)
-            state, out = dos(state, xss)
+            state, out = do(state, xss)
             res[(x, y)] = out
     return state, res
 

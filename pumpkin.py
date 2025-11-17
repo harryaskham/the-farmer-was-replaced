@@ -12,7 +12,7 @@ def pumpkin_died(state):
     return pure(state, not can_harvest())
 
 def plant_pumpkin(state, do_fertilize=True):
-    return dos(state, [
+    return do(state, [
         [sense],
         [cleanup],
         [water_to],
@@ -26,7 +26,7 @@ def plant_pumpkin(state, do_fertilize=True):
     ])
 
 def Pumpkin(state, x, y, box, otherwise, do_fertilize=True, do_harvest=True):
-    return dos(state, [
+    return do(state, [
         [Box, x, y, box,
             [dos, [
                 [when, state["id"] == 0 and (x, y) == corner(box, SW), [dos, [

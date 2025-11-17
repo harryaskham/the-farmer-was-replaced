@@ -40,7 +40,7 @@ def maybe_untill(state, e=None):
 
 def maybe_plant(state, e, flags=[]):
     flags = set(flags)
-    return dos(state, [
+    return do(state, [
         [cond, plantable(e) and et(state)[1] != e,
             [dos, [
                 [when, Growing.WATER in flags, [water_to]],
@@ -54,7 +54,7 @@ def maybe_plant(state, e, flags=[]):
     ])
 
 def plant_one(state, e, flags=[]):
-    return dos(state, [
+    return do(state, [
         [maybe_till, e],
         [maybe_untill, e],
         [maybe_plant, e, flags]
@@ -63,7 +63,7 @@ def plant_one(state, e, flags=[]):
 def plantM(state, e, flags=[]):
     flags = set(flags)
     state, planted = plant_one(state, e, flags)
-    return dos(state, [
+    return do(state, [
         [when, Growing.FERTILIZE in flags, [dos, [
             [fertilize, None, 1],
             [when, Growing.AWAIT in flags, [fertilize]]

@@ -21,7 +21,7 @@ def Lambda_(state, body):
 
 def defun(args, body):
     def bind_i(state, i):
-        return dos(state, [
+        return do(state, [
             [bind, [arg, i], [let, args[i]]]
         ])
 
@@ -57,7 +57,7 @@ def compile(func, arity=None):
             args.append(arg)
         if arity != None and len(args) > arity:
             fatal_((func), "takes", arity, "args, called with", len(args))
-        return dos(state, [
+        return do(state, [
             [push_args, args],
             [push_bindings],
             [bind, func, [pushret]],

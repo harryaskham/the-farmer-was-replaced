@@ -6,7 +6,7 @@ from filler_utils import *
 def filler_pumpkin(state):
     def handler(state, results):
         state, d = wh(state)
-        return dos(state, [
+        return do(state, [
             [try_harvest],
             [set_box_harvested, [0, 0, d, d]]
         ])

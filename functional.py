@@ -3,10 +3,8 @@ from application import *
 def id(x):
     return x
     
-def const(x):
-    def f(_):
-        return x
-    return f
+def const(a, b):
+    return a
 
 def to_const3(f):
     def f_(_, _, x):
