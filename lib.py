@@ -1,4 +1,5 @@
 from aliases import *
+from builtin_types import *
 from application import *
 from cell import *
 from conditional import *
@@ -28,3 +29,4 @@ set_state = State.put
 import Map
 
 import Type
+from builtin_types import *

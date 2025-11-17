@@ -37,4 +37,4 @@ def Test(state, a, b, test_name=None):
   return state
 
 def Test_(state, a, b, test_name=None):
-  return Test(state, pure(state, a), b, test_name)
+  return Test(state, [pure, a], b, test_name)

@@ -1,6 +1,5 @@
 from monad import *
 from trace import *
-from strings import *
 
 def lift1(state, f, a):
     return pure(state, f(a))
@@ -44,8 +43,8 @@ def In(x, xs):
 def NotIn(x, xs):
     return x not in xs
 
-def EQ(state, a, b):
-    return pure(state, a == b)
+def EQ(a, b):
+    return a == b
 
 eq = EQ
 
@@ -76,9 +75,7 @@ def mod(state, a, b):
 def eqM(state, a, b):
     state, ax = dos(state, [a])
     state, bx = dos(state, [b])
-    are_eq = eq(state, ax, bx)
-    state = debug(state, join([ax, "==", bx], " "), 3, "petals eq?")
-    return eq(state, ax, bx)
+    return pure(state, eq(ax, bx))
     
 def flipM(state, f, a, b):
     return f(state, b, a)

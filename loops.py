@@ -1,9 +1,6 @@
 from lib import *
 from move import *
 
-def nop_f(state, a, b):
-    return [const, state]
-
 def traverse_farm(state, f, box=None, start=None, reverse=False, flags=[]):
     state, d = wh(state)
 

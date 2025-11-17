@@ -30,6 +30,7 @@ def main(state=None, flags=MAIN_FLAGS):
         flags.remove(Execution.NORMAL)
         flags.add(Execution.SIMULATION)
         sim.run_sim(flags)
+        return state
 
     if state == None:
         state = State.new(flags)
@@ -42,7 +43,7 @@ def main(state=None, flags=MAIN_FLAGS):
         ])
 
     if Mode.RUN in flags:
-        return dos(state, [
+        state = do_(state, [
             [init],
             [when, Phase.PURGE in flags, [filler_purge]],
             [when, Phase.SCAN in flags, [dos, [
@@ -73,4 +74,4 @@ def main(state=None, flags=MAIN_FLAGS):
             ]]]
         ])
 
-    return unit(state)
+    return state

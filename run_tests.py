@@ -1,6 +1,7 @@
 from monad import *
 from operators import *
 
+import Type_test
 import compile_test
 import monad_test
 import pos_test

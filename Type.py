@@ -1,19 +1,23 @@
-from strings import *
-from monad import *
+from application import *
+from functional import *
 from debug import *
+from dict import *
+from builtin_types import *
 
 _ = "NOT_PROVIDED"
+NO_DEFAULT = "NO_DEFAULT"
 
 def mkF(handler):
     debug_(("mkF", handler))
     def fn(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
-        debug_(("fn", (a, b, c, d, e, f, g, h, i, j, k)))
+        debug_(("mkF fn", (a, b, c, d, e, f, g, h, i, j, k)))
         return handler(provided_args([a, b, c, d, e, f, g, h, i, j, k]))
     return fn
 
-NO_DEFAULT = "NO_DEFAULT"
+def identity_handler(arg):
+    return arg
 
-def field(name, default=NO_DEFAULT, handler=identity):
+def field(name, default=NO_DEFAULT, handler=identity_handler):
     return {
         "name": name,
         "default": default,
@@ -34,10 +38,22 @@ def method_call(self, method, args):
     args.insert(0, self)
     return applyN(method, args)
 
-def new(name, fields=[], methods={}, classmethods={}, dataclass=False):
+def bound_method(self, method):
+    debug_(("bound_method", self, method))
+    def handler(args):
+        debug_(("bound_method_handler", args))
+        return method_call(self, method, args)
+    return mkF(handler)
+
+def mk_init(Self):
+    debug_(("mk_init", Self))
+    fields = Self["fields"]
+    methods = Self["methods"]
+    dataclass = Self["dataclass"]
+
     def nop_handler(self_args):
         debug_(("nop_handler", self_args))
-        return None
+    nop_init = mkF(nop_handler)
 
     def setting_handler(self_args):
         debug_(("setting_handler", self_args))
@@ -53,44 +69,57 @@ def new(name, fields=[], methods={}, classmethods={}, dataclass=False):
                     fatal_(("error: no default and not provided", field["name"]))
                 arg = field["default"]
             self[field["name"]] = field["handler"](arg)
+    setting_init = mkF(setting_handler)
 
+    inits = [nop_init]
+    if dataclass:
+        inits.append(setting_init)
     if "__init__" in methods:
-        prev_init = methods["__init__"]
+        inits.append(methods["__init__"])
 
-        if dataclass:
-            def combined_init(self_args):
-                debug_(("combined_init", self_args))
-                setting_handler(self_args)
-                self, args = self_args[0], self_args[1:]
-                method_call(self, prev_init, args)
-            __init__ = mkF(combined_init)
+    def combined_handler(self_args):
+        debug_(("combined_init", self_args))
+        self, args = self_args[0], self_args[1:]
+        for init in inits:
+            method_call(self, init, args)
+    combined_init = mkF(combined_handler)
+
+    return combined_init
+
+def __newlist__(Self_args):
+    verbose_(("__newlist__", Self_args))
+    Self, args = Self_args[0], Self_args[1:]
+    self = {"__type__": Self}
+    for method_name, method in items(Self["methods"]):
+        self[method_name] = bound_method(self, method)
+    applyN(self["__init__"], args)
+    return self
+
+__new__ = mkF(__newlist__)
+
+def Type__str__(self):
+    return join(["Type<", self["name"], ">"])
+
+def default__str__(self):
+    T = of(self)
+    ss = [T["name"], "({"]
+    for i in range(len(T["fields"])):
+        field = T["fields"][i]
+        ss.append(field["name"])
+        ss.append(": ")
+        if field["name"] in self:
+            ss.append(repr(self[field["name"]]))
         else:
-            __init__ = mkF(prev_init)
-    elif dataclass:
-        __init__ = mkF(setting_handler)
-    else:
-        __init__ = mkF(nop_handler)
+            ss.append("<unset>")
+        if i < len(T["fields"]) - 1:
+            ss.append(", ")
+    ss.append("})")
+    return join(ss)
 
-    methods["__init__"] = __init__
-
-    def bound_method(self, method):
-        debug_(("bound_method", self, method))
-        def handler(args):
-            debug_(("bound_method_handler", args))
-            return method_call(self, method, args)
-        return mkF(handler)
-
-    def ctor_handler(Self_args):
-        Self, args = Self_args[0], Self_args[1:]
-        verbose_(("ctor_handler", Self, args))
-        self = {"__type__": Self}
-        for method_name in methods:
-            method = methods[method_name]
-            self[method_name] = bound_method(self, method)
-        applyN(self["__init__"], args)
-        return self
-
-    classmethods["new"] = mkF(ctor_handler)
+def new(name, fields=[], methods={}, classmethods={}, dataclass=False):
+    fields = list(fields)
+    methods = dict(methods)
+    classmethods = dict(classmethods)
 
     Self = {
         "name": name,
@@ -99,8 +128,15 @@ def new(name, fields=[], methods={}, classmethods={}, dataclass=False):
         "classmethods": classmethods,
         "dataclass": dataclass
     }
-    for method_name in classmethods:
-        method = classmethods[method_name]
+
+    Self["classmethods"]["new"] = __new__
+
+    if "__str__" not in Self["methods"]:
+        Self["methods"]["__str__"] = default__str__
+
+    Self["methods"]["__init__"] = mk_init(Self)
+
+    for method_name, method in items(Self["classmethods"]):
         Self[method_name] = bound_method(Self, method)
 
     return Self
@@ -117,6 +153,9 @@ def __Type__make(self):
         self["classmethods"],
         self["dataclass"])
 
+def __Type__new(cls, name, fields=[], methods={}, classmethods={}, dataclass=False):
+    return new(name, fields, methods, classmethods, dataclass)
+
 Type = new(
     "Type",
     [
@@ -129,60 +168,8 @@ Type = new(
     {
         "__init__": __Type__,
     },
+    {
+        "__str__": Type__str__,
+    },
     True
 )
-
-def name(x):
-    return of(x)["name"]
-
-__Builtin__ = "__Builtin__"
-
-def Builtin(name):
-    return {
-        "__type__": __Builtin__,
-        "name": name,
-        "fields": [],
-        "methods": {},
-        "classmethods": {},
-        "dataclass": False
-    }
-
-NoneType = Builtin("None")
-String = Builtin("String")
-Bool = Builtin("Bool")
-Int = Builtin("Int")
-Float = Builtin("Float")
-List = Builtin("List")
-Dict = Builtin("Dict")
-Set = Builtin("Set")
-
-NUM_CHARS = set(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "+", "."])
-
-def of(x):
-    r = repr(x)
-    if r == "None":
-        return NoneType
-    elif r == "True" or r == "False":
-        return Bool
-    elif r[0] == "[":
-        return List
-    elif r[0] == "{":
-        if "__type__" in x:
-            return x["__type__"]
-        for c in r:
-            if c == ":":
-                return Dict
-            elif c in [",", "}"]:
-                return Set
-    elif r[0] in '"' or "'":
-        return String
-    elif r[0] in NUM_CHARS:
-        for c in r:
-            if c == ".":
-                return Float
-        return Int
-
-    fatal_(("Cannot get Type of", x))
-
-def repr(x):
-    return str(x)

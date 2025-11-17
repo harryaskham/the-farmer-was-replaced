@@ -8,6 +8,7 @@ MAIN_FLAGS = set([
     #Testing.LOOP,
     #Log.DRONE_DETAILS,
     Log.DEBUG,
+    #Log.ALL,
     Size.SMALL,
     Space.FILL,
     #Phase.PURGE,

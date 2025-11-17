@@ -1,3 +1,4 @@
+import Type
 from application import *
 from dict import *
 from debug import *
@@ -136,8 +137,7 @@ def do_repr(xs):
         ss.append(x_repr(x))
     return join(ss, " ")
 
-def dos(state, xss):
-    quick_print(repr(xss))
+def do(state, xss):
     state = verbose(state, ("dos", xss))
 
     if xss == []:
@@ -150,7 +150,7 @@ def dos(state, xss):
             state = fatal(state, ("Error in do-block:", state["error"]))
             return unit(state)
 
-        state = debug(state, ("do", xs))
+        state = debug(state, (do, [xs]))
 
         xs = list(xs)
         xs.insert(1, state)
@@ -158,14 +158,14 @@ def dos(state, xss):
         out = aps(xs)
         if out == None:
             state_, v = state, None
-        elif "__type__" in out and out["__type__"] == "State":
+        elif Type.name(out) == "State":
             state_, v = out, None
         else:
             if len(out) != 2:
                 state = fatal(state, ["Malformed state,v returned:", out])
                 return unit(state)
             state_, v = out
-            if "__type__" not in state_ or state_["__type__"] != "State":
+            if Type.name(state_) != "State":
                 state = fatal(state, ["Malformed state returned:", state_, v])
                 return unit(state)
 
@@ -173,8 +173,10 @@ def dos(state, xss):
 
     return state, v
 
+dos = do
+
 def do_(state, xss):
-    return dos(state, xss)[0]
+    return do(state, xss)[0]
 
 def chain(xss):
     head = list(xss[0])

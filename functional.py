@@ -1,3 +1,5 @@
+from application import *
+
 def id(x):
     return x
     
@@ -72,3 +74,11 @@ def nop2(_, _):
 def nop3(_, _, _):
     return
 
+def case(x, cases):
+    x = aps(x)
+    for pred, result in cases:
+        pred = list(pred)
+        pred.append(x)
+        if aps(pred):
+            return aps(result)
+    fatal_(("case: no matching case", x, cases))

@@ -2,6 +2,7 @@ from flags import *
 from aliases import *
 from error import *
 from strings import *
+from builtin_types import *
 
 def log_drone_info(state, level):
     return log(
@@ -37,7 +38,16 @@ def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
     if (Log.DRONE_DETAILS in state["flags"]) and (not hide_drone_info):
         state = log_drone_info(state, level)
 
-    quick_print([level, msg])
+    msgs = []
+    if of(msg) in [List, Tuple]:
+        msgs = list(msg)
+    else:
+        msgs = [msg]
+    fmsgs = []
+    for msg in msgs:
+        fmsgs.append(repr(msg))
+
+    quick_print([level, join(fmsgs, " ")])
 
     return state
 
@@ -66,9 +76,9 @@ def shim_state():
     if Log.DRONE_DETAILS in flags:
         flags.remove(Log.DRONE_DETAILS)
     state = {
-        "__type__": "State",
+        "__type__": {"name": "State"},
         "flags": flags,
-        "id": "_",
+        "id": 1,
         "x": "_",
         "y": "_",
         "error": None,
