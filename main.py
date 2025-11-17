@@ -46,15 +46,15 @@ def main(state=None, flags=MAIN_FLAGS):
         state = do_(state, [
             [init],
             [when, Phase.PURGE in flags, [filler_purge]],
-            [when, Phase.SCAN in flags, [dos, [
+            [when, Phase.SCAN in flags, [do, [
                 [farmloop, do_scan, False]
             ]]],
-            [forever, [dos, [
+            [forever, [do, [
                 [when, Phase.FLIPS in flags, [do_flips]],
-                [when, Phase.PROGS in flags, [dos, [
+                [when, Phase.PROGS in flags, [do, [
                     [run_progs, progs]
                 ]]],
-                [when, Space.FILL in flags, [forever, [dos, [
+                [when, Space.FILL in flags, [forever, [do, [
                     [when, Phase.ENERGY in flags, [filler_energy]],
                     [when, Phase.PUMPKIN in flags, [filler_pumpkin]],
                     [when, Phase.CROPS in flags, [filler_crops]],
@@ -63,12 +63,12 @@ def main(state=None, flags=MAIN_FLAGS):
                     [when, Phase.COMPANIONS in flags, [filler_companions]],
                     [when, Phase.MAZE in flags, [filler_maze]]
                 ]]]],
-                [when, Phase.DINO in flags, [dos, [
+                [when, Phase.DINO in flags, [do, [
                     #[run_progs, purges],
                     [dino, [tail_follow]],
                     #[dino, [dumb, brute, search_apple]],
                 ]]],
-                [when, Phase.FARM in flags, [dos, [
+                [when, Phase.FARM in flags, [do, [
                     [bind, [cache_loop, loop], [farmloop]]
                 ]]]
             ]]]

@@ -44,7 +44,7 @@ def filler_cactus(state):
 
     state = do_(state, [
         [oscillate,
-            [dos, [
+            [do, [
                 [plant_one, E.Cactus],
                 [assume],
                 [condM, [sel],
@@ -52,7 +52,7 @@ def filler_cactus(state):
                     [whileM, [swap_once, [North, South]], [nop1]],
                 ]
             ]],
-            [dos, [
+            [do, [
                 [assume],
                 [condM, [sel],
                     [whileM, [swap_once, [East, West]], [nop1]],
@@ -69,10 +69,10 @@ def filler_cactus(state):
 
     def handle_dir(state, dir):
         return do(state, [
-            [forM, Dirs, [dos, [
-                [whenM, [then, [lift(is_none)], [read, "swap_dir"]], [dos, [
+            [forM, Dirs, [do, [
+                [whenM, [then, [lift(is_none)], [read, "swap_dir"]], [do, [
                     [then, [let, "swap?"], [bind, [read, "d2s"], [getattr, dir]]],
-                    [whenM, [read, "swap?"], [dos, [
+                    [whenM, [read, "swap?"], [do, [
                         [let, "swap_dir", dir]
                     ]]]
                 ]]]
@@ -86,7 +86,7 @@ def filler_cactus(state):
             [mapM, [handle_dir], Dirs],
             [condM, [bind, [read, "swap_dir"], [is_none]],
                 [unit],
-                [dos, [
+                [do, [
                     [bind, [read, "swap_dir"], [swapM]],
                     [bind, [read, "swap_dir"], [moveM]],
                     [pure, True]
@@ -118,10 +118,10 @@ def filler_cactus(state):
 
     return fill_row(
         state,
-        [dos, [
+        [do, [
             [condM, [harv],
                 [try_harvest],
-                [dos, [
+                [do, [
                     [plant_one, E.Cactus],
                     [assume],
                     [sense, [Sensing.DIRECTIONAL]],

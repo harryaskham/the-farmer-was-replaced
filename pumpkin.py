@@ -17,7 +17,7 @@ def plant_pumpkin(state, do_fertilize=True):
         [cleanup],
         [water_to],
         [plant_one, E.Pumpkin],
-        [when, do_fertilize, [dos, [
+        [when, do_fertilize, [do, [
             [fertilize],
             [maybe_cure]
         ]]],
@@ -28,9 +28,9 @@ def plant_pumpkin(state, do_fertilize=True):
 def Pumpkin(state, x, y, box, otherwise, do_fertilize=True, do_harvest=True):
     return do(state, [
         [Box, x, y, box,
-            [dos, [
-                [when, state["id"] == 0 and (x, y) == corner(box, SW), [dos, [
-                    [when, do_harvest, [dos, [
+            [do, [
+                [when, state["id"] == 0 and (x, y) == corner(box, SW), [do, [
+                    [when, do_harvest, [do, [
                         [try_harvest, [E.Pumpkin]],
                         [set_box_harvested, box]
                     ]]]

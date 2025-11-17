@@ -30,7 +30,7 @@ def maybe_cure(state, over=None, unsafe=False):
         if infected:
             return do(state, [
                 [useM, I.Weird_Substance],
-                [unless, unsafe, [dos, [
+                [unless, unsafe, [do, [
                     [useM, I.Fertilizer],
                     [useM, I.Weird_Substance]
                 ]]]

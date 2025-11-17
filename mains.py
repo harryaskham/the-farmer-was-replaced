@@ -4,7 +4,7 @@ def loop(state, x, y):
     state, d = wh(state)
     return [
         [debug, ""],
-        [when, x == 0 and y == 8, [dos, [
+        [when, x == 0 and y == 8, [do, [
             [spawn_, [farmloop, loop]]
         ]]],
         [sense],
@@ -13,7 +13,7 @@ def loop(state, x, y):
         [try_harvest, ALWAYS_HARVEST],
         [Box, x, y, [0, 0, 10, 1],
             [Sunflower, 7, 7],
-            [dos, [
+            [do, [
                 [when, x == 0, [boost, BOOSTS]],
                 chain([
                     [Pumpkin, x, y, [0, d - 6, 6, 6]],
@@ -65,7 +65,7 @@ def do_flips(state):
         [forM, range(32),
             [constM,
                 [spawn_,
-                    [dos, [
+                    [do, [
                         [bind, [ixy], [move_to]],
                         [forever, [do_a_flipM]]
                     ]],

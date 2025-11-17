@@ -7,7 +7,7 @@ from filler_maze import *
 from filler_utils import *
 
 def filler_crops(state):
-    return fill_rows(state, [dos, [
+    return fill_rows(state, [do, [
         [sense],
         [try_harvest],
         [Checker3, [plant_one, E.Tree], [plant_one, E.Carrot], [plant_one, E.Grass]],
@@ -17,7 +17,7 @@ def filler_purge(state):
     return fill_rows(state, [try_harvest])
 
 def filler_crop(state, e):
-    return fill_rows(state, [dos, [
+    return fill_rows(state, [do, [
         [sense],
         [try_harvest],
         [plant_one, e]

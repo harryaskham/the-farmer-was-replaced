@@ -25,7 +25,7 @@ def defun(args, body):
             [bind, [arg, i], [let, args[i]]]
         ])
 
-    return compile([dos, [
+    return compile([do, [
         [push_bindings, {"__call__": True}],
         [mapM, [bind_i], range(len(args))],
         [bind, body, [pushret]],

@@ -9,15 +9,15 @@ def toggle_infected(state, c=None):
     })
 
 SIDE_EFFECTS = {
-    I.Fertilizer: [dos, [
+    I.Fertilizer: [do, [
         [set_here, { "infected": True }],
         [sense]
     ]],
-    I.Weird_Substance: [dos, [
+    I.Weird_Substance: [do, [
         [toggle_infected],
         [bind, [neighbors], [mapM, [toggle_infected]]]
     ]],
-    I.Water: [dos, [
+    I.Water: [do, [
         [set_here, { "water": get_water() } ]
     ]]
 }

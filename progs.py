@@ -11,14 +11,14 @@ def purges(state, n_drones=16):
 def progs(state):
     n = wh(state)
     return [
-        [boxloop, [0, 0, 10, 10], [dos, [
+        [boxloop, [0, 0, 10, 10], [do, [
             [hatM, Hats.Brown_Hat],
             [sense],
             [try_harvest],
             [runSXY, [Checker, [plant_one, E.Tree], [plant_one, E.Carrot]]],
             [sense, [Companions.UPDATE]]
         ]]],
-        [boxloop, [12, 0, 10, 10], [dos, [
+        [boxloop, [12, 0, 10, 10], [do, [
             [hatM, Hats.Green_Hat],
             [sense],
             [runSXY,
@@ -29,7 +29,7 @@ def progs(state):
             ],
             [sense, [Companions.UPDATE]]
         ]]],
-        [boxloop, [0, n-6, 7*3, 6], [dos, [
+        [boxloop, [0, n-6, 7*3, 6], [do, [
             [hatM, Hats.Gold_Hat],
             [sense],
             [cleanup],
@@ -40,27 +40,27 @@ def progs(state):
             ]),
             [sense, [Companions.UPDATE]]
         ]]],
-        [boxloop, [18, 10, 4, 6], [dos, [
+        [boxloop, [18, 10, 4, 6], [do, [
             [hatM, Hats.Straw_Hat],
             [try_harvest]
         ]]],
-        [boxloop, [10, 0, 1, 1], [dos, [
+        [boxloop, [10, 0, 1, 1], [do, [
             [hatM, Hats.Sunflower_Hat],
             [boost, 1, False, True]
         ]]],
-        [boxloop, [11, 0, 1, 1], [dos, [
+        [boxloop, [11, 0, 1, 1], [do, [
             [hatM, Hats.Sunflower_Hat],
             [boost, 1, False, True]
         ]]],
-        [boxloop, [3, 13, 1, 1], [dos, [
+        [boxloop, [3, 13, 1, 1], [do, [
             [hatM, Hats.Sunflower_Hat],
             [maze, 6]
         ]]],
-        [boxloop, [9, 13, 1, 1], [dos, [
+        [boxloop, [9, 13, 1, 1], [do, [
             [hatM, Hats.Sunflower_Hat],
             [maze, 6]
         ]]],
-        [boxloop, [15, 13, 1, 1], [dos, [
+        [boxloop, [15, 13, 1, 1], [do, [
             [hatM, Hats.Sunflower_Hat],
             [maze, 6]
         ]]]

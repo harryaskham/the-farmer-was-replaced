@@ -42,7 +42,7 @@ def sense(state, flags=[]):
     return do_(state, [
         [cond, companion == None,
             [verbose, "no companion"],
-            [dos, [
+            [do, [
                 [debug, "companion/target"],
                 [debug, companion],
                 [bind, [at, companion[1]], [debug]],

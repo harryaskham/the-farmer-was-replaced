@@ -42,7 +42,7 @@ def maybe_plant(state, e, flags=[]):
     flags = set(flags)
     return do(state, [
         [cond, plantable(e) and et(state)[1] != e,
-            [dos, [
+            [do, [
                 [when, Growing.WATER in flags, [water_to]],
                 [lift([plant]), e],
                 [set_here, {"entity_type": e}],
@@ -64,11 +64,11 @@ def plantM(state, e, flags=[]):
     flags = set(flags)
     state, planted = plant_one(state, e, flags)
     return do(state, [
-        [when, Growing.FERTILIZE in flags, [dos, [
+        [when, Growing.FERTILIZE in flags, [do, [
             [fertilize, None, 1],
             [when, Growing.AWAIT in flags, [fertilize]]
         ]]],
-        [when, Harvesting.CURE in flags, [dos, [
+        [when, Harvesting.CURE in flags, [do, [
             [maybe_cure, [e], Harvesting.UNSAFE in flags],
         ]]],
         [pure, planted]

@@ -21,7 +21,7 @@ COMPANION_FLAGS = [
 
 def filler_companions(state, flags=None):
     flags = defaults(flags, COMPANION_FLAGS)()
-    f = [dos, [
+    f = [do, [
         [gatherM, flags],
         [sense, flags],
         [Checker0, [cureM, flags]],

@@ -26,7 +26,7 @@ def Sunflower(state, min_petals=7, max_petals=15, flags=[Growing.WATER]):
     return do(state, [
         [sense],
         [when, Growing.WATER in flags, [water_to]],
-        [untilM, [valid_sunflower], [dos, [
+        [untilM, [valid_sunflower], [do, [
             [harvestM],
             [plant_one, E.Sunflower]
         ]]],

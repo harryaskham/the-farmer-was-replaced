@@ -141,7 +141,7 @@ def Cactus(state, x, y, box, otherwise):
         
     return do(state, [
         [Box, x, y, box,
-            [dos, [
+            [do, [
                 [do_harvest],
                 [plant_one, E.Cactus],
                 [emplace_cactus]

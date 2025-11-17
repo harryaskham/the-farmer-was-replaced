@@ -116,7 +116,7 @@ def oscillate(state, ltr, rtl, flags=OSCILLATE_FLAGS):
 
     def p(y):
         b = row_box(d, y)
-        inner = [dos, [
+        inner = [do, [
             [box_do, b, ltr, ltr_flags],
             [box_do, b, rtl, rtl_flags]
         ]]

@@ -93,7 +93,7 @@ def filler_energy_2(state):
         ])
 
     return do(state, [
-        [forever, [dos, [
+        [forever, [do, [
             [fill_grid,
                 [cell_fn],
                 merge_cell,

@@ -10,7 +10,7 @@ def run(state):
     f0 = compile([pure, 123])
     AddM = lift([Add])
     Add1 = compile([bind, [arg, 0], [AddM, 1]], 1)
-    AddXY = compile([dos, [
+    AddXY = compile([do, [
         [bind, [arg, 0], [let, "x"]],
         [bind, [arg, 1], [let, "y"]],
         [liftA2, [AddM], [read, "x"], [read, "y"]]

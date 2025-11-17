@@ -5,7 +5,7 @@ def run(state):
     return do_(state, [
         [Tests, __name__],
         [Test,
-            [dos, [
+            [do, [
                 [move_to, (0, 0)],
                 [sense, [Sensing.DIRECTIONAL]],
                 [liftA2, [pairM],

@@ -11,6 +11,6 @@ def filler_pumpkin(state):
             [set_box_harvested, [0, 0, d, d]]
         ])
         
-    return fill_rows(state, [dos, [
+    return fill_rows(state, [do, [
         [plant_pumpkin, False],
     ]], handler)

@@ -8,8 +8,8 @@ def run(state):
         [Tests, __name__],
         [Test, [pure, 1], 1],
         [Test, [pure, None], None],
-        [Test, [dos, [[pure, None]]], None],
-        [Test, [dos, [[pushret, 42], [popret]]], 42],
-        [Test, [dos, [[pushret, 42], [peekret]]], 42],
-        [Test, [dos, [[pushret, 1], [pushret, 2], [liftA2, [pairM], [popret], [popret]]]], (2, 1)]
+        [Test, [do, [[pure, None]]], None],
+        [Test, [do, [[pushret, 42], [popret]]], 42],
+        [Test, [do, [[pushret, 42], [peekret]]], 42],
+        [Test, [do, [[pushret, 1], [pushret, 2], [liftA2, [pairM], [popret], [popret]]]], (2, 1)]
     ])
