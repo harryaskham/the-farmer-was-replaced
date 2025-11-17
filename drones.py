@@ -1,5 +1,7 @@
 from lib import *
 from debug import *
+from Type import new
+from State import State
 
 def update_drone_state(state):
     state["num_drones"] = num_drones()
@@ -50,7 +52,7 @@ def spawnM(state, f, flags=[]):
     elif Spawn.SHARE in flags:
         state, child_state = State.share(state, child_id)
     elif Spawn.NEW in flags:
-        child_state = State.new(state["flags"])
+        child_state = new(State, state["flags"])
         child_state["id"] = child_id
     else:
         state = Unlock(state, "child_handles")

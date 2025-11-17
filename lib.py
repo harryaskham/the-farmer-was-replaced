@@ -23,8 +23,8 @@ from time import *
 from trace import *
 from util import *
 
-import State
-set_state = State.put
+from State import *
+set_state = put
 
 import Map
 

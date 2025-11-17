@@ -33,7 +33,7 @@ def main(state=None, flags=MAIN_FLAGS):
         return state
 
     if state == None:
-        state = State.new(flags)
+        state = new(State, flags)
 
     if Mode.TEST in flags and Execution.SIMULATION in flags:
         runner = [test_main.main, run_tests.run, False, False]

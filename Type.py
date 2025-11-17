@@ -98,6 +98,9 @@ def __new__(Self_args):
 
     init = mk_init(Self)
     self["__init__"] = bound_method(self, init)
+    args = list(args)
+    while len(args) < len(Self["fields"]):
+        args.append(_)
     applyN(self["__init__"], args)
 
     return self
