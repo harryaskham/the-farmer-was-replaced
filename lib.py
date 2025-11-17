@@ -28,5 +28,5 @@ set_state = State.put
 
 import Map
 
-import Type
+from Type import Type, Field, new
 from builtin_types import *

@@ -3,7 +3,7 @@ from debug import debug_
 from locking import Lock, Unlock
 import To
 import Size
-import Type
+from Type import Type, Field, new
 
 def __State__(self, flags=set()):
     debug_(("__init__", self, flags))
@@ -105,19 +105,20 @@ def State__share(self, id):
     self = Unlock(self, "State__share")
     return pure(self, child)
 
-State = Type.new(
+State = new(
+    Type,
     __name__,
-    [Type.field("flags", set(), set)],
+    [Field("flags", set(), set)],
     {
         "__init__": __State__,
         "put": State__put,
         "get": State__get,
         "share": State__share,
         "fork": State__fork
-    })
+    },
+    {},
+    False)
     
-new = State["new"]
-
 def put(state, kvs, flags=[]):
     return state["put"](kvs, flags)
     

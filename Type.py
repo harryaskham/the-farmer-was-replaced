@@ -23,6 +23,7 @@ def field(name, default=NO_DEFAULT, handler=identity_handler):
         "default": default,
         "handler": handler
     }
+Field = field
 
 def provided_args(args):
     debug_(("provided_args", args))
@@ -47,9 +48,6 @@ def bound_method(self, method):
 
 def mk_init(Self):
     debug_(("mk_init", Self))
-    fields = Self["fields"]
-    methods = Self["methods"]
-    dataclass = Self["dataclass"]
 
     def nop_handler(self_args):
         debug_(("nop_handler", self_args))
@@ -57,13 +55,13 @@ def mk_init(Self):
 
     def setting_handler(self_args):
         debug_(("setting_handler", self_args))
-        if len(self_args) > len(fields) + 1:
-            fatal_(("error: more args than fields", len(args), len(fields)))
+        if len(self_args) > len(Self["fields"]) + 1:
+            fatal_(("error: more args than fields", len(args), len(Self["fields"])))
 
-        self, args = self_args[0], self_args[1:1+len(fields)]
+        self, args = self_args[0], self_args[1:1+len(Self["fields"])]
         for i in range(len(args)):
             arg = args[i]
-            field = fields[i]
+            field = Self["fields"][i]
             if arg == _:
                 if field["default"] == NO_DEFAULT:
                     fatal_(("error: no default and not provided", field["name"]))
@@ -72,10 +70,10 @@ def mk_init(Self):
     setting_init = mkF(setting_handler)
 
     inits = [nop_init]
-    if dataclass:
+    if Self["dataclass"]:
         inits.append(setting_init)
-    if "__init__" in methods:
-        inits.append(methods["__init__"])
+    if "__init__" in Self["methods"]:
+        inits.append(Self["methods"]["__init__"])
 
     def combined_handler(self_args):
         debug_(("combined_init", self_args))
@@ -86,16 +84,27 @@ def mk_init(Self):
 
     return combined_init
 
-def __newlist__(Self_args):
-    verbose_(("__newlist__", Self_args))
+def __new__(Self_args):
+    verbose_(("__new__", Self_args))
     Self, args = Self_args[0], Self_args[1:]
-    self = {"__type__": Self}
+
+    self = {
+        "__type__": Self,
+        "__init__": mk_init(Self)
+    }
+
+    if "__str__" not in Self["methods"]:
+        Self["methods"]["__str__"] = default__str__
+
     for method_name, method in items(Self["methods"]):
-        self[method_name] = bound_method(self, method)
+        if method_name != "__init__":
+            self[method_name] = bound_method(self, method)
+
     applyN(self["__init__"], args)
+
     return self
 
-__new__ = mkF(__newlist__)
+new = mkF(__new__)
 
 def Type__str__(self):
     return join(["Type<", self["name"], ">"])
@@ -116,60 +125,36 @@ def default__str__(self):
     ss.append("})")
     return join(ss)
 
-def new(name, fields=[], methods={}, classmethods={}, dataclass=False):
-    fields = list(fields)
-    methods = dict(methods)
-    classmethods = dict(classmethods)
+def __Typelist__(self_args):
+    self, name, fields, methods, classmethods, dataclass = self_args
+    for method_name, method in items(self["classmethods"]):
+        self[method_name] = bound_method(self, method)
 
-    Self = {
-        "name": name,
-        "fields": fields,
-        "methods": methods,
-        "classmethods": classmethods,
-        "dataclass": dataclass
-    }
+__Type__ = mkF(__Typelist__)
 
-    Self["classmethods"]["new"] = __new__
-
-    if "__str__" not in Self["methods"]:
-        Self["methods"]["__str__"] = default__str__
-
-    Self["methods"]["__init__"] = mk_init(Self)
-
-    for method_name, method in items(Self["classmethods"]):
-        Self[method_name] = bound_method(Self, method)
-
-    return Self
-
-def __Type__(self, name, fields=[], methods={}, classmethods={}, dataclass=False):
-    self["T"] = self["make"]()
-    self["T"]["__type__"] = Type
-
-def __Type__make(self):
-    return new(
-        self["name"],
-        self["fields"],
-        self["methods"],
-        self["classmethods"],
-        self["dataclass"])
-
-def __Type__new(cls, name, fields=[], methods={}, classmethods={}, dataclass=False):
-    return new(name, fields, methods, classmethods, dataclass)
-
-Type = new(
-    "Type",
-    [
+PreType = {
+    "name": "Type",
+    "fields": [
         field("name"),
-        field("fields", []),
-        field("methods", {}),
-        field("classmethods", {}),
+        field("fields", [], list),
+        field("methods", {}, dict),
+        field("classmethods", {}, dict),
         field("dataclass", False)
     ],
-    {
+    "methods": {
         "__init__": __Type__,
     },
-    {
+    "classmethods": {
         "__str__": Type__str__,
     },
-    True
-)
+    "dataclass": True
+}
+
+Type = new(
+    PreType,
+    PreType["name"],
+    PreType["fields"],
+    PreType["methods"],
+    PreType["classmethods"],
+    PreType["dataclass"])
+Type["__type__"] = Type
