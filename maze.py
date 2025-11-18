@@ -64,7 +64,8 @@ def maze(state, size=None, reuse_limit=0):
         state, t = get_treasure(state)
         state, c = xy(state)
         if t == c:
-            if state["maze_status"]["reuse_count"] < reuse_limit:
+            state["maze_status"]["reuse_count"] += 1
+            if state["maze_status"]["reuse_count"] < reuse_limit + 1:
                 return do(state, [
                     [use_substance, size],
                     [pure, True]
@@ -102,21 +103,30 @@ def maze(state, size=None, reuse_limit=0):
             state = spawn_or(
                 state,
                 [next(dir)],
-                [Spawn.SHARE, Spawn.AWAIT])
+                [Spawn.SHARE])
             state = end_excursion(state)
 
         state = Unlock(state, "maze_seen")
 
         if len(ds) == 0:
             return state
-        return next(ds[0])(state)
+        return next(ds.pop())(state)
 
     state = mk_maze(state, size)
     state = go(state)
+
+    def check(state):
+        return state["num_drones"] == 1
+
+    done = False
+    while not done:
+        wait_secs(1)
+        state, done = with_drone_state(state, check)
+
     if state["maze_status"]["reuse_count"] < reuse_limit:
         return do_(state, [
             [mk_maze, size],
             [go]
         ])
-    else:
-        return state
+
+    return state

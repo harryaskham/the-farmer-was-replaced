@@ -3,8 +3,21 @@ from debug import *
 from Type import new
 from State import State
 
+def with_drone_state(state, f):
+    state = Lock(state, "spawn")
+    state = Lock(state, "num_drones")
+    state = update_drone_state(state)
+    x = f(state)
+    state = Unlock(state, "num_drones")
+    state = Unlock(state, "spawn")
+    return state, x
+
 def update_drone_state(state):
+    state = Lock(state, "spawn")
+    state = Lock(state, "num_drones")
     state["num_drones"] = num_drones()
+    state = Unlock(state, "num_drones")
+    state = Unlock(state, "spawn")
     return state
 
 def can_spawn(state):
@@ -42,14 +55,22 @@ def spawnM(state, f, flags=[]):
 
     state = Lock(state, "spawn")
 
-    state, can = can_spawn(state)
-    if Spawn.BECOME in flags and not can:
+    if Spawn.BECOME in flags:
+        state = Lock(state, "can_spawn")
+        state, can = can_spawn(state)
+        if not can:
+            state = Unlock(state, "spawn")
+            state = Unlock(state, "can_spawn")
+            return do_(state, [f])
         state = Unlock(state, "spawn")
-        return do(state, [f])
 
     if Spawn.AWAIT in flags:
+        flags = without(flags, Spawn.AWAIT)
         state = Unlock(state, "spawn")
-        return must_spawn(state, f, flags)
+        spawned = False
+        while not spawned:
+            state, spawned = spawn(state, f, flags)
+        return pure(state, spawned)
 
     state = Lock(state, "child_handles")
 
