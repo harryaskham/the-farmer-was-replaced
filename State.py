@@ -12,6 +12,7 @@ def __State__(self, flags=set()):
     debug_(("__init__", self, flags))
 
     self["id"] = 1
+    self["parent_id"] = None
     self["next_id"] = 2
 
     self["flags"] = set(flags)
@@ -228,6 +229,12 @@ def merge_state(state, other):
 
     for child_id, child_handle in items(other["child_handles"]):
         state["child_handles"][child_id] = child_handle
+
+    for child_id, child_state in items(other["child_states"]):
+        state["child_states"][child_id] = child_state
+
+    for child_id, r  in items(other["drone_return"]):
+        state["drone_return"][child_id] = r
 
     for c in other["maze"]["seen"]:
         state["maze"]["seen"].add(c)

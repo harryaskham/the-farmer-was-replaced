@@ -46,8 +46,8 @@ def maze(state, size, limit):
 
     def next(dir):
         def continuation(state):
-            return state.do_([
-                [whenM, [moveM, dir, [Movement.FAST]], [go]]
+            return state.do([
+                [condM, [moveM, dir, [Movement.FAST]], [go], [pure, False]]
             ])
         return continuation
 
@@ -84,35 +84,35 @@ def maze(state, size, limit):
         state, c = xy(state)
         state, seen = add_seen(state, c)
         if seen:
-            return state
+            return pure(state, False)
 
         state, done = check_done(state)
         if done:
-            return state
+            return pure(state, True)
 
         state, ns = neighbors_dict(state)
         ds = []
         for dir, n in items(ns):
-            if n in state["maze"]["seen"]:
-                continue
+            #if n in state["maze"]["seen"]:
+            #    continue
             ds.append(dir)
 
         while ds != []:
             state = spawn_(
                 state,
                 [next(ds.pop())],
-                [Spawn.SHARE, Spawn.MERGE, Spawn.AWAIT])# Spawn.BECOME, Spawn.EXCURSE])
+                [Spawn.FORK, Spawn.MERGE, Spawn.BECOME, Spawn.EXCURSE])
 
-        state, _ = wait_all(state)
-
-        return state
+        state, rs = wait_all(state)
+        return pure(state, any(values(rs)))
 
     cont = True
     while cont:
-        state = state.do_([
+        state, done = state.do([
             [mk_maze, size],
             [go],
             #[dump, info],
         ])
-        state, cont = incr_maze(state, limit)
+        if done:
+            state, cont = incr_maze(state, limit)
     return reset_maze(state)
