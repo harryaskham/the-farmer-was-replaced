@@ -24,7 +24,6 @@ from trace import *
 from util import *
 
 from State import *
-set_state = put
 
 import Map
 

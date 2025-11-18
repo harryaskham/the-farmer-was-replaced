@@ -8,7 +8,7 @@ def set_apple(state):
     state, c = xy(state)
     if e != E.Apple or c != state["apple"]:
         return state
-    return set_state(state, {
+    return put(state, {
         "apple": measure()
     })
 
@@ -92,7 +92,7 @@ def dumb(state):
             return state
 
 def apple_here(state):
-    return set_state(state, { "apple": xy(state)[1] })
+    return put(state, { "apple": xy(state)[1] })
 
 def search_apple(state):
     while True:
@@ -112,16 +112,16 @@ def dino(state, policies, delay=0):
         state = do_(state, [
             [hatM, Hats.Straw_Hat],
             [hatM, Hats.Dinosaur_Hat],
-            [set_state, { "tail": [] }],
-            [set_state, { "tail_set": set() }],
-            [set_state, { "tail_len": 0 }],
+            [put, { "tail": [] }],
+            [put, { "tail_set": set() }],
+            [put, { "tail_len": 0 }],
             [apple_here],
             [policy],
             [wait_secsM, delay],
             [hatM, Hats.Straw_Hat],
-            [set_state, { "apple": None }],
-            [set_state, { "tail": [] }],
-            [set_state, { "tail_set": set() }],
-            [set_state, { "tail_len": 0 }],
+            [put, { "apple": None }],
+            [put, { "tail": [] }],
+            [put, { "tail_set": set() }],
+            [put, { "tail_len": 0 }],
         ])
     return state
