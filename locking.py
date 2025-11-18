@@ -30,16 +30,16 @@ def Metaunlock(state):
     state["locks"]["__locked__"] = False
     return state
 
-def Lock(state, key, retry_delay=0.1):
+def Lock(state, key, reentrant=True, retry_delay=0.1):
     locked = False
     while True:
-        state, locked = TryLock(state, key)
+        state, locked = TryLock(state, key, reentrant)
         if locked:
             break
         wait_secs(retry_delay)
     return state
 
-def TryLock(state, key):
+def TryLock(state, key, reentrant=True):
     state, locked = Metalock(state)
     if not locked:
         return pure(state, False)
@@ -55,7 +55,7 @@ def TryLock(state, key):
         locks[key][0] = state["id"]
         locks[key][1] = 1
         success = True
-    elif locks[key][0] == state["id"]:
+    elif locks[key][0] == state["id"] and reentrant:
         verbose(state, ("Drone", state["id"], "already has lock, incrementing", key, locks[key]))
         locks[key][1] += 1
         success = True

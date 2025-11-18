@@ -42,7 +42,7 @@ def mk_maze(state, size=None):
 
     return state
 
-def maze(state, size=None, limit=0):
+def maze(state, size, limit):
 
     def next(dir):
         def continuation(state):
@@ -58,9 +58,9 @@ def maze(state, size=None, limit=0):
                 [condM, [eqM, [xy], [pure, t]],
                     [do, [
                         [clear_treasure],
-                        [condM, [incr_maze, limit],
+                        [cond, state["maze"]["count"] < limit,
                             [use_substance, size],
-                            [harvestM],
+                            [harvestM]
                         ],
                         [sense],
                         [pure, True]
@@ -81,8 +81,8 @@ def maze(state, size=None, limit=0):
 
     def go(state):
         state = sense(state)
-        state, (x, y) = xy(state)
-        state, seen = add_seen(state, (x, y))
+        state, c = xy(state)
+        state, seen = add_seen(state, c)
         if seen:
             return state
 
@@ -92,38 +92,27 @@ def maze(state, size=None, limit=0):
 
         state, ns = neighbors_dict(state)
         ds = []
-        state = Lock(state, "maze_seen")
         for dir, n in items(ns):
             if n in state["maze"]["seen"]:
                 continue
             ds.append(dir)
 
-        while len(ds) > 1:
+        while ds != []:
             state = spawn_(
                 state,
                 [next(ds.pop())],
-                [Spawn.SHARE, Spawn.BECOME, Spawn.EXCURSE])
+                [Spawn.SHARE, Spawn.MERGE, Spawn.AWAIT])# Spawn.BECOME, Spawn.EXCURSE])
 
-        state = Unlock(state, "maze_seen")
+        state, _ = wait_all(state)
 
-        if len(ds) == 0:
-            return state
-        return next(ds.pop())(state)
+        return state
 
-    state = mk_maze(state, size)
-    state = go(state)
-
-    def check(state):
-        return num_drones() == 1
-
-    while not state.only_drone().eval():
-        wait_secs(5)
-        state.dump(info)
-
-    if state["maze"]["count"] < limit:
-        return do_(state, [
+    cont = True
+    while cont:
+        state = state.do_([
             [mk_maze, size],
-            [go]
+            [go],
+            #[dump, info],
         ])
-
-    return state
+        state, cont = incr_maze(state, limit)
+    return reset_maze(state)

@@ -15,7 +15,7 @@ def log_drone_info(state, level):
 def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
 
     if Log.EXCLUSIVE in state["flags"]:
-        state = Lock(state, "log")
+        state = Lock(state, "log", False)
         def do_return(state):
             state = Unlock(state, "log")
             return state

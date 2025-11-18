@@ -140,3 +140,9 @@ def pipe(fs):
 
 def pipe_(fs):
     return cmp(void, pipe(fs))
+
+def maybes(xs):
+    for x in xs:
+        if x != None:
+            return x
+    return None

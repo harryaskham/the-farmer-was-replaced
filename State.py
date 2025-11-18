@@ -1,4 +1,5 @@
 from monad import *
+from operators import *
 from debug import *
 from locking import *
 from dict import *
@@ -11,6 +12,7 @@ def __State__(self, flags=set()):
     debug_(("__init__", self, flags))
 
     self["id"] = 1
+    self["next_id"] = 2
 
     self["flags"] = set(flags)
     self["locks"] = {
@@ -44,7 +46,6 @@ def __State__(self, flags=set()):
     self["tail_len"] = 0
     self["petal_counts"] = {}
     self["maze"] = {
-        "done": False,
         "seen": set(),
         "count": 0,
         "treasure": None
@@ -78,6 +79,14 @@ def State__fork(self, id):
     for p in self["petal_counts"]:
         child["petal_counts"][p] = self["petal_counts"][p]
 
+    child["maze"] = {
+        "seen": set(),
+        "count": self["maze"]["count"],
+        "treasure": self["maze"]["treasure"]
+    }
+    for c in self["maze"]["seen"]:
+        child["maze"]["seen"].add(c)
+
     return pure(self, child)
 
 def State__share(self, id):
@@ -103,6 +112,8 @@ def State__share(self, id):
 
     child["tail"] = []
     child["tail_set"] = set()
+
+    child["maze"] = self["maze"]
 
     self = Unlock(self, "State__share")
     return pure(self, child)
@@ -178,9 +189,16 @@ def has_treasure(state):
 def incr_maze(state, limit):
     state = Lock(state, "maze_count")
     state["maze"]["count"] += 1
-    done = state["maze"]["count"] >= limit
+    cont = state["maze"]["count"] < limit
     state = Unlock(state, "maze_count")
-    return pure(state, done)
+    return pure(state, cont)
+
+def reset_maze(state):
+    state = Lock(state, "maze_count")
+    state["maze"]["count"] = 0
+    state["maze"]["seen"] = set()
+    state = Unlock(state, "maze_count")
+    return state
 
 def dump(state, log_f):
     def dump_line(state, kv):
@@ -191,3 +209,37 @@ def dump(state, log_f):
         [forM, items(state), [dump_line]],
         [log_f, "}"],
     ]).void()
+
+def set_next_id_max(state, next_id):
+    state = Lock(state, "next_id")
+    state["next_id"] = max(state["next_id"], next_id)
+    state = Unlock(state, "next_id")
+    return state
+
+def get_next_id(state):
+    state = Lock(state, "next_id")
+    id = state["next_id"]
+    state["next_id"] += 1
+    state = Unlock(state, "next_id")
+    return pure(state, id)
+
+def merge_state(state, other):
+    state = set_next_id_max(state, other["next_id"])
+
+    for child_id, child_handle in items(other["child_handles"]):
+        state["child_handles"][child_id] = child_handle
+
+    for c in other["maze"]["seen"]:
+        state["maze"]["seen"].add(c)
+
+    state["maze"]["count"] = max(
+        state["maze"]["count"],
+        other["maze"]["count"]
+    )
+
+    state["maze"]["treasure"] = maybes([
+        other["maze"]["treasure"],
+        state["maze"]["treasure"]
+    ])
+
+    return state
