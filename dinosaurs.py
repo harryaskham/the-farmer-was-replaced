@@ -20,7 +20,6 @@ def tail_follow(state):
     dir = North
     rot = CW
     while True:
-        #state = sense(state)
         state, moved = move_toward(state, state["apple"])
         if not moved:
             for _ in range(5):

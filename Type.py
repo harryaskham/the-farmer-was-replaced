@@ -55,13 +55,16 @@ def mk_init(Self):
 
     def setting_handler(self_args):
         debug_(("setting_handler", self_args))
-        if len(self_args) > len(Self["fields"]) + 1:
+
+        self, args = self_args[0], self_args[1:]
+        if len(args) > len(Self["fields"]) + 1:
             fatal_(("error: more args than fields", len(args), len(Self["fields"])))
 
-        self, args = self_args[0], self_args[1:1+len(Self["fields"])]
-        for i in range(len(args)):
-            arg = args[i]
+        for i in range(len(Self["fields"])):
             field = Self["fields"][i]
+            arg = _
+            if i < len(args):
+                arg = args[i]
             if arg == _:
                 if field["default"] == NO_DEFAULT:
                     fatal_(("error: no default and not provided", field["name"]))

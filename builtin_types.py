@@ -49,7 +49,7 @@ def ctoi(c):
 def parse_num(x):
     sx = str(x)
     if len(sx) == 1:
-        return ctoi(sx[0])
+        return False, ctoi(sx[0]), None
 
     negate = False
     if sx[0] == "-":
