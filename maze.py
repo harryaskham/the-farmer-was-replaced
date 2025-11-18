@@ -7,29 +7,42 @@ from drones import *
 
 def add_seen(state, c):
     state = Lock(state, "maze_seen")
-    seen = c in state["maze_seen"]
-    state["maze_seen"].add(c)
+    seen = c in state["maze_status"]["seen"]
+    state["maze_status"]["seen"].add(c)
     state = Unlock(state, "maze_seen")
     return pure(state, seen)
 
-def maze(state, size=None):
+def use_substance(state, size):
+    use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
+    return do_(state, [
+        [useM, I.Weird_Substance, use_n]
+    ])
+
+def mk_maze(state, size=None):
+    state = Lock(state, "maze_seen")
     state = Lock(state, "mk_maze")
 
     if size == None:
         state, size = wh(state)
-
     state = sense(state)
-    use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
+    state, e = et(state)
     state = do_(state, [
-        [harvestM],
-        [plant_one, E.Bush],
-        [useM, I.Weird_Substance, use_n],
+        [when, e not in [E.Hedge, E.Treasure], [do, [
+            [harvestM],
+            [plant_one, E.Bush],
+        ]]],
+        [use_substance, size],
         [sense]
     ])
-    state["maze_seen"] = set()
+
+    state["maze_status"]["seen"] = set()
 
     state = Unlock(state, "mk_maze")
+    state = Unlock(state, "maze_seen")
 
+    return state
+
+def maze(state, size=None, reuse_limit=0):
 
     def next(dir):
         def continuation(state):
@@ -44,17 +57,23 @@ def maze(state, size=None):
         if e not in (E.Hedge, E.Treasure):
             return pure(state, True)
 
-        state, has_t = State.has_treasure(state)
+        state, has_t = has_treasure(state)
         if not has_t:
             return pure(state, True)
 
-        state, t = State.get_treasure(state)
+        state, t = get_treasure(state)
         state, c = xy(state)
         if t == c:
-            return do(state, [
-                [harvestM],
-                [pure, True]
-            ])
+            if state["maze_status"]["reuse_count"] < reuse_limit:
+                return do(state, [
+                    [use_substance, size],
+                    [pure, True]
+                ])
+            else:
+                return do(state, [
+                    [harvestM],
+                    [pure, True]
+                ])
 
         return pure(state, False)
 
@@ -73,16 +92,18 @@ def maze(state, size=None):
         ds = []
         state = Lock(state, "maze_seen")
         for dir, n in items(ns):
-            if n in state["maze_seen"]:
+            if n in state["maze_status"]["seen"]:
                 continue
             ds.append(dir)
 
         while len(ds) > 1:
             dir = ds.pop()
-            state = spawn_(
+            state = start_excursion(state)
+            state = spawn_or(
                 state,
                 [next(dir)],
                 [Spawn.SHARE, Spawn.AWAIT])
+            state = end_excursion(state)
 
         state = Unlock(state, "maze_seen")
 
@@ -90,11 +111,12 @@ def maze(state, size=None):
             return state
         return next(ds[0])(state)
 
+    state = mk_maze(state, size)
     state = go(state)
-    while True:
-        wait_secs(1)
-        state = sense(state)
-        state, done = check_done(state)
-        if done:
-            break
-    return state
+    if state["maze_status"]["reuse_count"] < reuse_limit:
+        return do_(state, [
+            [mk_maze, size],
+            [go]
+        ])
+    else:
+        return state

@@ -16,6 +16,16 @@ def can_spawn(state):
     state = Unlock(state, "can_spawn")
     return pure(state, can)
 
+def spawn_or(state, f, flags=[]):
+    state = Lock(state, "can_spawn")
+    state, can = can_spawn(state)
+    if can:
+        state = spawn_(state, f, flags)
+    else:
+        state = Unlock(state, "can_spawn")
+        state = do_(state, [f])
+    return state
+
 def must_spawn(state, f, flags=[]):
     flags = without(flags, Spawn.AWAIT)
     spawned = False
@@ -48,9 +58,9 @@ def spawnM(state, f, flags=[]):
         child_state = dict(state)
         child_state["id"] = child_id
     elif Spawn.FORK in flags:
-        state, child_state = State.fork(state, child_id)
+        state, child_state = state.fork(child_id)
     elif Spawn.SHARE in flags:
-        state, child_state = State.share(state, child_id)
+        state, child_state = state.share(child_id)
     elif Spawn.NEW in flags:
         child_state = State.new(state["flags"])
         child_state["id"] = child_id

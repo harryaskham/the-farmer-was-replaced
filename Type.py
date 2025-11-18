@@ -8,9 +8,9 @@ _ = "NOT_PROVIDED"
 NO_DEFAULT = "NO_DEFAULT"
 
 def mkF(handler):
-    debug_(("mkF", handler))
+    verbose_(("mkF", handler))
     def fn(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
-        debug_(("mkF fn", (a, b, c, d, e, f, g, h, i, j, k)))
+        verbose_(("mkF fn", (a, b, c, d, e, f, g, h, i, j, k)))
         return handler(provided_args([a, b, c, d, e, f, g, h, i, j, k]))
     return fn
 
@@ -26,7 +26,7 @@ def field(name, default=NO_DEFAULT, handler=identity_handler):
 Field = field
 
 def provided_args(args):
-    debug_(("provided_args", args))
+    verbose_(("provided_args", args))
     xs = []
     for arg in args:
         if arg == _:
@@ -40,21 +40,21 @@ def method_call(self, method, args):
     return applyN(method, args)
 
 def bound_method(self, method):
-    debug_(("bound_method", self, method))
+    verbose_(("bound_method", self, method))
     def handler(args):
-        debug_(("bound_method_handler", args))
+        verbose_(("bound_method_handler", args))
         return method_call(self, method, args)
     return mkF(handler)
 
 def mk_init(Self):
-    debug_(("mk_init", Self))
+    verbose_(("mk_init", Self))
 
     def nop_handler(self_args):
-        debug_(("nop_handler", self_args))
+        verbose_(("nop_handler", self_args))
     nop_init = mkF(nop_handler)
 
     def setting_handler(self_args):
-        debug_(("setting_handler", self_args))
+        verbose_(("setting_handler", self_args))
 
         self, args = self_args[0], self_args[1:]
         if len(args) > len(Self["fields"]) + 1:
@@ -79,7 +79,7 @@ def mk_init(Self):
         inits.append(Self["methods"]["__init__"])
 
     def combined_handler(self_args):
-        debug_(("combined_init", self_args))
+        verbose_(("combined_init", self_args))
         self, args = self_args[0], self_args[1:]
         for init in inits:
             method_call(self, init, args)

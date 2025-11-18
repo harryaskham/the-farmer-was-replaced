@@ -41,7 +41,11 @@ def __State__(self, flags=set()):
     self["tail_set"] = set()
     self["tail_len"] = 0
     self["petal_counts"] = {}
-    self["maze_seen"] = set()
+    self["maze_status"] = {
+        "done": False,
+        "seen": set(),
+        "reuse_count": 0
+    }
     self["treasure"] = [None, None]
 
     debug_(("self", self))

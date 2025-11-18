@@ -61,7 +61,7 @@ def debug(state, msg, unused=None, prefix=None):
     return log(state, msg, Log.DEBUG, prefix)
     
 def warn(state, msg):
-    return log(state, msg, Log.WARN, prefix)
+    return log(state, msg, Log.WARN)
     
 def error(state, msg, level=Log.ERROR):
     state = throw(state, msg)
