@@ -6,6 +6,8 @@ WARN = "Log.WARN"
 VERBOSE = "Log.VERBOSE"
 ALL = "Log.ALL"
 
+REPR = "Log.REPR"
+
 AIR = "Log.AIR"
 DRONE_DETAILS = "Log.DRONE_DETAILS"
 

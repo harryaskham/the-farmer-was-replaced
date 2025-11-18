@@ -13,6 +13,7 @@ def log_drone_info(state, level):
         True)
 
 def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
+
     if ONLY_LOG_DRONES != None and state["id"] not in ONLY_LOG_DRONES:
         return state
 
@@ -38,16 +39,18 @@ def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
     if (Log.DRONE_DETAILS in state["flags"]) and (not hide_drone_info):
         state = log_drone_info(state, level)
 
-    msgs = []
-    if of(msg) in [List, Tuple]:
-        msgs = list(msg)
+    if Log.REPR in state["flags"]:
+        msgs = []
+        if of(msg) in [List, Tuple]:
+            msgs = list(msg)
+        else:
+            msgs = [msg]
+        fmsgs = []
+        for msg in msgs:
+            fmsgs.append(repr(msg))
+        quick_print([level, join(fmsgs, " ")])
     else:
-        msgs = [msg]
-    fmsgs = []
-    for msg in msgs:
-        fmsgs.append(repr(msg))
-
-    quick_print([level, join(fmsgs, " ")])
+        quick_print([level, msg])
 
     return state
 

@@ -10,7 +10,7 @@ def init(state):
     return do_(
         state,
         [
-            [State.set_size],
+            [set_size],
             [hatM, Hats.Straw_Hat],
             [sense],
             [try_harvest, [E.Hedge, E.Treasure]],
@@ -33,7 +33,7 @@ def main(state=None, flags=MAIN_FLAGS):
         return state
 
     if state == None:
-        state = new(State, flags)
+        state = State.new(flags)
 
     if Mode.TEST in flags and Execution.SIMULATION in flags:
         runner = [test_main.main, run_tests.run, False, False]
