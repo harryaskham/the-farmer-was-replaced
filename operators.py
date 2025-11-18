@@ -1,4 +1,5 @@
 from monad import *
+from compile import *
 from trace import *
 
 def lift1(state, f, a):
@@ -40,13 +41,15 @@ def In(x, xs):
         fatal_(("In", x, None))
     return x in xs
 
+def Contains(xs, x):
+    return In(x, xs)
+
 def NotIn(x, xs):
     return x not in xs
 
-def EQ(a, b):
+def Eq(a, b):
     return a == b
 
-eq = EQ
 
 def LT(a, b):
     return a < b
@@ -59,6 +62,17 @@ def GT(a, b):
 
 def GTE(a, b):
     return a >= b
+
+eq = Eq
+lt = LT
+lte = LTE
+gt = GT
+gte = GTE
+
+ltM = lift([lt])
+lteM = lift([lte])
+gtM = lift([gt])
+gteM = lift([gte])
 
 def Or(a, b):
     return a or b
@@ -116,3 +130,13 @@ def fmap(state, f, ma):
     fa.append(a)
     b = aps(fa)
     return pure(state, b)
+
+def pipe(fs):
+    def p(state, x):
+        for f in fs:
+            state, x = state.do([f, x])
+        return pure(state, x)
+    return p
+
+def pipe_(fs):
+    return cmp(void, pipe(fs))

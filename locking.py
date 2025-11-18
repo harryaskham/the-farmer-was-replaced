@@ -30,13 +30,13 @@ def Metaunlock(state):
     state["locks"]["__locked__"] = False
     return state
 
-def Lock(state, key):
+def Lock(state, key, retry_delay=0.1):
     locked = False
     while True:
         state, locked = TryLock(state, key)
         if locked:
             break
-        wait_secs(0.1)
+        wait_secs(retry_delay)
     return state
 
 def TryLock(state, key):
@@ -66,13 +66,13 @@ def TryLock(state, key):
     state = Metaunlock(state)
     return pure(state, success)
 
-def Unlock(state, key):
+def Unlock(state, key, retry_delay=0.1):
     unlocked = False
     while True:
         state, unlocked = TryUnlock(state, key)
         if unlocked:
             break
-        wait_secs(0.1)
+        wait_secs(retry_delay)
     return state
 
 def TryUnlock(state, key):

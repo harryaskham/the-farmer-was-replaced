@@ -14,8 +14,17 @@ def log_drone_info(state, level):
 
 def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
 
+    if Log.EXCLUSIVE in state["flags"]:
+        state = Lock(state, "log")
+        def do_return(state):
+            state = Unlock(state, "log")
+            return state
+    else:
+        def do_return(state):
+            return state
+
     if ONLY_LOG_DRONES != None and state["id"] not in ONLY_LOG_DRONES:
-        return state
+        return do_return(state)
 
     debug_level = 0
     for l in Log.Levels:
@@ -28,7 +37,7 @@ def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
         n_level = level
 
     if n_level > debug_level:
-        return state
+        return do_return(state)
         
     if prefix != None:
         msg = prefix + " " + str(msg)
@@ -48,11 +57,17 @@ def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
         fmsgs = []
         for msg in msgs:
             fmsgs.append(repr(msg))
-        quick_print([level, join(fmsgs, " ")])
+        if Log.SHOW_LEVEL in state["flags"]:
+            quick_print([level, join(fmsgs, " ")])
+        else:
+            quick_print(join(fmsgs, " "))
     else:
-        quick_print([level, msg])
+        if Log.SHOW_LEVEL in state["flags"]:
+            quick_print([level, msg])
+        else:
+            quick_print(msg)
 
-    return state
+    return do_return(state)
 
 def info(state, msg):
     return log(state, msg, Log.INFO)

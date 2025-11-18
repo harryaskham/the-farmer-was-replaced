@@ -1,6 +1,8 @@
-from monad import pure
-from debug import debug_
-from locking import Lock, Unlock
+from monad import *
+from debug import *
+from locking import *
+from dict import *
+from strings import *
 import To
 import Size
 from Type import Type, Field, new
@@ -41,15 +43,15 @@ def __State__(self, flags=set()):
     self["tail_set"] = set()
     self["tail_len"] = 0
     self["petal_counts"] = {}
-    self["maze_status"] = {
+    self["maze"] = {
         "done": False,
         "seen": set(),
-        "reuse_count": 0
+        "count": 0,
+        "treasure": None
     }
-    self["treasure"] = [None, None]
 
     debug_(("self", self))
-    
+
 def State__put(state, kvs, flags=[]):
     flags = set(flags)
     states = [state]
@@ -61,7 +63,7 @@ def State__put(state, kvs, flags=[]):
         for k in kvs:
             st[k] = kvs[k]
     return state
-    
+
 def State__get(self, key):
     return pure(self, self[key])
 
@@ -76,10 +78,6 @@ def State__fork(self, id):
     for p in self["petal_counts"]:
         child["petal_counts"][p] = self["petal_counts"][p]
 
-    child["maze_seen"] = set()
-    for c in self["maze_seen"]:
-        child["maze_seen"].add(c)
- 
     return pure(self, child)
 
 def State__share(self, id):
@@ -122,19 +120,19 @@ State = new(
     },
     {},
     False)
-    
+
 def put(state, kvs, flags=[]):
     return state["put"](kvs, flags)
-    
+
 def get(state, k):
     return state["get"](k)
-    
+
 def share(state, id):
     return state["share"](id)
 
 def fork(state, id):
     return state["fork"](id)
-    
+
 def set_size(state, n=None):
     if n == None:
         for flag in state["flags"]:
@@ -154,28 +152,42 @@ def set_size(state, n=None):
 
 def drone_id(state):
     return state["id"]
-    
+
 def loop_index(state):
     return state["i"]
 
 def set_treasure(state, c):
     state = Lock(state, "treasure")
-    if c == None:
-        c = (None, None)
-    state["treasure"][0] = c[0]
-    state["treasure"][1] = c[1]
+    state["maze"]["treasure"] = c
     state = Unlock(state, "treasure")
     return state
 
-def get_treasure(state):
-    [x, y] = state["treasure"]
-    if (x == None) or (y == None):
-        return pure(state, None)
-    return pure(state, (x, y))
+def with_treasure(state, f):
+    state = Lock(state, "treasure")
+    c = state["maze"]["treasure"]
+    state, x = state.do([[f, c]])
+    state = Unlock(state, "treasure")
+    return pure(state, x)
 
 def clear_treasure(state):
-    return set_treasure(state, (None, None))
+    return set_treasure(state, None)
 
 def has_treasure(state):
-    state, t = get_treasure(state)
-    return pure(state, t != [None, None])
+    return with_treasure(state, lift([is_not_none]))
+
+def incr_maze(state, limit):
+    state = Lock(state, "maze_count")
+    state["maze"]["count"] += 1
+    done = state["maze"]["count"] >= limit
+    state = Unlock(state, "maze_count")
+    return pure(state, done)
+
+def dump(state, log_f):
+    def dump_line(state, kv):
+        return log_f(state, ['  "', kv[0], '": ', str(kv[1])].join())
+
+    return state.do([
+        [log_f, "State: {"],
+        [forM, items(state), [dump_line]],
+        [log_f, "}"],
+    ]).void()

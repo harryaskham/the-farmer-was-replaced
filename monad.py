@@ -97,9 +97,11 @@ def untilM(state, cf, a):
         state = do_(state, [a])
     return state
 
-def void(state, ma):
-    state, _ = do(state, [ma])
-    return state
+def void(state_a):
+    return state_a[0]
+
+def eval(state_a):
+    return state_a[1]
 
 def do(state, fs):
     for xs in fs:

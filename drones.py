@@ -1,16 +1,21 @@
 from lib import *
 from debug import *
+from excursion import *
+from move import *
 from Type import new
 from State import State
 
-def with_drone_state(state, f):
+def with_spawn_lock(state, f):
     state = Lock(state, "spawn")
-    state = Lock(state, "num_drones")
     state = update_drone_state(state)
-    x = f(state)
-    state = Unlock(state, "num_drones")
+    state, x = f(state)
     state = Unlock(state, "spawn")
-    return state, x
+    return pure(state, x)
+
+def only_drone(state):
+    def p(state):
+        return pure(state, state["num_drones"] == 1)
+    return with_spawn_lock(state, p)
 
 def update_drone_state(state):
     state = Lock(state, "spawn")
@@ -29,40 +34,43 @@ def can_spawn(state):
     state = Unlock(state, "can_spawn")
     return pure(state, can)
 
-def spawn_or(state, f, flags=[]):
+def cond_spawn(state, f, g):
     state = Lock(state, "can_spawn")
+
+    def do_return(state, h):
+        state = Unlock(state, "can_spawn")
+        return state.do([h])
+
     state, can = can_spawn(state)
     if can:
-        state = spawn_(state, f, flags)
+        return do_return(state, f)
     else:
-        state = Unlock(state, "can_spawn")
-        state = do_(state, [f])
-    return state
-
-def must_spawn(state, f, flags=[]):
-    flags = without(flags, Spawn.AWAIT)
-    spawned = False
-    while not spawned:
-        state, spawned = spawn(state, f, flags)
-    return pure(state, spawned)
+        return do_return(state, g)
 
 def spawn_(state, f, flags=[]):
-    return spawn(state, f, flags)[0]
+    return spawn(state, f, flags).void()
 
 def spawnM(state, f, flags=[]):
     state = info(state, ("Spawning with flags", flags, "program", f))
     flags = set(flags)
 
     state = Lock(state, "spawn")
+    def do_return(state, value):
+        state = Unlock(state, "spawn")
+        return pure(state, value)
 
     if Spawn.BECOME in flags:
-        state = Lock(state, "can_spawn")
-        state, can = can_spawn(state)
-        if not can:
-            state = Unlock(state, "spawn")
-            state = Unlock(state, "can_spawn")
-            return do_(state, [f])
-        state = Unlock(state, "spawn")
+        state, became = state.cond_spawn(
+            [pure, False],
+            [do, [
+                [Unlock, "spawn"],
+                [when, Spawn.EXCURSE in flags, [start_excursion]],
+                f,
+                [when, Spawn.EXCURSE in flags, [end_excursion]],
+                [pure, True]
+            ]])
+        if became:
+            return do_return(state, True)
 
     if Spawn.AWAIT in flags:
         flags = without(flags, Spawn.AWAIT)

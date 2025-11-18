@@ -7,8 +7,8 @@ from drones import *
 
 def add_seen(state, c):
     state = Lock(state, "maze_seen")
-    seen = c in state["maze_status"]["seen"]
-    state["maze_status"]["seen"].add(c)
+    seen = c in state["maze"]["seen"]
+    state["maze"]["seen"].add(c)
     state = Unlock(state, "maze_seen")
     return pure(state, seen)
 
@@ -35,48 +35,49 @@ def mk_maze(state, size=None):
         [sense]
     ])
 
-    state["maze_status"]["seen"] = set()
+    state["maze"]["seen"] = set()
 
     state = Unlock(state, "mk_maze")
     state = Unlock(state, "maze_seen")
 
     return state
 
-def maze(state, size=None, reuse_limit=0):
+def maze(state, size=None, limit=0):
 
     def next(dir):
         def continuation(state):
-            return do_(state, [
+            return state.do_([
                 [whenM, [moveM, dir, [Movement.FAST]], [go]]
             ])
         return continuation
 
+    def handle_treasure(state, t):
+        return state.do([
+            [cond, t == None,
+                [pure, True],
+                [condM, [eqM, [xy], [pure, t]],
+                    [do, [
+                        [clear_treasure],
+                        [condM, [incr_maze, limit],
+                            [use_substance, size],
+                            [harvestM],
+                        ],
+                        [sense],
+                        [pure, True]
+                    ]],
+                    [pure, False]
+                ]
+            ]
+        ])
+
     def check_done(state):
-        state = sense(state)
-        state, e = et(state)
-        if e not in (E.Hedge, E.Treasure):
-            return pure(state, True)
-
-        state, has_t = has_treasure(state)
-        if not has_t:
-            return pure(state, True)
-
-        state, t = get_treasure(state)
-        state, c = xy(state)
-        if t == c:
-            state["maze_status"]["reuse_count"] += 1
-            if state["maze_status"]["reuse_count"] < reuse_limit + 1:
-                return do(state, [
-                    [use_substance, size],
-                    [pure, True]
-                ])
-            else:
-                return do(state, [
-                    [harvestM],
-                    [pure, True]
-                ])
-
-        return pure(state, False)
+        return state.do([
+            [sense],
+            [condM, [then, [lift([Contains]), [E.Hedge, E.Treasure]], [et]],
+                [with_treasure, handle_treasure],
+                [pure, True],
+            ]
+        ])
 
     def go(state):
         state = sense(state)
@@ -93,18 +94,15 @@ def maze(state, size=None, reuse_limit=0):
         ds = []
         state = Lock(state, "maze_seen")
         for dir, n in items(ns):
-            if n in state["maze_status"]["seen"]:
+            if n in state["maze"]["seen"]:
                 continue
             ds.append(dir)
 
         while len(ds) > 1:
-            dir = ds.pop()
-            state = start_excursion(state)
-            state = spawn_or(
+            state = spawn_(
                 state,
-                [next(dir)],
-                [Spawn.SHARE])
-            state = end_excursion(state)
+                [next(ds.pop())],
+                [Spawn.SHARE, Spawn.BECOME, Spawn.EXCURSE])
 
         state = Unlock(state, "maze_seen")
 
@@ -116,14 +114,13 @@ def maze(state, size=None, reuse_limit=0):
     state = go(state)
 
     def check(state):
-        return state["num_drones"] == 1
+        return num_drones() == 1
 
-    done = False
-    while not done:
-        wait_secs(1)
-        state, done = with_drone_state(state, check)
+    while not state.only_drone().eval():
+        wait_secs(5)
+        state.dump(info)
 
-    if state["maze_status"]["reuse_count"] < reuse_limit:
+    if state["maze"]["count"] < limit:
         return do_(state, [
             [mk_maze, size],
             [go]
