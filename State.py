@@ -235,7 +235,7 @@ def get_next_id(state):
     id = state["next_id"]
     state["next_id"] += 1
     state = Unlock(state, "next_id")
-    return pure(state, id)
+    return pure(state, (state["id"] + id) * 65535)
 
 def merge_state(state, other):
     state = set_next_id_max(state, other["next_id"])

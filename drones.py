@@ -108,8 +108,7 @@ def spawnM(state, f, flags=[]):
     def after(child_state, r):
         def finalize(state):
             if Spawn.WAIT_AFTER in flags:
-                for child_id, handle in items(child_state["child_handles"]):
-                    state, _ = wait_for_child(state, child_id, handle)
+                wait_all(child_state)
 
             if Spawn.MERGE in flags:
                 state = state.merge_state(child_state)
@@ -143,7 +142,6 @@ spawn = spawnM
 
 def wait_for_child(state, child_id, handle):
     state = info(state, ("Waiting for child", child_id))
-
     if child_id == state["id"]:
         return fatal(state, ("Cannot wait for self", child_id))
 
