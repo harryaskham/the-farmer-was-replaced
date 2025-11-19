@@ -1,3 +1,4 @@
 SIMULATE = "Mode.SIMULATE"
 TEST = "Mode.TEST"
 RUN = "Mode.RUN"
+LOOP = "Mode.LOOP"

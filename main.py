@@ -43,35 +43,41 @@ def main(state=None, flags=MAIN_FLAGS):
         ])
 
     if Mode.RUN in flags:
-        state = do_(state, [
-            [init],
-            [when, Phase.PURGE in flags, [filler_purge]],
-            [when, Phase.SCAN in flags, [do, [
-                [farmloop, do_scan, False]
-            ]]],
-            [forever, [do, [
-                [when, Phase.FLIPS in flags, [do_flips]],
-                [when, Phase.PROGS in flags, [do, [
-                    [run_progs, progs]
+        def go(state):
+            return do_(state, [
+                [init],
+                [when, Phase.PURGE in flags, [filler_purge]],
+                [when, Phase.SCAN in flags, [do, [
+                    [farmloop, do_scan, False]
                 ]]],
-                [when, Space.FILL in flags, [forever, [do, [
-                    [when, Phase.ENERGY in flags, [filler_energy]],
-                    [when, Phase.PUMPKIN in flags, [filler_pumpkin]],
-                    [when, Phase.CROPS in flags, [filler_crops]],
-                    [when, Phase.CARROTS in flags, [filler_crop, E.Carrot]],
-                    [when, Phase.CACTUS in flags, [filler_cactus]],
-                    [when, Phase.COMPANIONS in flags, [filler_companions]],
-                    [when, Phase.MAZE in flags, [filler_maze]]
-                ]]]],
-                [when, Phase.DINO in flags, [do, [
-                    #[run_progs, purges],
-                    [dino, [tail_follow]],
-                    #[dino, [dumb, brute, search_apple]],
-                ]]],
-                [when, Phase.FARM in flags, [do, [
-                    [bind, [cache_loop, loop], [farmloop]]
+                [forever, [do, [
+                    [when, Phase.FLIPS in flags, [do_flips]],
+                    [when, Phase.PROGS in flags, [do, [
+                        [run_progs, progs]
+                    ]]],
+                    [when, Space.FILL in flags, [forever, [do, [
+                        [when, Phase.ENERGY in flags, [filler_energy]],
+                        [when, Phase.PUMPKIN in flags, [filler_pumpkin]],
+                        [when, Phase.CROPS in flags, [filler_crops]],
+                        [when, Phase.CARROTS in flags, [filler_crop, E.Carrot]],
+                        [when, Phase.CACTUS in flags, [filler_cactus]],
+                        [when, Phase.COMPANIONS in flags, [filler_companions]],
+                        [when, Phase.MAZE in flags, [filler_maze]]
+                    ]]]],
+                    [when, Phase.DINO in flags, [do, [
+                        #[run_progs, purges],
+                        [dino, [tail_follow]],
+                        #[dino, [dumb, brute, search_apple]],
+                    ]]],
+                    [when, Phase.FARM in flags, [do, [
+                        [bind, [cache_loop, loop], [farmloop]]
+                    ]]]
                 ]]]
-            ]]]
-        ])
+            ])
+
+        if Mode.LOOP in flags:
+            return do_(state, [forever, [go]])
+        else:
+            return go(state)
 
     return state
