@@ -1,6 +1,7 @@
 from monad import *
 from compile import *
 from trace import *
+from Type import uncurry, curry, Type, new, field
 
 def lift1(state, f, a):
     return pure(state, f(a))
@@ -50,7 +51,6 @@ def NotIn(x, xs):
 def Eq(a, b):
     return a == b
 
-
 def LT(a, b):
     return a < b
 
@@ -63,17 +63,6 @@ def GT(a, b):
 def GTE(a, b):
     return a >= b
 
-eq = Eq
-lt = LT
-lte = LTE
-gt = GT
-gte = GTE
-
-ltM = lift([lt])
-lteM = lift([lte])
-gtM = lift([gt])
-gteM = lift([gte])
-
 def Or(a, b):
     return a or b
 
@@ -83,8 +72,8 @@ def And(a, b):
 def Not(a):
     return not a
     
-def mod(state, a, b):
-    return pure(state, a % b)
+def Mod(a, b):
+    return a % b
     
 def eqM(state, a, b):
     state, ax = do(state, [a])
@@ -124,25 +113,76 @@ def is_none(x):
 def is_not_none(x):
     return not is_none(x)
 
-def fmap(state, f, ma):
-    state, a = do(state, [ma])
-    fa = list(f)
-    fa.append(a)
-    b = aps(fa)
-    return pure(state, b)
-
-def pipe(fs):
-    def p(state, x):
+def pipeU(fs):
+    def p(arg):
         for f in fs:
-            state, x = state.do([f, x])
-        return pure(state, x)
+            arg = f(arg)
+        return arg
     return p
+pipe = curry(pipeU)
 
-def pipe_(fs):
-    return cmp(void, pipe(fs))
+def pipeMU(state_fs):
+    state, fs = state_fs[0], state_fs[1:]
+    def p(state, arg):
+        for f in fs:
+            state, arg = state.apply(f, [arg])
+        return pure(state, arg)
+    return pure(state, [p])
+pipeM = curry(pipeMU)
 
 def maybes(xs):
     for x in xs:
         if x != None:
             return x
     return None
+
+def partialU(f_args):
+    def pU(xs):
+        return applyS(f_args, xs)
+    return curry(pU)
+partial = curry(partialU)
+
+eq = Eq
+lt = LT
+lte = LTE
+gt = GT
+gte = GTE
+
+add = Add
+plus = Add
+sub = Sub
+mul = Mul
+div = Div
+idiv = IDiv
+floor = Floor
+ceil = Ceil
+mod = Mod
+
+not_ = Not
+or_ = Or
+and_ = And
+in_ = In
+not_in = NotIn
+contains = Contains
+
+ltM = lift([lt])
+lteM = lift([lte])
+gtM = lift([gt])
+gteM = lift([gte])
+
+addM = lift([add])
+plusM = lift([plus])
+subM = lift([sub])
+mulM = lift([mul])
+divM = lift([div])
+idivM = lift([idiv])
+floorM = lift([floor])
+ceilM = lift([ceil])
+modM = lift([mod])
+
+notM = lift([not_])
+orM = lift([or_])
+andM = lift([and_])
+inM = lift([in_])
+not_inM = lift([not_in])
+containsM = lift([contains])

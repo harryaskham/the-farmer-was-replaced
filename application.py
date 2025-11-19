@@ -30,3 +30,9 @@ def applyN(f, args):
     for arg in args:
         fa.append(arg)
     return aps(fa)
+
+def applyS(fs, args):
+    fa = list(fs)
+    for arg in args:
+        fa.append(arg)
+    return aps(fa)

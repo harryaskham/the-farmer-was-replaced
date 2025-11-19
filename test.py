@@ -16,6 +16,7 @@ def assert_equal(state, a, b, msg=None):
         return log_return(state, ("FAIL", msg, "Actual:", a))
 
 def Tests(state, module_name=None):
+    info(state, ("Running tests for module:", module_name))
     state["test_module_name"] = module_name
     if module_name not in state["test_results"]:
         state["test_results"][module_name] = {}

@@ -7,12 +7,17 @@ from builtin_types import *
 _ = "NOT_PROVIDED"
 NO_DEFAULT = "NO_DEFAULT"
 
-def mkF(handler):
-    verbose_(("mkF", handler))
-    def fn(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
-        verbose_(("mkF fn", (a, b, c, d, e, f, g, h, i, j, k)))
-        return handler(provided_args([a, b, c, d, e, f, g, h, i, j, k]))
-    return fn
+def uncurry(f):
+    def g(xs):
+        return applyN(f, xs)
+    return g
+
+def curry(uncurried):
+    verbose_(("curry", uncurried))
+    def curried(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
+        verbose_(("curry fn", (a, b, c, d, e, f, g, h, i, j, k)))
+        return uncurried(provided_args([a, b, c, d, e, f, g, h, i, j, k]))
+    return curried
 
 def identity_handler(arg):
     return arg
@@ -44,14 +49,14 @@ def bound_method(self, method):
     def handler(args):
         verbose_(("bound_method_handler", args))
         return method_call(self, method, args)
-    return mkF(handler)
+    return curry(handler)
 
 def mk_init(Self):
     verbose_(("mk_init", Self))
 
     def nop_handler(self_args):
         verbose_(("nop_handler", self_args))
-    nop_init = mkF(nop_handler)
+    nop_init = curry(nop_handler)
 
     def setting_handler(self_args):
         verbose_(("setting_handler", self_args))
@@ -70,7 +75,7 @@ def mk_init(Self):
                     fatal_(("error: no default and not provided", field["name"]))
                 arg = field["default"]
             self[field["name"]] = field["handler"](arg)
-    setting_init = mkF(setting_handler)
+    setting_init = curry(setting_handler)
 
     inits = [nop_init]
     if Self["dataclass"]:
@@ -83,7 +88,7 @@ def mk_init(Self):
         self, args = self_args[0], self_args[1:]
         for init in inits:
             method_call(self, init, args)
-    combined_init = mkF(combined_handler)
+    combined_init = curry(combined_handler)
 
     return combined_init
 
@@ -108,7 +113,7 @@ def __new__(Self_args):
 
     return self
 
-new = mkF(__new__)
+new = curry(__new__)
 
 def Type__str__(self):
     return join(["Type<", self["name"], ">"])
@@ -138,7 +143,7 @@ def __Typelist__(self_args):
     if "__str__" not in self:
         self["__str__"] = bound_method(self, Type__str__)
 
-__Type__ = mkF(__Typelist__)
+__Type__ = curry(__Typelist__)
 
 PreType = {
     "name": "Type",

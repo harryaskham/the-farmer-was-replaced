@@ -7,8 +7,9 @@ from strings import *
 import To
 import Size
 from Type import Type, Field, new
+from flags import MAIN_FLAGS
 
-def __State__(self, flags=set()):
+def __State__(self, flags=MAIN_FLAGS):
     debug_(("__init__", self, flags))
 
     self["id"] = 1
@@ -82,11 +83,14 @@ def State__fork(self, id):
 
     child["maze"] = {
         "seen": set(),
+        "map": dict(),
         "count": self["maze"]["count"],
         "treasure": self["maze"]["treasure"]
     }
     for c in self["maze"]["seen"]:
         child["maze"]["seen"].add(c)
+    for c, entry in self["maze"]["map"].items():
+        child["maze"]["map"][c] = dict(entry)
 
     return pure(self, child)
 
@@ -168,6 +172,14 @@ def drone_id(state):
 def loop_index(state):
     return state["i"]
 
+def map_direction(state, c, dir):
+    state = Lock(state, "maze_map")
+    if c not in state["maze"]["map"]:
+        state["maze"]["map"][c] = {}
+    state["maze"]["map"][c][dir] = True
+    state = Unlock(state, "maze_map")
+    return state
+
 def set_treasure(state, c):
     state = Lock(state, "treasure")
     state["maze"]["treasure"] = c
@@ -238,6 +250,9 @@ def merge_state(state, other):
 
     for c in other["maze"]["seen"]:
         state["maze"]["seen"].add(c)
+
+    for c, entry in other["maze"]["map"].items():
+        state["maze"]["map"][c] = dict(entry)
 
     state["maze"]["count"] = max(
         state["maze"]["count"],

@@ -46,8 +46,18 @@ def maze(state, size, limit):
 
     def next(dir):
         def continuation(state):
+            state, c = xy(state)
             return state.do([
-                [condM, [moveM, dir, [Movement.FAST]], [go], [pure, False]]
+                [condM, [moveM, dir, [Movement.FAST]],
+                    [do, [
+                        [map_direction, c, dir, True],
+                        go
+                    ]],
+                    [do, [
+                        [map_direction, c, dir, False],
+                        [pure, False]
+                    ]]
+                ]
             ])
         return continuation
 
@@ -79,38 +89,29 @@ def maze(state, size, limit):
             ]
         ])
 
-    def go(state):
-        state = sense(state)
-        state, c = xy(state)
-        state, seen = add_seen(state, c)
-        if seen:
-            return pure(state, False)
-
-        state, done = check_done(state)
-        if done:
-            return pure(state, True)
-
-        state, ns = neighbors_dict(state)
-        ds = []
-        for dir, n in items(ns):
-            #if n in state["maze"]["seen"]:
-            #    continue
-            ds.append(dir)
-
-        while ds != []:
-            state = spawn_(
-                state,
-                [next(ds.pop())],
-                [Spawn.FORK, Spawn.MERGE, Spawn.BECOME, Spawn.EXCURSE])
-
-        state, rs = wait_all(state)
-        return pure(state, any(values(rs)))
+    go = [do, [
+        [sense],
+        [condM, [bind, [xy], [add_seen]],
+            [pure, False],
+            [condM, check_done,
+                [pure, True],
+                [dos, [
+                    [flapM, [neighbors_dict], [pipeM,
+                        [lift([values])],
+                        [lift([map]), pipe(singleton, next)],
+                        [mapM, [flipM, spawn, [Spawn.FORK, Spawn.MERGE, Spawn.BECOME, Spawn.EXCURSE]]]
+                    ]],
+                    [fmap, pipe(values, any), [wait_all]]
+                ]]
+            ]
+        ]
+    ]]
 
     cont = True
     while cont:
         state, done = state.do([
             [mk_maze, size],
-            [go],
+            go,
             #[dump, info],
         ])
         if done:

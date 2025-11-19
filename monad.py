@@ -120,6 +120,11 @@ def liftA2(state, f, ma, mb):
     f.append(b)
     return do(state, [f])
 
+def traverse(state, f, xs):
+    return do(state, [
+        [bind, [fmap, f, xs], [sequence]]
+    ])
+
 def sequence(state, ms):
     vs = []
     for m in ms:
@@ -189,9 +194,7 @@ def chain(xss):
     return head
 
 def run(state, ma):
-    ma = list(ma)
-    ma.insert(1, state)
-    return aps(ma)
+    return do(state, [ma])
 
 def apply(state, f, args):
     fa = list(f)
@@ -199,7 +202,7 @@ def apply(state, f, args):
         fa.append(arg)
     return run(state, fa)
 
-def ap(state, f, arg):
+def apS(state, f, arg):
     return apply(state, f, [arg])
 
 def flap(state, arg, f):
@@ -207,13 +210,19 @@ def flap(state, arg, f):
 
 def apM(state, mf, arg):
     state, f = do(state, [mf])
-    return apply(state, f, args)
+    return apply(state, f, [arg])
 
-def flapM(state, arg, mf):
-    return apM(state, mf, arg)
+def flapM(state, args, mf):
+    return apM(state, mf, args)
+
+def fmap(state, f, ma):
+    state, a = do(state, [ma])
+    fa = list(f)
+    fa.append(a)
+    b = aps(fa)
+    return pure(state, b)
 
 def bind(state, ma, f):
-    state = debug(state, ("bind", ma, f))
     state, a = do(state, [ma])
     fa = list(f)
     fa.append(a)
@@ -230,6 +239,12 @@ def mapM(state, f, xs):
         state, v = do(state, [fx])
         out.append(v)
     return pure(state, out)
+
+def bimapM(state, fs, gs, xs):
+    a, b = xs
+    state, fa = apS(state, fs, a)
+    state, gb = apS(state, gs, b)
+    return pure(state, (fa, gb))
 
 def forM(state, xs, f):
     return mapM(state, f, xs)
