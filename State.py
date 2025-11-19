@@ -49,6 +49,7 @@ def __State__(self, flags=MAIN_FLAGS):
     self["petal_counts"] = {}
     self["maze"] = {
         "seen": set(),
+        "map": dict(),
         "count": 0,
         "treasure": None
     }
@@ -172,11 +173,11 @@ def drone_id(state):
 def loop_index(state):
     return state["i"]
 
-def map_direction(state, c, dir):
+def map_direction(state, c, dir, accessible):
     state = Lock(state, "maze_map")
     if c not in state["maze"]["map"]:
         state["maze"]["map"][c] = {}
-    state["maze"]["map"][c][dir] = True
+    state["maze"]["map"][c][dir] = accessible
     state = Unlock(state, "maze_map")
     return state
 
@@ -202,7 +203,7 @@ def has_treasure(state):
 def incr_maze(state, limit):
     state = Lock(state, "maze_count")
     state["maze"]["count"] += 1
-    cont = state["maze"]["count"] < limit
+    cont = state["maze"]["count"] <= limit
     state = Unlock(state, "maze_count")
     return pure(state, cont)
 
@@ -239,20 +240,23 @@ def get_next_id(state):
 def merge_state(state, other):
     state = set_next_id_max(state, other["next_id"])
 
-    for child_id, child_handle in items(other["child_handles"]):
-        state["child_handles"][child_id] = child_handle
-
     for child_id, child_state in items(other["child_states"]):
         state["child_states"][child_id] = child_state
 
-    for child_id, r  in items(other["drone_return"]):
-        state["drone_return"][child_id] = r
+    for child_id, rs in other["drone_return"]:
+        if child_id not in state["drone_return"]:
+            state["drone_return"][child_id] = []
+        for r in rs:
+            state["drone_return"][child_id].append(r)
 
     for c in other["maze"]["seen"]:
         state["maze"]["seen"].add(c)
 
-    for c, entry in other["maze"]["map"].items():
-        state["maze"]["map"][c] = dict(entry)
+    for c, dir_to_accesible in other["maze"]["map"].items():
+        if c not in state["maze"]["map"]:
+            state["maze"]["map"][c] = {}
+        for dir, accessible in dir_to_accesible.items():
+            state["maze"]["map"][c][dir] = accessible
 
     state["maze"]["count"] = max(
         state["maze"]["count"],

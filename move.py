@@ -35,7 +35,7 @@ def moveM(state, d, flags=None):
 
     if Movement.FAST in flags:
         if moved:
-            state, (state["x"], state["y"]) = pos_to(state, d)
+            state = sense_position(state)
         state, ce = current_excursion(state)
         if ce != None:
             state = warn(state, "Fast movement with active excursion")

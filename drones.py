@@ -107,24 +107,17 @@ def spawnM(state, f, flags=[]):
 
     def after(child_state, r):
         def finalize(state):
+            if Spawn.WAIT_AFTER in flags:
+                for child_id, handle in items(child_state["child_handles"]):
+                    state, _ = wait_for_child(state, child_id, handle)
+
             if Spawn.MERGE in flags:
                 state = state.merge_state(child_state)
 
-            state, _ = wait_all(state, child_state)
-
-            state = Lock(state, "child_handles")
-            state = Lock(state, "child_states")
-            state = Lock(state, "drone_return")
-
-            if child_state["id"] in state["child_states"]:
-                state["child_states"].pop(child_state["id"])
-            if child_state["id"] in state["child_handles"]:
-                state["child_handles"].pop(child_state["id"])
-            state["drone_return"][child_state["id"]] = r
-
-            state = Unlock(state, "drone_return")
-            state = Unlock(state, "child_states")
-            state = Unlock(state, "child_handles")
+            child_id = child_state["id"]
+            if child_id not in state["drone_return"]:
+                state["drone_return"][child_id] = []
+            state["drone_return"][child_id].append(r)
 
             return pure(state, (child_state, r))
         return finalize
@@ -148,56 +141,28 @@ def spawnM(state, f, flags=[]):
 
 spawn = spawnM
 
-def wait_for_child_handle(state, child_handle):
-    finalize = wait_for(child_handle)
-    return finalize(state)
+def wait_for_child(state, child_id, handle):
+    state = info(state, ("Waiting for child", child_id))
 
-def wait_for_child(state, child_id, other_state=None):
     if child_id == state["id"]:
-        return warn(state, ("Cannot wait for self", child_id))
+        return fatal(state, ("Cannot wait for self", child_id))
 
     if child_id == state["parent_id"]:
-        return warn(state, ("Cannot wait for parent", child_id))
+        return fatal(state, ("Cannot wait for parent", child_id))
 
-    state = Lock(state, "child_handles")
+    finalize = wait_for(handle)
+    state, (child_state, v) = finalize(state)
 
-    if other_state == None:
-        other_state = state
-
-    child_state, v = None, None
-
-    if child_id in other_state["child_handles"]:
-        state, (child_state, v) = wait_for_child_handle(state, other_state["child_handles"][child_id])
-    else:
-        if child_id in other_state["drone_return"]:
-            v = other_state["drone_return"][child_id]
-        if child_id in other_state["child_states"]:
-            child_state = other_state["child_states"][child_id]
-            state = state.merge_state(child_state)
-
-    if child_id in state["child_handles"]:
-        state["child_handles"].pop(child_id)
-
-    if child_id in state["child_states"]:
-        state["child_states"].pop(child_id)
-
-    state = Unlock(state, "child_handles")
     return pure(state, (child_state, v))
 
-def wait_all(state, other_state=None):
-    if other_state == None:
-        other_state = state
-
+def wait_all(state):
     vs = {}
-
-    def go(state):
-        child_ids = keys(other_state["child_handles"])
-        for child_id in child_ids:
-            state, (_, v) = wait_for_child(state, child_id, other_state)
-            vs[child_id] = v
-        if child_ids != []:
-            return go(state)
-        return state
-
-    state = go(state)
+    for child_id, handle in items(state["child_handles"]):
+        state, (_, v) = wait_for_child(state, child_id, handle)
+        vs[child_id] = v
     return pure(state, vs)
+
+def wait_solo(state, delay_secs=1):
+    while num_drones() > 1:
+        wait_secs(delay_secs)
+    return state

@@ -2,6 +2,8 @@ from operators import *
 import monad
 from dict import *
 from monad import do, fmap, traverse
+import List
+import dict
 
 def from_list(kvs):
     xs = {}
@@ -25,11 +27,13 @@ def mapM(state, f, xs):
 def mapM_(state, f, xs):
     return mapM(state, f, xs).void()
 
-def bimapM(state, f, g, xsM):
+def bimapM(state, f, g, xs):
     return state.do([
-        [pipe([
-            [fmap, from_list],
-            [traverse, [bimapM, f, g]],
-            [fmap, to_list]
-        ]), xsM]
+        [fmap,
+            [from_list],
+            [traverse, [monad.bimapM, f, g], to_list(xs)]]
     ])
+
+values = dict.values
+keys = dict.keys
+items = dict.items

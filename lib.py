@@ -11,7 +11,7 @@ from flags import *
 from functional import *
 from grid import *
 from hat import *
-from list import *
+from lists import *
 from locking import *
 from maybe import *
 from monad import *
@@ -26,6 +26,7 @@ from util import *
 from State import *
 
 import Map
+import List
 
 from Type import Type, Field, new
 from builtin_types import *

@@ -3,7 +3,8 @@ from application import *
 from dict import *
 from debug import *
 from error import *
-from list import *
+from lists import *
+import List
 
 def push_bindings(state, kvs=None):
     if kvs == None:
@@ -75,10 +76,12 @@ def condM(state, mc, a, b):
     state, c = do(state, [mc])
     return cond(state, c, a, b)
 
-def unless(state, c, a):
-    if c:
-        return state
-    return do(state, [a])
+def unless(state, c, xs):
+    return when(state, not c, xs)
+
+def unlessM(state, ps, xs):
+    state, p = do(state, [ps])
+    return unless(state, p, xs)
 
 def whileM(state, cf, a):
     v = None
@@ -119,18 +122,6 @@ def liftA2(state, f, ma, mb):
     f.append(a)
     f.append(b)
     return do(state, [f])
-
-def traverse(state, f, xs):
-    return do(state, [
-        [bind, [fmap, f, xs], [sequence]]
-    ])
-
-def sequence(state, ms):
-    vs = []
-    for m in ms:
-        state, v = do(state, [m])
-        vs.append(v)
-    return pure(state, vs)
 
 def unit(state):
     return pure(state, None)
@@ -239,6 +230,15 @@ def mapM(state, f, xs):
         state, v = do(state, [fx])
         out.append(v)
     return pure(state, out)
+
+traverse = mapM
+
+def sequence(state, ms):
+    vs = []
+    for m in ms:
+        state, v = do(state, [m])
+        vs.append(v)
+    return pure(state, vs)
 
 def bimapM(state, fs, gs, xs):
     a, b = xs

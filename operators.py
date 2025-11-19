@@ -9,7 +9,7 @@ def lift1(state, f, a):
 def lift2(state, f, a, b):
     return pure(state, f(a, b))
 
-def Add(a, b):
+def Plus(a, b):
     return a + b
 
 def Sub(a, b):
@@ -121,13 +121,12 @@ def pipeU(fs):
     return p
 pipe = curry(pipeU)
 
-def pipeMU(state_fs):
-    state, fs = state_fs[0], state_fs[1:]
+def pipeMU(fs):
     def p(state, arg):
         for f in fs:
             state, arg = state.apply(f, [arg])
         return pure(state, arg)
-    return pure(state, [p])
+    return p
 pipeM = curry(pipeMU)
 
 def maybes(xs):
@@ -141,6 +140,7 @@ def partialU(f_args):
         return applyS(f_args, xs)
     return curry(pU)
 partial = curry(partialU)
+partialM = lift([partial])
 
 eq = Eq
 lt = LT
@@ -148,8 +148,7 @@ lte = LTE
 gt = GT
 gte = GTE
 
-add = Add
-plus = Add
+plus = Plus
 sub = Sub
 mul = Mul
 div = Div
@@ -170,7 +169,6 @@ lteM = lift([lte])
 gtM = lift([gt])
 gteM = lift([gte])
 
-addM = lift([add])
 plusM = lift([plus])
 subM = lift([sub])
 mulM = lift([mul])

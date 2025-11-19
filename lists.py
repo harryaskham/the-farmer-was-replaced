@@ -26,5 +26,10 @@ def unpack(xs):
         return xs[0], xs[1], xs[2], xs[3]
     return fatal_(("unpack: too many elements", xs))
 
-def singleton(x):
-    return [x]
+def enumerate(xs):
+    res = []
+    i = 0
+    for x in xs:
+        res.append((i, x))
+        i += 1
+    return res

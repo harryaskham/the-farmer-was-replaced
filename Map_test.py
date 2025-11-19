@@ -13,8 +13,11 @@ def run(state):
         [Test_, Map.to_list({}), []],
         [Test_, Map.to_list({"a": 1, "b": 2}), [("a", 1), ("b", 2)]],
         [Test_,
-            Map.bimap(partial(Add, "x"), partial(Add, 1), {"a": 1, "b": 2}),
-            {"ax": 2, "bx": 3}]
+            Map.bimap(partial(Plus, "x"), partial(Plus, 1), {"a": 1, "b": 2}),
+            {"xa": 2, "xb": 3}],
+        [Test,
+            [Map.bimapM, [plusM, "x"], [plusM, 1], {"a": 1, "b": 2}],
+            {"xa": 2, "xb": 3}]
     ])
 
 if __name__ == "__main__":

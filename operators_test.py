@@ -18,15 +18,6 @@ def run(state):
         [Test_, partial(Plus, 1)(2), 3],
         [Test_, partial(Plus, 1, 2)(), 3],
         [Test_, pipe(partial(plus, 1), partial(mul, 3))(2), 9],
-        [Test,
-            [bind,
-                [pipeM, [lift([plus]), 1], [lift([mul, 3])]],
-                [flap, 2]],
-            9],
-        [Test,
-            [apM,
-                [pipeM, [lift([plus]), 1], [lift([mul, 3])]],
-                2],
-            9],
-        [Test, [apM, [pipeM, [plusM, 1], [mulM, 3]], 2], 9]
+        [Test, [pipeM([lift([plus]), 1], [lift([mul, 3])]), 2], 9],
+        [Test, [pipeM([plusM, 1], [mulM, 3]), 2], 9]
     ])

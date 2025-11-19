@@ -67,7 +67,7 @@ def compile(func, arity=None):
         ])
     return p
 
-# lift([Add, 1]), lift([Not])
+# lift([Plus, 1]), lift([Not])
 def lift(func):
     def p(state, a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
         fn = list(func)

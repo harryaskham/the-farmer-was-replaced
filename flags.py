@@ -9,8 +9,8 @@ MAIN_FLAGS = set([
     #Testing.LOOP,
     #Log.DRONE_DETAILS,
     #Log.SHOW_LEVEL,
-    Log.INFO,
-    Size.SMALL,
+    Log.DEBUG,
+    Size.TINY,
     Space.FILL,
     #Phase.PURGE,
     #Phase.COMPANIONS,
@@ -24,7 +24,8 @@ MAIN_FLAGS = set([
     #Phase.FLIPS,
 ])
 
-ONLY_LOG_DRONES = set([1, 2])
+ONLY_LOG_DRONES = None
+#ONLY_LOG_DRONES = set([1, 2])
 #ONLY_LOG_DRONES = set([1])
 
 WATER_RANGE = (0.75, 1.0)
