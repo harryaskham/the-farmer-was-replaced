@@ -1,6 +1,5 @@
 BECOME = "Spawn.BECOME"
 EXCURSE = "Spawn.EXCURSE"
-AWAIT = "Spawn.AWAIT"
 FORK = "Spawn.FORK"
 SHARE = "Spawn.SHARE"
 SERIAL = "Spawn.SERIAL"

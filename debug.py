@@ -23,7 +23,7 @@ def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
         def do_return(state):
             return state
 
-    if ONLY_LOG_DRONES != None and state["id"] not in ONLY_LOG_DRONES:
+    if (ONLY_LOG_DRONES != None) and (state["id"] not in ONLY_LOG_DRONES):
         return do_return(state)
 
     debug_level = 0
@@ -45,7 +45,7 @@ def log(state, msg, level=Log.DEBUG, prefix=None, hide_drone_info=False):
     if Log.AIR in state["flags"]:
         print(msg)
 
-    if (Log.DRONE_DETAILS in state["flags"]) and (not hide_drone_info):
+    if (level != Log.TRACE) and (Log.DRONE_DETAILS in state["flags"]) and (not hide_drone_info):
         state = log_drone_info(state, level)
 
     if Log.REPR in state["flags"]:
@@ -74,7 +74,10 @@ def info(state, msg):
     
 def debug(state, msg, unused=None, prefix=None):
     return log(state, msg, Log.DEBUG, prefix)
-    
+
+def trace(state, msg):
+    return log(state, msg, Log.TRACE)
+
 def warn(state, msg):
     return log(state, msg, Log.WARN)
     
@@ -96,7 +99,7 @@ def shim_state():
     state = {
         "__type__": {"name": "State"},
         "flags": flags,
-        "id": 1,
+        "id": "1",
         "x": "_",
         "y": "_",
         "error": None,
@@ -118,6 +121,9 @@ def verbose_(msg):
     
 def warn_(msg):
     return warn(shim_state(), msg)
+
+def trace_(msg):
+    return trace(shim_state(), msg)
     
 def error_(msg):
     return error(shim_state(), msg)

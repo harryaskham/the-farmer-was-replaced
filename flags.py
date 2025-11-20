@@ -7,7 +7,7 @@ MAIN_FLAGS = set([
     Mode.RUN,
     #Mode.LOOP,
     #Testing.LOOP,
-    Log.DRONE_DETAILS,
+    #Log.DRONE_DETAILS,
     #Log.SHOW_LEVEL,
     Log.INFO,
     Size.TINY,

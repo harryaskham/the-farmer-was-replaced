@@ -4,8 +4,6 @@ from harvest import *
 from sense import *
 from move import *
 from drones import *
-import List
-import Map
 import State
 
 def add_seen(state, c):
@@ -14,6 +12,9 @@ def add_seen(state, c):
     state["maze"]["seen"].add(c)
     state = Unlock(state, "maze_seen")
     return pure(state, seen)
+
+def is_seen(state, c):
+    return pure(state, c in state["maze"]["seen"])
 
 def use_substance(state, size):
     use_n = size * 2**(num_unlocked(Unlocks.Mazes) - 1)
@@ -45,17 +46,27 @@ def mk_maze(state, size=None):
 
     return state
 
-def maze(state, size, limit):
-
-    def map_maze(dir):
-        return [do, [
-            [whenM, [moveM, dir, [Movement.FAST]],
-                [do, [
+def go_dir(dir):
+    def f(state):
+        return state.do([
+            [unlessM, [bind, [xy], [add_seen]], [do, [
+                [whenM, [moveM, dir], [do, [
                     [map_direction, dir],
-                    [go, map_maze, mapping_done, MAP_FLAGS],
-                ]],
-            ]
-        ]]
+                    [go]
+                ]]]
+            ]]],
+        ])
+    return [f]
+
+go_dirs = map(go_dir, Dirs)
+
+def go(state):
+    return state.do([
+        [sense],
+        [spawns, go_dirs],
+    ])
+
+def maze(state, size, limit):
 
     def handle_treasure(state, t):
         return state.do([
@@ -74,7 +85,7 @@ def maze(state, size, limit):
                     [pure, False]
                 ]
             ]
-        ])
+        ] )
 
     def find_treasure(state):
         return state.do([
@@ -85,31 +96,14 @@ def maze(state, size, limit):
             ]
         ])
 
-    def mapping_done(state):
-        return pure(state, False)
-
-    MAP_FLAGS = [
-        Spawn.SHARE,
-        Spawn.AWAIT,
-    ]
-
-    def go(state, mk_continuation, check_done, flags):
-        return state.do([
-            [sense],
-            [unlessM, [bind, [xy], [add_seen]],
-                [unlessM, [check_done], [do, [
-                    [forM, map(mk_continuation, Dirs[:-1]), [flipM, spawn, flags]],
-                    mk_continuation(Dirs[-1]),
-                ]]],
-            ],
-            [wait_returns],
-        ])
-
-    return state.do([
+    state = state.do_([
         [whileM, [incr_maze, limit], [do, [
             [mk_maze, size],
-            [go, map_maze, mapping_done, MAP_FLAGS],
-            [bind, [State.get, "maze"], [info]],
+            [go],
+            #[wait_all_solo]
+            [wait_all]
         ]]],
         #[reset_maze]
     ])
+    state = dump(state)
+    return state

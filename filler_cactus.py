@@ -109,7 +109,7 @@ def filler_cactus(state):
                         [assume],
                         [emplace_cactus]
                     ])
-                state = spawn_(state, [f], [Spawn.AWAIT])
+                state = spawn_(state, [f])
         state = do_(state, [
             [wait_all],
             [try_harvest]

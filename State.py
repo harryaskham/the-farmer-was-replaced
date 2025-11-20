@@ -38,8 +38,6 @@ def __State__(self, flags=MAIN_FLAGS):
     self["test_module_name"] = None
     self["test_results"] = {}
 
-    self["num_drones"] = 1
-    self["max_drones"] = max_drones()
     self["child_handles"] = {}
     self["child_states"] = {}
     self["child_returns"] = {}
@@ -81,42 +79,18 @@ def State__get(self, key):
     return pure(self, self[key])
 
 def State__fork(self, id):
-    self, child = self.share(id)
-
-    child["ret"] = list(self["ret"])
-    child["args"] = list(self["args"])
-    child["bindings"] = list(self["bindings"])
-    child["stack"] = list(self["stack"])
-
-    child["grid"] = {}
-    for c in self["grid"]:
-        child["grid"][c] = dict(self["grid"][c])
-
-    child["excursions"] = []
-    for e in self["excursions"]:
-        child["excursions"].append(list(e))
-
-    child["petal_counts"] = {}
-    for p in self["petal_counts"]:
-        child["petal_counts"][p] = self["petal_counts"][p]
-
-    child["maze"] = {
-        "seen": set(),
-        "map": set(),
-        "count": self["maze"]["count"],
-        "treasure": self["maze"]["treasure"]
-    }
-    for c in self["maze"]["seen"]:
-        child["maze"]["seen"].add(c)
-    for edge in self["maze"]["map"]:
-        child["maze"]["map"].add(edge)
-
-    return pure(self, child)
+    child_state = State.new(self["flags"])
+    child_state["id"] = id
+    for k in ["maze"]:
+        child_state[k] = self[k]
+    return child_state
 
 def State__share(self, id):
-    self = Lock(self, "State__share")
 
-    child = dict(self)
+    child = {}
+    for k in self:
+        child[k] = self[k]
+
     child.set_timestamps()
     child["id"] = id
     child["next_id"] = 1
@@ -125,7 +99,7 @@ def State__share(self, id):
     #child["args"] = []
     #child["bindings"] = []
     #child["stack"] = []
-    #
+
     child["test_module_name"] = None
     child["test_results"] = {}
 
@@ -136,8 +110,7 @@ def State__share(self, id):
     child["tail"] = []
     child["tail_set"] = set()
 
-    self = Unlock(self, "State__share")
-    return pure(self, child)
+    return child
 
 State = new(
     Type,
@@ -230,7 +203,10 @@ def reset_maze(state):
     state = Unlock(state, "maze_count")
     return state
 
-def dump(state, log_f):
+def dump(state, level=Log.INFO):
+    def log_f(state, msg):
+        return log(state, msg, level, None, True)
+
     def dump_line(state, kv):
         return log_f(state, ['  "', kv[0], '": ', str(kv[1])].join())
 
@@ -249,12 +225,6 @@ def get_next_id(state):
 
 def merge_state(state, other):
     state["i"] = max(state["i"], other["i"])
-
-    for child_id, child_handle in other["child_handles"].items():
-        state["child_handles"][child_id] = child_handle
-
-    for child_id, child_state in other["child_states"].items():
-        state["child_states"][child_id] = child_state
 
     for child_id, child_return in other["child_returns"].items():
         state["child_returns"][child_id] = child_return

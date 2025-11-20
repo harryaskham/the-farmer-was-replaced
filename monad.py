@@ -148,7 +148,7 @@ def do(state, xss):
             state = fatal(state, ("Error in do-block:", state["error"]))
             return unit(state)
 
-        state = debug(state, (do, [xs]))
+        state = trace(state, (do, [xs]))
 
         xs = list(xs)
         xs.insert(1, state)

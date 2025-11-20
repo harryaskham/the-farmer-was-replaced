@@ -1,5 +1,6 @@
 INFO = "Log.INFO"
 DEBUG = "Log.DEBUG"
+TRACE = "Log.TRACE"
 ERROR = "Log.ERROR"
 FATAL = "Log.FATAL"
 WARN = "Log.WARN"
@@ -16,9 +17,10 @@ DRONE_DETAILS = "Log.DRONE_DETAILS"
 Levels = {
     FATAL: 0,
     ERROR: 1,
-    INFO: 2,
-    WARN: 3,
-    DEBUG: 4,
+    WARN: 2,
+    INFO: 3,
+    TRACE: 4,
+    DEBUG: 5,
     VERBOSE: 5,
     ALL: 99
 }
