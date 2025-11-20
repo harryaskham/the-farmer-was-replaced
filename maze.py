@@ -174,7 +174,8 @@ def maze(state, size, limit):
     def grow_limit(state, limit):
         return state.do_([
             [whileM, [incr_maze, limit], [do, [
-                [grow_maze]
+                [grow_maze],
+                [bind, [bind, [State.get, "maze"], [flipM, lift([getattr]), "count"]], [info]]
             ]]],
         ])
 
