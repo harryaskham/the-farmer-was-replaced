@@ -1,3 +1,5 @@
+from monad import *
+
 def wait_secs(secs):
     t = get_time()
     while get_time() < t + secs:
@@ -7,7 +9,7 @@ def wait_secs(secs):
 def wait_secsM(state, secs):
     if secs > 0:
         wait_secs(secs)
-    return state
+    return pure(state, True)
 
 def wait_ticks(ticks):
     for _ in range(ticks):

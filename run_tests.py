@@ -7,6 +7,7 @@ import compile_test
 import monad_test
 import pos_test
 import operators_test
+import drones_test
 import e2e_test
 
 def run(state):
@@ -17,5 +18,6 @@ def run(state):
         [operators_test.run],
         [Map_test.run],
         [pos_test.run],
-        [e2e_test.run]
+        [drones_test.run],
+        [e2e_test.run],
     ])

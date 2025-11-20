@@ -47,10 +47,15 @@ def cond_spawn(state, f, g):
     else:
         return do_return(state, g)
 
-def spawn_(state, f, flags=[]):
+DEFAULT_FLAGS = [
+    Spawn.SHARE,
+    Spawn.AWAIT,
+]
+
+def spawn_(state, f, flags=DEFAULT_FLAGS):
     return spawn(state, f, flags).void()
 
-def spawnM(state, f, flags=[]):
+def spawnM(state, f, flags=DEFAULT_FLAGS):
     state = debug(state, ("Spawning with flags", flags, "program", f))
     flags = set(flags)
 
@@ -105,62 +110,71 @@ def spawnM(state, f, flags=[]):
             ("Drone ID collision on spawn:", child_state["id"], "state:", state, "child_state:", child_state))
         return do_return(state, None)
 
-    def after(child_state, r):
-        def finalize(state):
-            if Spawn.WAIT_AFTER in flags:
-                wait_all(child_state)
-
-            if Spawn.MERGE in flags:
-                state = state.merge_state(child_state)
-
-            child_id = child_state["id"]
-            if child_id not in state["drone_return"]:
-                state["drone_return"][child_id] = []
-            state["drone_return"][child_id].append(r)
-
-            return pure(state, (child_state, r))
-        return finalize
-
     def mk_spawn_inner(child_state):
         def spawn_inner():
-            child_state_after, r = do(child_state, [f])
-            finalize = after(child_state_after, r)
-            return finalize
+            return do(child_state, [f])
         return spawn_inner
 
     spawned = False
     child = spawn_drone(mk_spawn_inner(child_state))
     if child != None:
+        state = info(state, ("Spawned child drone", child_state["id"]))
         spawned = True
-        if Spawn.TRACK_STATE in flags:
-            state["child_states"][child_state["id"]] = child_state
         state["child_handles"][child_state["id"]] = child
 
     return do_return(state, spawned)
 
 spawn = spawnM
 
-def wait_for_child(state, child_id, handle):
-    state = info(state, ("Waiting for child", child_id))
+def wait_for_child(state, child_id):
     if child_id == state["id"]:
         return fatal(state, ("Cannot wait for self", child_id))
 
     if child_id == state["parent_id"]:
         return fatal(state, ("Cannot wait for parent", child_id))
 
-    finalize = wait_for(handle)
-    state, (child_state, v) = finalize(state)
+    if child_id in state["child_returns"]:
+        debug(state, ("Child already waited for", child_id))
+        if child_id in state["child_states"]:
+            return pure(state, (state["child_states"][child_id], state["child_returns"][child_id]))
+        return pure(state, (None, state["child_returns"][child_id]))
 
-    return pure(state, (child_state, v))
+    state = debug(state, ("Waiting for child", child_id))
+
+    if child_id not in state["child_handles"]:
+        return fatal(state, ("No such child handle", child_id))
+
+    child_state, r = wait_for(state["child_handles"][child_id])
+
+    state = merge_state(state, child_state)
+
+    state["child_returns"][child_state["id"]] = r
+    state["child_states"][child_state["id"]] = child_state
+
+    for child_id in child_state["child_handles"]:
+        wait_for_child(state, child_id)
+
+    return pure(state, (child_state, r))
 
 def wait_all(state):
-    vs = {}
-    for child_id, handle in items(state["child_handles"]):
-        state, (_, v) = wait_for_child(state, child_id, handle)
-        vs[child_id] = v
-    return pure(state, vs)
+    info(state, (len(state["child_handles"]), "handles", len(state["child_returns"]), "returns"))
+    if len(state["child_handles"]) == len(state["child_returns"]):
+        debug(state, ("All children have been waited for"))
+        return state
+    for child_id in keys(state["child_handles"]):
+        state, _ = wait_for_child(state, child_id)
+    return state
 
 def wait_solo(state, delay_secs=1):
-    while num_drones() > 1:
+    while True:
+        if num_drones() == 1:
+            break
+        wait_secs(delay_secs)
+    return state
+
+def wait_returns(state, delay_secs=1):
+    while True:
+        if len(state["child_handles"]) == len(state["child_returns"]):
+            break
         wait_secs(delay_secs)
     return state

@@ -6,6 +6,7 @@ from move import *
 from drones import *
 import List
 import Map
+import State
 
 def add_seen(state, c):
     state = Lock(state, "maze_seen")
@@ -46,36 +47,15 @@ def mk_maze(state, size=None):
 
 def maze(state, size, limit):
 
-    def search_maze(state, dir):
-        def continuation(state):
-            state, c = xy(state)
-            return state.do([
-                [condM, [moveM, dir, [Movement.FAST]],
-                    [do, [
-                        [map_direction, c, dir, True],
-                        search_go
-                    ]],
-                    [do, [
-                        [map_direction, c, dir, False],
-                        [pure, False]
-                    ]]
-                ]
-            ])
-        return pure(state, [continuation])
-
-    def map_maze(state, dir):
-        def continuation(state):
-            state, c = xy(state)
-            return state.do([
-                [condM, [moveM, dir, [Movement.FAST]],
-                    [do, [
-                        [map_direction, c, dir, True],
-                        map_go
-                    ]],
-                    [map_direction, c, dir, False],
-                ]
-            ])
-        return pure(state, [continuation])
+    def map_maze(dir):
+        return [do, [
+            [whenM, [moveM, dir, [Movement.FAST]],
+                [do, [
+                    [map_direction, dir],
+                    [go, map_maze, mapping_done, MAP_FLAGS],
+                ]],
+            ]
+        ]]
 
     def handle_treasure(state, t):
         return state.do([
@@ -109,46 +89,27 @@ def maze(state, size, limit):
         return pure(state, False)
 
     MAP_FLAGS = [
-        Spawn.FORK,
-        Spawn.MERGE,
-        Spawn.WAIT_AFTER,
-        Spawn.BECOME,
-        Spawn.EXCURSE
+        Spawn.SHARE,
+        Spawn.AWAIT,
     ]
 
-    SEARCH_FLAGS = [
-        Spawn.FORK,
-        Spawn.MERGE,
-        Spawn.WAIT_AFTER,
-        Spawn.BECOME,
-        Spawn.EXCURSE
-    ]
-
-    def mk_go(mk_continuation, check_done, flags):
-        return [do, [
+    def go(state, mk_continuation, check_done, flags):
+        return state.do([
             [sense],
             [unlessM, [bind, [xy], [add_seen]],
-                [unlessM, [check_done],
-                    [flipM, mapM, Dirs, [pipeM(
-                        [mk_continuation],
-                        [flipM, spawn, flags]
-                    )]],
-                ]
-            ]
-        ]]
-
-    map_go = mk_go(map_maze, mapping_done, MAP_FLAGS)
-    search_go = mk_go(search_maze, find_treasure, SEARCH_FLAGS)
+                [unlessM, [check_done], [do, [
+                    [forM, map(mk_continuation, Dirs[:-1]), [flipM, spawn, flags]],
+                    mk_continuation(Dirs[-1]),
+                ]]],
+            ],
+            [wait_returns],
+        ])
 
     return state.do([
         [whileM, [incr_maze, limit], [do, [
             [mk_maze, size],
-            map_go,
-            #search_go,
-            #[fmap, [pipe(values, any)], [wait_all]],
-            [wait_all],
-            [dump, info]
+            [go, map_maze, mapping_done, MAP_FLAGS],
+            [bind, [State.get, "maze"], [info]],
         ]]],
-        [wait_secsM, 1000],
-        [reset_maze]
+        #[reset_maze]
     ])

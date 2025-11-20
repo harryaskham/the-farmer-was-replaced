@@ -3,18 +3,27 @@ from operators import *
 from debug import *
 from locking import *
 from dict import *
+from pos import *
 from strings import *
 import To
 import Size
 from Type import Type, Field, new
 from flags import MAIN_FLAGS
 
+def set_timestamps(self):
+    self["start_time"] = get_time()
+    self["start_ticks"] = get_tick_count()
+
 def __State__(self, flags=MAIN_FLAGS):
     debug_(("__init__", self, flags))
 
-    self["id"] = 1
+    self.set_timestamps()
+
+    self["id"] = "1"
     self["parent_id"] = None
-    self["next_id"] = 2
+    self["next_id"] = 1
+    self["start_time"] = get_time()
+    self["start_ticks"] = get_tick_count()
 
     self["flags"] = set(flags)
     self["locks"] = {
@@ -33,7 +42,7 @@ def __State__(self, flags=MAIN_FLAGS):
     self["max_drones"] = max_drones()
     self["child_handles"] = {}
     self["child_states"] = {}
-    self["drone_return"] = {}
+    self["child_returns"] = {}
 
     self["i"] = 0
     self["x"] = get_pos_x()
@@ -49,7 +58,7 @@ def __State__(self, flags=MAIN_FLAGS):
     self["petal_counts"] = {}
     self["maze"] = {
         "seen": set(),
-        "map": dict(),
+        "map": set(),
         "count": 0,
         "treasure": None
     }
@@ -72,11 +81,20 @@ def State__get(self, key):
     return pure(self, self[key])
 
 def State__fork(self, id):
-    self, child = self["share"](id)
+    self, child = self.share(id)
+
+    child["ret"] = list(self["ret"])
+    child["args"] = list(self["args"])
+    child["bindings"] = list(self["bindings"])
+    child["stack"] = list(self["stack"])
 
     child["grid"] = {}
     for c in self["grid"]:
         child["grid"][c] = dict(self["grid"][c])
+
+    child["excursions"] = []
+    for e in self["excursions"]:
+        child["excursions"].append(list(e))
 
     child["petal_counts"] = {}
     for p in self["petal_counts"]:
@@ -84,14 +102,14 @@ def State__fork(self, id):
 
     child["maze"] = {
         "seen": set(),
-        "map": dict(),
+        "map": set(),
         "count": self["maze"]["count"],
         "treasure": self["maze"]["treasure"]
     }
     for c in self["maze"]["seen"]:
         child["maze"]["seen"].add(c)
-    for c, entry in self["maze"]["map"].items():
-        child["maze"]["map"][c] = dict(entry)
+    for edge in self["maze"]["map"]:
+        child["maze"]["map"].add(edge)
 
     return pure(self, child)
 
@@ -99,27 +117,24 @@ def State__share(self, id):
     self = Lock(self, "State__share")
 
     child = dict(self)
+    child.set_timestamps()
     child["id"] = id
+    child["next_id"] = 1
 
-    child["ret"] = []
-    child["args"] = []
-    child["bindings"] = []
-    child["stack"] = []
+    #child["ret"] = []
+    #child["args"] = []
+    #child["bindings"] = []
+    #child["stack"] = []
+    #
     child["test_module_name"] = None
     child["test_results"] = {}
 
     child["child_handles"] = {}
     child["child_states"] = {}
-    child["drone_return"] = {}
-
-    child["excursions"] = []
-    for e in self["excursions"]:
-        child["excursions"].append(list(e))
+    child["child_returns"] = {}
 
     child["tail"] = []
     child["tail_set"] = set()
-
-    child["maze"] = self["maze"]
 
     self = Unlock(self, "State__share")
     return pure(self, child)
@@ -173,11 +188,11 @@ def drone_id(state):
 def loop_index(state):
     return state["i"]
 
-def map_direction(state, c, dir, accessible):
+def map_direction(state, dir):
     state = Lock(state, "maze_map")
-    if c not in state["maze"]["map"]:
-        state["maze"]["map"][c] = {}
-    state["maze"]["map"][c][dir] = accessible
+    state, c = xy(state)
+    state, d = pos_to(state, opposite(dir))
+    state["maze"]["map"].add((c, d))
     state = Unlock(state, "maze_map")
     return state
 
@@ -211,6 +226,7 @@ def reset_maze(state):
     state = Lock(state, "maze_count")
     state["maze"]["count"] = 0
     state["maze"]["seen"] = set()
+    state["maze"]["map"] = set()
     state = Unlock(state, "maze_count")
     return state
 
@@ -224,44 +240,30 @@ def dump(state, log_f):
         [log_f, "}"],
     ]).void()
 
-def set_next_id_max(state, next_id):
-    state = Lock(state, "next_id")
-    state["next_id"] = max(state["next_id"], next_id)
-    state = Unlock(state, "next_id")
-    return state
-
 def get_next_id(state):
     state = Lock(state, "next_id")
-    id = state["next_id"]
+    nid = [state["id"], str(state["next_id"])].join(".")
     state["next_id"] += 1
     state = Unlock(state, "next_id")
-    return pure(state, (state["id"] + id) * 65535)
+    return pure(state, nid)
 
 def merge_state(state, other):
-    state = set_next_id_max(state, other["next_id"])
+    state["i"] = max(state["i"], other["i"])
 
-    for child_id, child_state in items(other["child_states"]):
+    for child_id, child_handle in other["child_handles"].items():
+        state["child_handles"][child_id] = child_handle
+
+    for child_id, child_state in other["child_states"].items():
         state["child_states"][child_id] = child_state
 
-    for child_id, rs in other["drone_return"]:
-        if child_id not in state["drone_return"]:
-            state["drone_return"][child_id] = []
-        for r in rs:
-            state["drone_return"][child_id].append(r)
+    for child_id, child_return in other["child_returns"].items():
+        state["child_returns"][child_id] = child_return
 
     for c in other["maze"]["seen"]:
         state["maze"]["seen"].add(c)
 
-    for c, dir_to_accesible in other["maze"]["map"].items():
-        if c not in state["maze"]["map"]:
-            state["maze"]["map"][c] = {}
-        for dir, accessible in dir_to_accesible.items():
-            state["maze"]["map"][c][dir] = accessible
-
-    state["maze"]["count"] = max(
-        state["maze"]["count"],
-        other["maze"]["count"]
-    )
+    for edge in other["maze"]["map"]:
+         state["maze"]["map"].add(edge)
 
     state["maze"]["treasure"] = maybes([
         other["maze"]["treasure"],

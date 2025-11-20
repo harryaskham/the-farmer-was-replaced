@@ -7,7 +7,7 @@ from builtin_types import *
 def log_drone_info(state, level):
     return log(
         state,
-        join([str(level), str(state["id"]), str((state["x"], state["y"])), str(num_drones())], " | "),
+        join([str(level), state["id"], str((state["x"], state["y"])), str(num_drones())], " | "),
         level,
         None,
         True)

@@ -33,6 +33,9 @@ def defun(args, body):
         [popret]
     ]])
 
+def defun_(body):
+    return defun([], body)
+
 read = get_binding
 let = push_binding
 

@@ -10,27 +10,62 @@ def lines(state, level, msgs):
     return Unlock(state, "locking.lines")
     return state
 
-def Metalock(state):
+def all_states(state):
+    states = [state]
+    for other in states["child_states"]:
+        states.append(other)
+    return states
+
+def Metalocks(state, retry_delay=0.1):
+    locked_ids = set()
+    while True:
+        for other in all_states(state):
+            if other["id"] in locked_ids:
+                continue
+            _, locked = Metalock(other, state["id"])
+            if locked:
+                locked_ids.add(other["id"])
+
+        if len(locked_ids) < len(states):
+            wait_secs(retry_delay)
+            continue
+
+        return pure(state, True)
+
+def Metalock(state, id=None):
+    if id == None:
+        id = state["id"]
+
     if state["locks"]["__locked__"]:
-        verbose(state, ("Drone", state["id"], "waiting for global lock"))
+        verbose(state, ("Drone", id, "waiting for global lock"))
         wait_secs(0.1)
         return pure(state, False)
 
     state["locks"]["__locked__"] = True
-    state["locks"]["__lockers__"].add(state["id"])
+    state["locks"]["__lockers__"].add(id)
 
     if len(state["locks"]["__lockers__"]) > 1:
-        state["locks"]["__lockers__"].remove(state["id"])
+        state["locks"]["__lockers__"].remove(id)
         state = fatal(state, ("Multiple lockers at once:", state["locks"]["__lockers__"]))
 
     return pure(state, True)
 
-def Metaunlock(state):
-    state["locks"]["__lockers__"].remove(state["id"])
+def Metaunlock(state, id=None):
+    if id == None:
+        id = state["id"]
+    state["locks"]["__lockers__"].remove(id)
     state["locks"]["__locked__"] = False
     return state
 
+def Metaunlocks(state):
+    for other in all_states(state):
+        Metaunlock(other, state["id"])
+    return state
+
 def Lock(state, key, reentrant=True, retry_delay=0.1):
+    return state
+
+def Lock_(state, key, reentrant=True, retry_delay=0.1):
     locked = False
     while True:
         state, locked = TryLock(state, key, reentrant)
@@ -67,6 +102,9 @@ def TryLock(state, key, reentrant=True):
     return pure(state, success)
 
 def Unlock(state, key, retry_delay=0.1):
+    return state
+
+def Unlock_(state, key, retry_delay=0.1):
     unlocked = False
     while True:
         state, unlocked = TryUnlock(state, key)

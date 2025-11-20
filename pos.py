@@ -118,7 +118,7 @@ def i2(state, id=None):
 
 def ixy(state, id=None):
     if id == None:
-        id = state["id"]
+        id = state["next_id"]
     state, d = wh(state)
     y = 0
     while id >= d:
