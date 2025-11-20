@@ -166,6 +166,7 @@ def map_direction(state, dir):
     state, c = xy(state)
     state, d = pos_to(state, opposite(dir))
     state["maze"]["map"].add((c, d))
+    state["maze"]["map"].add((d, c))
     state = Unlock(state, "maze_map")
     return state
 

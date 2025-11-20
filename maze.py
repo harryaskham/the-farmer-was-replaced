@@ -46,24 +46,24 @@ def mk_maze(state, size=None):
 
     return state
 
-def go_dir(dir):
+def map_dir(dir):
     def f(state):
         return state.do([
             [unlessM, [bind, [xy], [add_seen]], [do, [
                 [whenM, [moveM, dir], [do, [
                     [map_direction, dir],
-                    [go]
+                    [map_maze]
                 ]]]
             ]]],
         ])
     return [f]
 
-go_dirs = map(go_dir, Dirs)
+map_dirs = map(map_dir, Dirs)
 
-def go(state):
+def map_maze(state):
     return state.do([
         [sense],
-        [spawns, go_dirs],
+        [spawns, map_dirs],
     ])
 
 def maze(state, size, limit):
@@ -96,14 +96,45 @@ def maze(state, size, limit):
             ]
         ])
 
-    state = state.do_([
+    def grow_maze(state, harvest=False):
+        state = sense(state)
+        state["maze"]["seen"] = set()
+        def pathM(state, c=None, path=None):
+            if c == None:
+                state, c = xy(state)
+            if path == None:
+                path = []
+            if c == state["maze"]["treasure"]:
+                return pure(state, path)
+            if c in state["maze"]["seen"]:
+                return pure(state, None)
+            state["maze"]["seen"].add(c)
+            for dir in Dirs:
+                state, cn = pos_to(state, dir, c)
+                if cn in state["maze"]["seen"]:
+                    continue
+                if (c, cn) not in state["maze"]["map"]:
+                    continue
+                path_n = list(path)
+                path_n.append(dir)
+                state, p = pathM(state, cn, path_n)
+                if p != None:
+                    state = info(state, ("Found path", p))
+                    return pure(state, p)
+            return pure(state, None)
+        return state.do_([
+            [bind, [pathM], [mapM, [moveM]]],
+            [cond, harvest, [harvestM], [use_substance, size]]
+        ])
+
+    return state.do_([
+        [reset_maze],
+        [mk_maze, size],
+        [map_maze],
+        [wait_all],
+        [bind, [get, "maze"], [debug]],
         [whileM, [incr_maze, limit], [do, [
-            [mk_maze, size],
-            [go],
-            #[wait_all_solo]
-            [wait_all]
+            [grow_maze]
         ]]],
-        #[reset_maze]
+        [grow_maze, True]
     ])
-    state = dump(state)
-    return state
