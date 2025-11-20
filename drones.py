@@ -92,16 +92,16 @@ def spawns(state, fs, flags=DEFAULT_FLAGS):
         while True:
             child = spawn_drone(spawn_f)
             if child != None:
-                state = info(state, ("Parent drone", state["id"], "spawned child drone", child_state["id"]))
+                state = debug(state, ("Parent drone", state["id"], "spawned child drone", child_state["id"]))
                 state["child_handles"][child_id] = Handle(STARTED, child_id, child)
                 break
             elif Spawn.BECOME in flags:
-                state = info(state, ("Parent drone", state["id"], "becoming child drone", child_state["id"]))
+                state = debug(state, ("Parent drone", state["id"], "becoming child drone", child_state["id"]))
                 state = become(state, child_state, f)
-                state = info(state, ("Parent drone", state["id"], "became child drone", child_state["id"]))
+                state = debug(state, ("Parent drone", state["id"], "became child drone", child_state["id"]))
                 break
             else:
-                state = info(state, ("Parent drone", state["id"], "failed to spawn child drone", child_state["id"], "retrying"))
+                state = debug(state, ("Parent drone", state["id"], "failed to spawn child drone", child_state["id"], "retrying"))
                 wait_secs(1)
 
     #return wait_all(state, True)
@@ -127,7 +127,7 @@ def wait_for_child(state, child_id, recursive=True):
         return fatal(state, ("No such child handle", child_id))
 
     handle = state["child_handles"][child_id]
-    state = info(state, (state["id"], "waiting for handle:", handle))
+    state = debug(state, (state["id"], "waiting for handle:", handle))
     if handle["status"] == BECAME:
         state = debug(state, ("Not waiting for BECAME child", child_id))
         return pure(state, (state, None))
@@ -141,7 +141,7 @@ def wait_for_child(state, child_id, recursive=True):
         child_state, r = wait_for(handle["handle"])
         state["child_returns"][child_state["id"]] = r
         #state["child_states"][child_state["id"]] = child_state
-        info(state, ("Child drone returned", child_id, "return value", r, "child state", child_state["maze"]))
+        debug(state, ("Child drone returned", child_id, "return value", r, "child state", child_state["maze"]))
         handle["status"] = FINISHED
 
     if handle["status"] == FINISHED:

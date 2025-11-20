@@ -96,22 +96,31 @@ def maze(state, size, limit):
             ]
         ])
 
-    def pathM(state, c=None, path=None):
+    def default_get_target(state):
+        return state["maze"]["treasure"]
+
+    def pathM(state, c=None, get_target=default_get_target, path=None):
         state = sense(state)
+
         state["maze"]["seen"] = set()
-        init_treasure = state["maze"]["treasure"]
+
         if c == None:
             state, c = xy(state)
+
+        target = get_target(state)
+
         if path == None:
             path = []
+
         q = [(c, [])]
+
         while q != []:
             state = sense(state)
-            if state["maze"]["treasure"] != init_treasure:
+            if get_target(state) != target:
                 return pure(state, None)
 
             (c, path), q = q[0], q[1:]
-            if c == state["maze"]["treasure"]:
+            if c == target:
                 return pure(state, path)
             if c in state["maze"]["seen"]:
                 return pure(state, None)
@@ -132,14 +141,20 @@ def maze(state, size, limit):
         for y in range(d):
             for x in range(d):
                 c = (x, y)
-                for dir in Dirs:
-                    state, n = pos_to(state, dir, c)
-                    if n == None or (c, n) in state["maze"]["all_paths"]:
-                        continue
-                    state, path = pathM(state, c, n)
-                    state = info(state, ("Populated path", c, "to", n))
-                    state["maze"]["all_paths"][(c, n)] = path
-                    state["maze"]["all_paths"][(n, c)] = reverse(map(opposite, path))
+                for y_ in range(d):
+                    for x_ in range(d):
+                        n = (x_, y_)
+                        state = info(state, ("Computing path", c, "to", n))
+                        if n == None or ((c, n) in state["maze"]["all_paths"]):
+                            continue
+                        def get_target(state):
+                            return n
+                        state, path = pathM(state, c, get_target)
+                        if path == None:
+                            return fatal(state, ("No path found in maze from", c, "to", n))
+                        state = info(state, ("Populated path", c, "to", n))
+                        state["maze"]["all_paths"][(c, n)] = path
+                        state["maze"]["all_paths"][(n, c)] = reverse(map(opposite, path))
         return state
 
     def get_path(state):
@@ -152,7 +167,8 @@ def maze(state, size, limit):
             [bind, [get_path], [mapM, [moveM]]],
             [cond, harvest,
                 [harvestM],
-                [use_substance, size]]
+                [use_substance, size]],
+            [sense]
         ])
 
     def grow_limit(state, limit):
@@ -173,9 +189,6 @@ def maze(state, size, limit):
         [map_maze],
         [wait_all],
         [populate_all_paths],
-        [bind, [get, "maze"], [debug]],
-        [spawn, [grow_limit, limit]],
         [grow_limit, limit],
-        [wait_all],
         [finish_maze]
     ])
