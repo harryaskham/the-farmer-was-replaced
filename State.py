@@ -58,7 +58,8 @@ def __State__(self, flags=MAIN_FLAGS):
         "seen": set(),
         "map": set(),
         "count": 0,
-        "treasure": None
+        "treasure": None,
+        "all_paths": {}
     }
 
     debug_(("self", self))
@@ -201,6 +202,7 @@ def reset_maze(state):
     state["maze"]["count"] = 0
     state["maze"]["seen"] = set()
     state["maze"]["map"] = set()
+    state["maze"]["all_paths"] = dict()
     state = Unlock(state, "maze_count")
     return state
 
@@ -235,6 +237,9 @@ def merge_state(state, other):
 
     for edge in other["maze"]["map"]:
          state["maze"]["map"].add(edge)
+
+    for from_to, path in other["maze"]["all_paths"].items():
+         state["maze"]["all_paths"][from_to] = path
 
     state["maze"]["treasure"] = maybes([
         other["maze"]["treasure"],

@@ -10,6 +10,7 @@ def can_spawn(state):
 
 DEFAULT_FLAGS = [
     Spawn.FORK,
+    Spawn.BECOME,
 ]
 
 NOT_STARTED = "NOT_STARTED"
@@ -36,6 +37,12 @@ def mk_spawn_inner(child_state, f):
 
 def spawn(state, f, flags=DEFAULT_FLAGS):
     return spawns(state, [f], flags)
+
+def replicate(state, f, n, flags=DEFAULT_FLAGS):
+    fs = []
+    for _ in range(n):
+        fs.append(f)
+    return spawns(state, fs, flags)
 
 def spawns(state, fs, flags=DEFAULT_FLAGS):
     flags = set(flags)
@@ -77,7 +84,7 @@ def spawns(state, fs, flags=DEFAULT_FLAGS):
 
     for child_id, handle in handles.items():
         state["child_handles"][child_id] = handle
-        state["child_states"][child_id] = states[child_id]
+        #state["child_states"][child_id] = states[child_id]
 
     for child_id in handles:
         spawn_f = spawn_fs[child_id]
@@ -133,7 +140,7 @@ def wait_for_child(state, child_id, recursive=True):
         state = debug(state, ("Waiting for child with status", handle["status"], child_id))
         child_state, r = wait_for(handle["handle"])
         state["child_returns"][child_state["id"]] = r
-        state["child_states"][child_state["id"]] = child_state
+        #state["child_states"][child_state["id"]] = child_state
         info(state, ("Child drone returned", child_id, "return value", r, "child state", child_state["maze"]))
         handle["status"] = FINISHED
 
@@ -175,6 +182,7 @@ def wait_all(state, recursive=True):
         ):
             return wait_all(state, recursive)
 
+    state["child_handles"] = {}
     return pure(state, True)
 
 def wait_solo(state, delay_secs=1):
@@ -201,7 +209,7 @@ def wait_returns(state, delay_secs=1):
 def become(state, child_state, f):
     child_id = child_state["id"]
     state["child_handles"][child_id] = Handle(BECAME, child_id)
-    state["child_states"][child_id] = child_state
+    #state["child_states"][child_id] = child_state
     child_state, r = child_state.do([
         [start_excursion],
         f,

@@ -33,3 +33,9 @@ def enumerate(xs):
         res.append((i, x))
         i += 1
     return res
+
+def reverse(xs):
+    res = []
+    for x in xs:
+        res.insert(0, x)
+    return res
