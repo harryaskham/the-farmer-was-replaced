@@ -82,9 +82,22 @@ def State__get(self, key):
 def State__fork(self, id):
     child_state = State.new(self["flags"])
     child_state["id"] = id
-    for k in ["maze"]:
-        child_state[k] = self[k]
+    child_state["next_id"] = 1
+
+    child_state["maze"] = self["maze"]
+
     return child_state
+
+
+NO_SHARE = set([
+    "id",
+    "next_id",
+    "child_handles",
+    "child_states",
+    "child_returns",
+    "test_module_name",
+    "test_results",
+])
 
 def State__share(self, id):
 
@@ -95,11 +108,6 @@ def State__share(self, id):
     child.set_timestamps()
     child["id"] = id
     child["next_id"] = 1
-
-    #child["ret"] = []
-    #child["args"] = []
-    #child["bindings"] = []
-    #child["stack"] = []
 
     child["test_module_name"] = None
     child["test_results"] = {}
@@ -227,6 +235,9 @@ def get_next_id(state):
     return pure(state, nid)
 
 def merge_state(state, other):
+    if other == None:
+        return state
+
     state["i"] = max(state["i"], other["i"])
 
     for child_id, child_return in other["child_returns"].items():

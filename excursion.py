@@ -15,6 +15,3 @@ def maybe_update_excursion(state, direction):
         return state
     excursion.append(direction)
     return state
-    
-
-    

@@ -5,12 +5,13 @@ from move import *
 from Type import new
 from State import *
 
-def can_spawn(state):
-    return pure(state, num_drones() < max_drones())
+def can_spawn(state, limit=None):
+    if limit == None:
+        limit = max_drones()
+    return pure(state, num_drones() < limit)
 
 DEFAULT_FLAGS = [
     Spawn.FORK,
-    Spawn.BECOME,
 ]
 
 NOT_STARTED = "NOT_STARTED"
@@ -27,28 +28,30 @@ def Handle(status, child_id, handle=None):
         "handle": handle,
     }
 
-def spawn_(state, f, flags=DEFAULT_FLAGS):
-    return spawn(state, f, flags).void()
+def spawn_(state, f, limit=None, flags=DEFAULT_FLAGS):
+    return spawn(state, f, limit, flags).void()
 
 def mk_spawn_inner(child_state, f):
     def spawn_inner():
         return do(child_state, [f])
     return spawn_inner
 
-def spawn(state, f, flags=DEFAULT_FLAGS):
-    return spawns(state, [f], flags)
+def spawn(state, f, limit=None, flags=DEFAULT_FLAGS):
+    return spawns(state, [f], limit, flags)
 
-def replicate(state, f, n, flags=DEFAULT_FLAGS):
+def replicate(state, f, n, limit=None, flags=DEFAULT_FLAGS):
     fs = []
     for _ in range(n):
         fs.append(f)
-    return spawns(state, fs, flags)
+    return spawns(state, fs, limit, flags)
 
-def spawns(state, fs, flags=DEFAULT_FLAGS):
+def spawns(state, fs, limit=None, flags=DEFAULT_FLAGS):
     flags = set(flags)
     states = {}
     handles = {}
     spawn_fs = {}
+    if limit == None:
+        limit = max_drones()
     for f in fs:
         state = debug(state, ("Spawning with flags", flags, "program", f))
 
@@ -90,19 +93,25 @@ def spawns(state, fs, flags=DEFAULT_FLAGS):
         spawn_f = spawn_fs[child_id]
         child_state = states[child_id]
         while True:
-            child = spawn_drone(spawn_f)
+            state, can = can_spawn(state, limit)
+            child = None
+
+            if can:
+                child = spawn_drone(spawn_f)
+
             if child != None:
                 state = debug(state, ("Parent drone", state["id"], "spawned child drone", child_state["id"]))
                 state["child_handles"][child_id] = Handle(STARTED, child_id, child)
                 break
-            elif Spawn.BECOME in flags:
+
+            if Spawn.BECOME in flags:
                 state = debug(state, ("Parent drone", state["id"], "becoming child drone", child_state["id"]))
                 state = become(state, child_state, f)
                 state = debug(state, ("Parent drone", state["id"], "became child drone", child_state["id"]))
                 break
-            else:
-                state = debug(state, ("Parent drone", state["id"], "failed to spawn child drone", child_state["id"], "retrying"))
-                wait_secs(1)
+
+            state = debug(state, ("Parent drone", state["id"], "failed to spawn child drone", child_state["id"], "retrying"))
+            wait_secs(1)
 
     #return wait_all(state, True)
     return pure(state, True)
@@ -138,10 +147,11 @@ def wait_for_child(state, child_id, recursive=True):
 
     if handle["status"] in [STARTED, FINISHED]:
         state = debug(state, ("Waiting for child with status", handle["status"], child_id))
-        child_state, r = wait_for(handle["handle"])
-        state["child_returns"][child_state["id"]] = r
-        #state["child_states"][child_state["id"]] = child_state
-        debug(state, ("Child drone returned", child_id, "return value", r, "child state", child_state["maze"]))
+        if handle["handle"] != None:
+            child_state, r = wait_for(handle["handle"])
+            state["child_returns"][child_state["id"]] = r
+            #state["child_states"][child_state["id"]] = child_state
+            debug(state, ("Child drone returned", child_id, "return value", r, "child state", child_state["maze"]))
         handle["status"] = FINISHED
 
     if handle["status"] == FINISHED:
@@ -168,7 +178,9 @@ def wait_all(state, recursive=True):
     any_remaining = False
 
     for child_id in ks:
-        state, out = wait_for_child(state, child_id, recursive)
+        state, out = state.do([
+            [wait_for_child, child_id, recursive]
+        ])
         any_remaining = any_remaining or (out == None)
 
     ks = keys(state["child_handles"])
@@ -211,12 +223,11 @@ def become(state, child_state, f):
     state["child_handles"][child_id] = Handle(BECAME, child_id)
     #state["child_states"][child_id] = child_state
     child_state, r = child_state.do([
-        [start_excursion],
         f,
     ])
-    child_state = child_state.do_([
-        [end_excursion]
-    ])
+    c = state["x"], state["y"]
+    state = sense_position(state)
+    state = move_to(state, c)
     state["child_returns"][child_id] = r
     state["child_handles"][child_id] = Handle(FINISHED, child_id)
     return state

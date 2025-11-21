@@ -18,32 +18,30 @@ CCW = {
 
 Rots = [CW, CCW]
 
-MOVE_FLAGS = frozenset([
+MOVE_FLAGS = [
     Movement.FAST,
-])
+    Movement.UNBOUNDED,
+]
 
-def moveM(state, d, flags=None):
-    flags = defaults(flags, MOVE_FLAGS)()
-
-    if Movement.UNBOUNDED in flags:
-        move_fn = lift([move])
-    else:
-        move_fn = move_bounded
+def moveM(state, d, flags=MOVE_FLAGS):
+    flags = set(flags)
 
     state, prev = xy(state)
-    state, moved = move_fn(state, d)
+    if Movement.UNBOUNDED in flags:
+        moved = move(d)
+    else:
+        state, moved = move_bounded(state, d)
+
+    if moved and Movement.REWIND_EXCURSION not in flags:
+        state = maybe_update_excursion(state, d)
 
     if Movement.FAST in flags:
         if moved:
             state = sense_position(state)
-        state, ce = current_excursion(state)
-        if ce != None:
-            state = warn(state, "Fast movement with active excursion")
         return pure(state, moved)
 
     return do(state, [
         [sense, flags],
-        [unless, Movement.REWIND_EXCURSION in flags, [maybe_update_excursion, d]]
         [when, Dinosaur.UPDATE_TAIL in flags, [update_dinosaur_tail, prev, d]],
         [pure, moved]
     ])
@@ -57,8 +55,7 @@ def update_dinosaur_tail(state, prev, d):
     state["tail_set"].add(prev)
     return state
 
-def move_bounded(state, dir, flags=None):
-    flags = defaults(flags, MOVE_FLAGS)()
+def move_bounded(state, dir, flags=MOVE_FLAGS):
     state, (x, y) = xy(state)
     state, d = wh(state)
     if x == d-1 and dir == East:
@@ -71,7 +68,7 @@ def move_bounded(state, dir, flags=None):
         return pure(state, False)
     return moveM(state, dir, without(flags, Movement.UNBOUNDED))
 
-def move_to(state, c, flags=None):
+def move_to(state, c, flags=MOVE_FLAGS):
     cx, cy = unpack(c)
 
     while x(state)[1] > cx:
@@ -96,17 +93,19 @@ def move_to(state, c, flags=None):
 
     return state
 
-def end_excursion(state, flags=None):
-    flags = defaults(flags, MOVE_FLAGS)()
+def end_excursion(state, flags=MOVE_FLAGS):
     flags = with(flags, Movement.REWIND_EXCURSION)
 
     excursion = state["excursions"].pop()
+    if excursion in [None, []]:
+        return state
+
     while excursion != []:
         d = excursion.pop()
         state, _ = moveM(state, opposite(d), flags)
     return state
 
-def move_toward(state, c, flags=None):
+def move_toward(state, c, flags=MOVE_FLAGS):
     cx, cy = unpack(c)
 
     if x(state)[1] > cx:

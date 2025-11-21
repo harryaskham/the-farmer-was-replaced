@@ -23,9 +23,6 @@ def use_substance(state, size):
     ])
 
 def mk_maze(state, size=None):
-    state = Lock(state, "maze_seen")
-    state = Lock(state, "mk_maze")
-
     if size == None:
         state, size = wh(state)
     state = sense(state)
@@ -38,158 +35,171 @@ def mk_maze(state, size=None):
         [use_substance, size],
         [sense]
     ])
-
     state["maze"]["seen"] = set()
-
-    state = Unlock(state, "mk_maze")
-    state = Unlock(state, "maze_seen")
-
     return state
 
-def map_dir(dir):
+def map_dir(dir, drone_limit=None):
     def f(state):
         return state.do([
-            [unlessM, [bind, [xy], [add_seen]], [do, [
-                [whenM, [moveM, dir], [do, [
+            [whenM, [moveM, dir], [do, [
+                [unlessM, [bind, [xy], [add_seen]], [do, [
                     [map_direction, dir],
-                    [map_maze]
+                    [map_maze, drone_limit]
                 ]]]
-            ]]],
+            ]]]
         ])
     return [f]
 
-map_dirs = map(map_dir, Dirs)
-
-def map_maze(state):
+def map_dirs(state, drone_limit=None):
+    ds = []
+    for dir in Dirs:
+        ds.append(map_dir(dir, drone_limit))
     return state.do([
-        [sense],
-        [spawns, map_dirs],
+        [when, ds != [], [spawns, ds, drone_limit]]
     ])
 
-def maze(state, size, limit):
+def map_maze(state, drone_limit=None):
+    return state.do([
+        [map_dirs, drone_limit],
+    ])
 
-    def handle_treasure(state, t):
-        return state.do([
-            [cond, t == None,
-                [pure, True],
-                [condM, [eqM, [xy], [pure, t]],
-                    [do, [
-                        [clear_treasure],
-                        [cond, state["maze"]["count"] < limit,
-                            [use_substance, size],
-                            [harvestM]
-                        ],
-                        [sense],
-                        [pure, True]
-                    ]],
-                    [pure, False]
-                ]
-            ]
-        ] )
+def default_get_target(state):
+    return state["maze"]["treasure"]
 
-    def find_treasure(state):
-        return state.do([
-            [sense],
-            [condM, [then, [lift([Contains]), [E.Hedge, E.Treasure]], [et]],
-                [with_treasure, handle_treasure],
-                [pure, True],
-            ]
-        ])
+def pathM(state, c=None, get_target=default_get_target, path=None):
+    state = sense(state)
 
-    def default_get_target(state):
-        return state["maze"]["treasure"]
+    state["maze"]["seen"] = set()
 
-    def pathM(state, c=None, get_target=default_get_target, path=None):
-        state = sense(state)
-
-        state["maze"]["seen"] = set()
-
-        if c == None:
-            state, c = xy(state)
-
-        target = get_target(state)
-
-        if path == None:
-            path = []
-
-        q = [(c, [])]
-
-        while q != []:
-            state = sense(state)
-            if get_target(state) != target:
-                return pure(state, None)
-
-            (c, path), q = q[0], q[1:]
-            if c == target:
-                return pure(state, path)
-            if c in state["maze"]["seen"]:
-                return pure(state, None)
-            state["maze"]["seen"].add(c)
-            for dir in Dirs:
-                state, cn = pos_to(state, dir, c)
-                if cn in state["maze"]["seen"]:
-                    continue
-                if (c, cn) not in state["maze"]["map"]:
-                    continue
-                path_n = list(path)
-                path_n.append(dir)
-                q.append((cn, path_n))
-        return pure(state, None)
-
-    def populate_all_paths(state):
-        state, d = wh(state)
-        for y in range(d):
-            for x in range(d):
-                c = (x, y)
-                for y_ in range(d):
-                    for x_ in range(d):
-                        n = (x_, y_)
-                        state = info(state, ("Computing path", c, "to", n))
-                        if n == None or ((c, n) in state["maze"]["all_paths"]):
-                            continue
-                        def get_target(state):
-                            return n
-                        state, path = pathM(state, c, get_target)
-                        if path == None:
-                            return fatal(state, ("No path found in maze from", c, "to", n))
-                        state = info(state, ("Populated path", c, "to", n))
-                        state["maze"]["all_paths"][(c, n)] = path
-                        state["maze"]["all_paths"][(n, c)] = reverse(map(opposite, path))
-        return state
-
-    def get_path(state):
-        t = state["maze"]["treasure"]
+    if c == None:
         state, c = xy(state)
+
+    target = get_target(state)
+
+    if path == None:
+        path = []
+
+    q = [(c, [], set())]
+
+    while q != []:
+        state = sense(state)
+        if get_target(state) != target:
+            return pure(state, None)
+
+        #(c, path, seen), q = q[0], q[1:]
+        (c, path, seen) = q.pop()
+
+        if c == target:
+            return pure(state, path)
+        if c in seen:
+            return pure(state, None)
+        seen = set(seen)
+        seen.add(c)
+        for dir in Dirs:
+            state, cn = pos_to(state, dir, c)
+            if cn in seen:
+                continue
+            if (c, cn) not in state["maze"]["map"]:
+                continue
+            path_n = list(path)
+            path_n.append(dir)
+            q.append((cn, path_n, seen))
+    return pure(state, None)
+
+def populate_paths_from(state, start):
+    state["maze"]["seen"] = set()
+    q = [(start, [])]
+    while q != []:
+        (c, path), q = q[0], q[1:]
+        if c in state["maze"]["seen"]:
+            continue
+        state["maze"]["seen"].add(c)
+        if (start, c) not in state["maze"]["all_paths"]:
+            state["maze"]["all_paths"][(start, c)] = list(path)
+        if (c, start) not in state["maze"]["all_paths"]:
+            state["maze"]["all_paths"][(c, start)] = reverse(map(opposite, path))
+        for dir in Dirs:
+            state, cn = pos_to(state, dir, c)
+            if cn in state["maze"]["seen"]:
+                continue
+            if (c, cn) not in state["maze"]["map"]:
+                continue
+            path_n = list(path)
+            path_n.append(dir)
+            q.append((cn, path_n))
+    return state
+
+def populate_all_paths(state):
+    state = info(state, ("Computing paths"))
+    state = info(state, state["maze"])
+    state, d = wh(state)
+    for y in range(d):
+        for x in range(d):
+            start = (x, y)
+            state = info(state, ("Computing paths from", start))
+            state = populate_paths_from(state, start)
+    state = info(state, ("Computed paths"))
+    state = info(state, state["maze"])
+    return state
+
+def populate_all_paths_2(state):
+    state, d = wh(state)
+    for y in range(d):
+        for x in range(d):
+            c = (x, y)
+            for y_ in range(d):
+                for x_ in range(d):
+                    n = (x_, y_)
+                    state = info(state, ("Computing path", c, "to", n))
+                    if n == None or ((c, n) in state["maze"]["all_paths"]):
+                        continue
+                    def get_target(state):
+                        return n
+                    state, path = pathM(state, c, get_target)
+                    if path == None:
+                        return fatal(state, ("No path found in maze from", c, "to", n))
+                    state = info(state, ("Populated path", c, "to", n))
+                    state["maze"]["all_paths"][(c, n)] = path
+                    state["maze"]["all_paths"][(n, c)] = reverse(map(opposite, path))
+    return state
+
+def get_path(state):
+    t = state["maze"]["treasure"]
+    state, c = xy(state)
+    if (c, t) in state["maze"]["all_paths"]:
         return pure(state, state["maze"]["all_paths"][(c, t)])
+    else:
+        return pathM(state, c)
 
-    def grow_maze(state, harvest=False):
-        return state.do_([
-            [bind, [get_path], [mapM, [moveM]]],
-            [cond, harvest,
-                [harvestM],
-                [use_substance, size]],
-            [sense]
-        ])
+def grow_maze(state, size, harvest=False):
+    return state.do_([
+        [bind, [get_path], [mapM, [moveM]]],
+        [cond, harvest,
+            [harvestM],
+            [use_substance, size]],
+        [sense]
+    ])
 
-    def grow_limit(state, limit):
-        return state.do_([
-            [whileM, [incr_maze, limit], [do, [
-                [grow_maze],
-                [bind, [bind, [State.get, "maze"], [flipM, lift([getattr]), "count"]], [info]]
-            ]]],
-        ])
+def grow_limit(state, size, limit):
+    return state.do_([
+        [whileM, [incr_maze, limit], [do, [
+            [grow_maze, size],
+            [bind, [bind, [State.get, "maze"], [flipM, lift([getattr]), "count"]], [info]]
+        ]]],
+    ])
 
-    def finish_maze(state):
-        return state.do_([
-            [grow_maze, True],
-        ])
+def finish_maze(state, size):
+    return state.do_([
+        [grow_maze, size, True],
+    ])
 
+def maze(state, size, limit, drone_limit=max_drones()):
     return state.do_([
         [reset_maze],
         [mk_maze, size],
-        [map_maze],
+        [map_maze, drone_limit],
         [wait_all],
         [populate_all_paths],
-        [grow_limit, limit],
-        [finish_maze]
+        [grow_limit, size, limit],
+        [finish_maze, size]
     ])
