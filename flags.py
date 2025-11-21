@@ -9,7 +9,7 @@ MAIN_FLAGS = set([
     #Testing.LOOP,
     #Log.DRONE_DETAILS,
     #Log.SHOW_LEVEL,
-    #Log.TRACE,
+    Log.INFO,
     #Size.SMALL,
     Space.FILL,
     #Phase.PURGE,

@@ -2,6 +2,14 @@ from debug import *
 from monad import *
 from time import *
 
+def delay_lock(state, conditionM, actionM, multiplier=1.0):
+    return state.do([
+        [whenM, conditionM, [do, [
+            [wait_secsM, state["delay"] * multiplier],
+            [whenM, conditionM, actionM]
+        ]]]
+    ])
+
 def lines(state, level, msgs):
     state = Lock(state, "locking.lines")
     state = log_drone_info(state, level)

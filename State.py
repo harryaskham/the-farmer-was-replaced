@@ -22,6 +22,7 @@ def __State__(self, flags=MAIN_FLAGS):
     self["id"] = "1"
     self["parent_id"] = None
     self["next_id"] = 1
+    self["delay"] = 1
     self["start_time"] = get_time()
     self["start_ticks"] = get_tick_count()
 
@@ -82,6 +83,7 @@ def State__get(self, key):
 def State__fork(self, id):
     child_state = State.new(self["flags"])
     child_state["id"] = id
+    child_state["delay"] = self["next_id"]
     child_state["next_id"] = 1
 
     child_state["maze"] = self["maze"]
@@ -108,6 +110,7 @@ def State__share(self, id):
     child.set_timestamps()
     child["id"] = id
     child["next_id"] = 1
+    child["delay"] = self["next_id"]
 
     child["test_module_name"] = None
     child["test_results"] = {}

@@ -49,7 +49,7 @@ def main(state=None, flags=MAIN_FLAGS):
             [when, Phase.CARROTS in flags, [filler_crop, E.Carrot]],
             [when, Phase.CACTUS in flags, [filler_cactus]],
             [when, Phase.COMPANIONS in flags, [filler_companions]],
-            [when, Phase.MAZE in flags, [filler_maze]],
+            [when, Phase.MAZE in flags, [filler_maze_large]],
             [when, Phase.DINO in flags, [dino, [tail_follow]]],
             [when, Phase.FARM in flags, [bind, [cache_loop, loop], [farmloop]]]
         ]]
