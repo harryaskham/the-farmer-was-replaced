@@ -2,7 +2,8 @@ from monad import *
 from compile import *
 from compile import _
 from trace import *
-from Type import uncurry, curry, Type, new, field
+from Type import uncurry, curry, new, field
+import Type
 
 def lift1(state, f, a):
     return pure(state, f(a))
@@ -195,6 +196,24 @@ def CallU(ma_name_margs):
 
 Call = curry(CallU)
 
+def DefunU(names_statements):
+    statements = []
+    for i, name in enumerate(names_statements):
+        if Type.of(name) == String:
+            statements.append([bind, [Arg, i], [let, name]])
+        else:
+            for j in range(i, len(names_statements)):
+                statements.append(names_statements[j])
+            break
+    p = LambdaU(statements)
+    return p
+Defun = curry(DefunU)
+
+def DefunMU(names_statements):
+    p = DefunU(names_statements)
+    return lift([p])
+DefunM = curry(DefunMU)
+
 def LambdaU(statements):
     def p(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_, l=_, m=_, n=_, o=_, p=_, q=_, r=_, s=_, t=_, u=_, v=_, w=_, x=_, y=_, z=_):
         args = []
@@ -209,3 +228,15 @@ def LambdaU(statements):
         return out
     return p
 Lambda = curry(LambdaU)
+
+def LambdaMU(statements):
+    p = LambdaU(statements)
+    return lift([p])
+LambdaM = curry(LambdaMU)
+
+def S1(f):
+    def g(a):
+        return (f, a)
+    return g
+
+Pure = S1(pure)

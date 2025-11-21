@@ -104,6 +104,9 @@ def tuple(x):
 def function(f):
     return f
 
+def module(f):
+    return f
+
 NoneType = mk_builtin("NoneType", __None__)
 String = mk_builtin("String", str)
 Bool = mk_builtin("Bool", bool)
@@ -114,6 +117,7 @@ Tuple = mk_builtin("Tuple", tuple)
 Dict = mk_builtin("Dict", dict)
 Set = mk_builtin("Set", set)
 Function = mk_builtin("Set", function)
+Module = mk_builtin("Module", module)
 
 NUM_CHARS = set(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "+", "."])
 
@@ -139,6 +143,8 @@ def of(x):
                 return Dict
             elif c in [",", "}"]:
                 return Set
+    elif r[:7] == "<Module":
+        return Module
     elif r[0] in NUM_CHARS:
         for c in r:
             if c == ".":

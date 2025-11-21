@@ -63,6 +63,25 @@ def map_maze(state, drone_limit=None):
         [map_dirs, drone_limit],
     ])
 
+def map_maze_solo(state):
+    def go(state):
+        state, c = xy(state)
+        state, seen = add_seen(state, c)
+        if not seen:
+            for dir in Dirs:
+                state, n = pos_to(state, dir)
+                state, seen = is_seen(state, n)
+                if seen:
+                    continue
+                state = state.do_([
+                    [whenM, [moveM, dir], [do, [
+                        [map_direction, dir],
+                        [go],
+                        [moveM, opposite(dir)]
+                    ]]],
+                ])
+    return state.do([[go]])
+
 def default_get_target(state):
     return state["maze"]["treasure"]
 
@@ -171,9 +190,14 @@ def get_path(state):
     else:
         return pathM(state, c)
 
+def fast_follow(state, path):
+    for dir in path:
+        move(dir)
+    return sense_position(state)
+
 def grow_maze(state, size, harvest=False):
     return state.do_([
-        [bind, [get_path], [mapM, [moveM]]],
+        [bind, [get_path], [fast_follow]],
         [cond, harvest,
             [harvestM],
             [use_substance, size]],
@@ -197,7 +221,8 @@ def maze(state, size, limit, drone_limit=max_drones()):
     return state.do_([
         [reset_maze],
         [mk_maze, size],
-        [map_maze, drone_limit],
+        #[map_maze, drone_limit],
+        [map_maze_solo],
         [wait_all],
         [populate_all_paths],
         [grow_limit, size, limit],

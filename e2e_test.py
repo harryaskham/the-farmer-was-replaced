@@ -1,5 +1,6 @@
 from farmlib import *
 from test import *
+import _
 
 def run(state):
     return do_(state, [
@@ -13,5 +14,5 @@ def run(state):
                     [liftA2, [pairM], [exists_to, North], [exists_to, East]]
                 ]
             ]],
-            ((False, False), (True, True))]
+            ((False, False), (True, True))],
     ])
