@@ -6,6 +6,7 @@ def staps(state, xs):
     aps(xs)
 
 def aps(xs):
+    #quick_print(xs)
     if len(xs) == 0:
         return
     if len(xs) == 1:

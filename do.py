@@ -1,23 +1,36 @@
 from compile import *
+from compile import _1
+import monad
 from monad import *
 from operators import *
+from Type import *
+import State
+import List
 
-UNBOUND = "State.UNBOUND"
+DoBlock = Type.new(
+    "DoBlock",
+    [Field("statements", [], list)],
+    {
+        "RunDo": Lambda(
+            [liftA2, [lift(monad.run_do)], _1, Call(Self, "CompileDo")]
+        ),
+        "CompileDo": Lambda(
+            [liftA2, [lift([cons])],
+                [pure, monad.do],
+                [fmap, [List.singleton], GetAttr(Self, "statements")]
+            ])
+    },
+    {},
+    True)
+RunDo = Method("RunDo")
+CompileDo = Method("CompileDo")
 
-def Run(state, ma):
-    return do(state, [ma])
-
-def Eval(state, ma):
-    return Run(state, ma).void()
-
-def mk(a):
-    ma = {
-        "value": value,
-        "fs": []
-    }
-
-    ma["run"] = compile([Pure, a])
+def DoTest(state, testF, do_block, v):
+    info(state, ("DoTest do_block:", do_block))
+    ma = do_block.CompileDo()
+    info(state, ("DoTest compiled:", ma))
+    return testF(state, ma, v)
 
 def DoU(fs):
-    return fs
+    return DoBlock.new(fs)
 Do = curry(DoU)

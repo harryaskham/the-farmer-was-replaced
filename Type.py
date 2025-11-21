@@ -171,3 +171,9 @@ Type = new(
     PreType["classmethods"],
     PreType["dataclass"])
 Type["__type__"] = Type
+
+def Method(name):
+    def methodU(self_args):
+        self, args = self_args[0], self_args[1:]
+        return applyN(self[name], args)
+    return curry(methodU)

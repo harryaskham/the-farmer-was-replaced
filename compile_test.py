@@ -29,6 +29,6 @@ def run(state):
         [Test, [PlusXY, 1, 2], 3],
         [Test, [PlusF, 1, 2], 3],
         [Test,
-            [bind, [Lambda_, [liftA2, [PlusM], [pure, 1], [arg, 0]]], [flap, 5]],
-            6]
+            [bind, [CLambda_, [liftA2, [PlusM], [pure, 1], [arg, 0]]], [flap, 5]],
+            6],
     ])

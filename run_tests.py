@@ -1,5 +1,4 @@
-from monad import *
-from operators import *
+from monad import do_
 
 import Type_test
 import Map_test

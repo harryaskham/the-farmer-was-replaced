@@ -1,5 +1,6 @@
 from monad import *
 from compile import *
+from compile import _
 from trace import *
 from Type import uncurry, curry, Type, new, field
 
@@ -184,3 +185,27 @@ andM = lift([and_])
 inM = lift([in_])
 not_inM = lift([not_in])
 containsM = lift([contains])
+
+def GetAttr(ma, name):
+    return [fmap, [partial(flip(getattr), name)], ma]
+
+def CallU(ma_name_margs):
+    ma, name, margs = ma_name_margs[0], ma_name_margs[1], ma_name_margs[2:]
+    return [then, [applyM, GetAttr(ma, name)], [sequence, margs]]
+
+Call = curry(CallU)
+
+def LambdaU(statements):
+    def p(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_, l=_, m=_, n=_, o=_, p=_, q=_, r=_, s=_, t=_, u=_, v=_, w=_, x=_, y=_, z=_):
+        args = []
+        for arg in [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]:
+            if arg == _:
+                break
+            args.append(arg)
+        state = shim_state()
+        state["args"].append(args)
+        state["bindings"].append({})
+        state, out = state.do(statements)
+        return out
+    return p
+Lambda = curry(LambdaU)

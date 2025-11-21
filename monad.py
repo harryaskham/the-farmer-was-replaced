@@ -106,12 +106,6 @@ def void(state_a):
 def eval(state_a):
     return state_a[1]
 
-def do(state, fs):
-    for xs in fs:
-        state_ = aps(xs)
-        state = merge(state, state_)
-    return state
-
 def pure(state, x):
     return state, x
 
@@ -134,6 +128,9 @@ def do_repr(xs):
     for x in xs:
         ss.append(x_repr(x))
     return join(ss, " ")
+
+def run_do(state, do_f):
+    return do(state, do_f[1])
 
 def do(state, xss):
     state = verbose(state, ("dos", xss))
@@ -158,7 +155,7 @@ def do(state, xss):
             state_, v = state, None
         elif Type.name(out) == "State":
             state_, v = out, None
-        else:
+        elif Type.name(out) in ["List", "Tuple"]:
             if len(out) != 2:
                 state = fatal(state, ["Malformed state,v returned:", out])
                 return unit(state)
@@ -166,6 +163,9 @@ def do(state, xss):
             if Type.name(state_) != "State":
                 state = fatal(state, ["Malformed state returned:", state_, v])
                 return unit(state)
+        else:
+            state_ = state
+            v = out
 
         state = state_
 
@@ -192,6 +192,10 @@ def apply(state, f, args):
     for arg in args:
         fa.append(arg)
     return run(state, fa)
+
+def applyM(state, mf, args):
+    state, f = do(state, [mf])
+    return apply(state, [f], args)
 
 def apS(state, f, arg):
     return apply(state, f, [arg])

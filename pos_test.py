@@ -8,7 +8,7 @@ def run(state):
     return do_(state, [
         [Tests, __name__],
         [Test, [xy], (0,0)],
-        [Test, [ixy], (0,0)],
+        [Test, [ixy], (1,0)],
         [Test, [pos_to, North], (0, 1)],
         [Test, [pos_to, East], (1,0)],
         [Test, [pos_to, South], None],

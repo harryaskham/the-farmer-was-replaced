@@ -3,7 +3,7 @@ from operators import *
 from compile import *
 from builtin_types import *
 from test import *
-from Type import Type, Field, new
+from Type import Type, Field, Method, new
 
 def __T__(self, a, b=123, c=0):
     self["x"] = self["sum"]()
@@ -17,11 +17,25 @@ def get_sum(self):
 def get_x(self):
     return self["x"]
 
+get_x2 = Method("get_x2")
+get_x3 = Method("get_x3")
+
 T = new(
     Type,
     "T",
     [Field("a"), Field("b", 123), Field("c", 0, int)],
-    { "__init__": __T__, "sum": T__sum, "get_sum": get_sum, "get_x": get_x},
+    {
+        "__init__": __T__,
+        "sum": T__sum,
+        "get_sum": get_sum,
+        "get_x": get_x,
+        "get_x2": Lambda(
+            GetAttr(Self, "x")
+        ),
+        "get_x3": Lambda(
+            Call(Self, "get_x2")
+        )
+    },
     {},
     True)
 
@@ -63,8 +77,11 @@ def run(state):
         [Test_, T.new(1, 2).get_x(), 3],
         [Test_, T.new(1, 2, 3).get_x(), 6],
         [Test_, T.new(1, 2, 3.142).get_x(), 6],
+        [Test_, T.new(1, 2, 3.142).get_x2(), 6],
+        [Test_, T.new(1, 2, 3.142).get_x3(), 6],
         [Test_, T.new(1).get_sum(), 124],
         [Test_, T.new(1, 2).get_sum(), 3],
         [Test_, T.new(1, 2, 3).get_sum(), 6],
         [Test_, T.new(1, 2, 3.142).get_sum(), 6],
+        #[Test, [apM, [lift([function]), [fmap, [Add, 1], _0]], 123], 124]
     ])

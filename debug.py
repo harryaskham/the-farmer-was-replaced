@@ -106,7 +106,9 @@ def shim_state():
         "locks": {
             "__locked__": False,
             "__lockers__": set()
-        }
+        },
+        "args": [],
+        "bindings": []
     }
     return state
     
