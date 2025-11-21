@@ -238,10 +238,8 @@ def merge_state(state, other):
     if other == None:
         return state
 
-    state["i"] = max(state["i"], other["i"])
-
-    for child_id, child_return in other["child_returns"].items():
-        state["child_returns"][child_id] = child_return
+    for c in other["grid"]:
+        state["grid"][c] = other["grid"][c]
 
     for c in other["maze"]["seen"]:
         state["maze"]["seen"].add(c)
@@ -249,8 +247,8 @@ def merge_state(state, other):
     for edge in other["maze"]["map"]:
          state["maze"]["map"].add(edge)
 
-    for from_to, path in other["maze"]["all_paths"].items():
-         state["maze"]["all_paths"][from_to] = path
+    for from_to in other["maze"]["all_paths"]:
+         state["maze"]["all_paths"][from_to] = other["maze"]["all_paths"][from_to]
 
     state["maze"]["treasure"] = maybes([
         other["maze"]["treasure"],

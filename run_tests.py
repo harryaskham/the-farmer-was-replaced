@@ -5,6 +5,7 @@ import Type_test
 import Map_test
 import compile_test
 import monad_test
+import do_test
 import pos_test
 import operators_test
 import drones_test
@@ -20,4 +21,5 @@ def run(state):
         [pos_test.run],
         [drones_test.run],
         [e2e_test.run],
+        [do_test.run],
     ])

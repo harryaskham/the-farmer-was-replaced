@@ -5,45 +5,38 @@ from test import *
 from drones import *
 import State
 
-def memory_test(x, y, flags):
-    n = x + y / 10.0
+def memory_test(x, y):
     return [do, [
         [spawn, [compile([do, [
-            [State.put, {"i": y}],
-            [wait_secsM, 2],
-            [get_at, (x, y), "tail_len"],
-        ]])], flags],
-        [set_at, (x, y), {"tail_len": n}],
-        [liftA2, [pairM],
-            [wait_all],
-            [State.get, "i"]]
+            [set_at, (x, y), {"entity_type": E.Tree}],
+        ]])]],
+        [wait_all],
+        [get_at, (x, y), "entity_type"]
     ]]
 
 def run(state):
     return state.do_([
         [Tests, __name__],
         [Test, [do, [
-            [spawn, [compile([pure, 1.1])], [Spawn.FORK]],
-            [spawn, [compile([pure, 1.2])], [Spawn.FORK]],
-            [wait_all]
+            [spawn, [compile([pure, 1.1])]],
+            [spawn, [compile([pure, 1.2])]],
+            [wait_all],
+            [State.get, "child_returns"],
         ]], {"1.1": 1.1, "1.2": 1.2}],
-        [Test, [wait_all], {"1.1": 1.1, "1.2": 1.2}],
-        [Test,
-            memory_test(1, 3, [Spawn.SHARE]),
-            ({"1.1": 1.1, "1.2": 1.2, "1.3": None}, 0)],
-        [Test,
-            memory_test(1, 4, [Spawn.SHARE]),
-            ({"1.1": 1.1, "1.2": 1.2, "1.3": None, "1.4": None}, 4)],
+        [Test, memory_test(1, 3), E.Tree],
+        [Test, memory_test(1, 4), E.Tree],
         [Test,
             [dos, [
-                [spawn,
-                    [compile(memory_test(1, 6, [Spawn.SHARE]))],
-                    [Spawn.SHARE]],
+                [spawns, [
+                    [compile(memory_test(1, 5))],
+                    [compile(memory_test(1, 6))],
+                ]],
+                [wait_all],
                 [liftA2, [pairM],
-                    [wait_all],
-                    [State.get, "i"]]
+                    [get_at, (1, 5), "entity_type"],
+                    [get_at, (1, 6), "entity_type"]
+                ]
             ]],
-            ({"1.1": 1.1, "1.2": 1.2, "1.3": None, "1.4": None,
-              "1.5": ({'1.1':1.1,'1.2':1.2,'1.3':None,'1.4':None,'1.5.6':None}),
-              "1.5.6": None}, 6)],
+            (E.Tree, E.Tree)
+        ]
     ])

@@ -52,9 +52,9 @@ def get_arg(state, i):
 arg = get_arg
 
 def compile(func, arity=None):
-    def p(state, a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
+    def p(state, a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_, l=_, m=_, n=_, o=_, p=_, q=_, r=_, s=_, t=_, u=_, v=_, w=_, x=_, y=_, z=_):
         args = []
-        for arg in [a, b, c, d, e, f, g, h, i, j, k]:
+        for arg in [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]:
             if arg == _:
                 break
             args.append(arg)
@@ -72,9 +72,9 @@ def compile(func, arity=None):
 
 # lift([Plus, 1]), lift([Not])
 def lift(func):
-    def p(state, a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_):
+    def p(state, a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_, l=_, m=_, n=_, o=_, p=_, q=_, r=_, s=_, t=_, u=_, v=_, w=_, x=_, y=_, z=_):
         fn = list(func)
-        for arg in [a, b, c, d, e, f, g, h, i, j, k]:
+        for arg in [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]:
             if arg == _:
                 break
             fn.append(arg)
