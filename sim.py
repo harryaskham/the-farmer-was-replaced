@@ -13,7 +13,7 @@ for i in sim_overrides.items:
 def run_sim(
     main_flags=flags.MAIN_FLAGS,
     name="simulation", globals={},
-    speedup=64,
+    speedup=2048,
     seed=random() * 100000 // 1,
     unlocks=Unlocks,
     items=all_items

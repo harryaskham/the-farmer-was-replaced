@@ -174,10 +174,12 @@ def add_all_paths(state, start, end, path):
     #add_path(state, start, end, path)
     s = start
     for i, dir in enumerate(path):
-        e = end
-        for j in range(len(path)-1, i-1, -1):
-            add_path(state, s, e, path[i:j+1])
-            state, e = pos_to(state, opposite(path[j]), e)
+        add_path(state, s, end, path[i:])
+        #e = end
+        #for j in range(len(path)-1, i-1, -1):
+        #    add_path(state, s, e, path[i:j+1])
+        #    break
+        #    state, e = pos_to(state, opposite(path[j]), e)
         state, s = pos_to(state, dir, s)
     return state
 
@@ -230,7 +232,7 @@ def get_path(state, t=None, c=None):
     if c == None:
         state, c = xy(state)
 
-    state = info(state, ("Getting path from", c, "to", t))
+    state = debug(state, ("Getting path from", c, "to", t))
 
     if c == t:
         return pure(state, [])
@@ -320,13 +322,16 @@ def grow_limit(state, size, limit):
         [whileM, [incr_maze, limit], [do, [
             [grow_maze, size],
             #[whenM, [everyN, 20], [do, [
-            [whenM, [soloM], [do, [
-                [wait_all],
-                [reset_seen],
-                [spawn, [map_maze_solo]]
-            ]]],
-            [bind, [bind, [State.get, "maze"], [flipM, lift([getattr]), "count"]], [info]]
-        ]]],
+            #[whenM, [soloM], [do, [
+            #    [wait_all],
+            #    [reset_seen],
+            #    [spawn, [map_maze_solo]]
+            #]]],
+            [then, [info],
+                [liftA2, [pairM],
+                    [State.get, "id"],
+                    [bind, [State.get, "maze"], [flipM, lift([getattr]), "count"]]]]
+        ]]]
     ])
 
 def finish_maze(state, size):

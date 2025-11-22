@@ -25,7 +25,7 @@ MOVE_FLAGS = set([
 
 def moveM(state, d, flags=MOVE_FLAGS):
     if Movement.FAST in flags:
-        if state["has_excursion"] != None:
+        if state["has_excursion"]:
             state = warn(state, "FAST movement during excursion")
         moved = move(d)
         state = sense_position(state)
