@@ -42,7 +42,7 @@ def filler_maze_large(state):
         ]]]
 
     workers = []
-    size = 32
+    size = d
     for x in range(size // 2, d, size):
         for y in range(size // 2, d, size):
             workers.append(worker((x, y)))

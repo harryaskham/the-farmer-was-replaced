@@ -2,7 +2,6 @@ from aliases import *
 
 MAIN_FLAGS = set([
     #Mode.SIMULATE,
-    #Size.SMALL,  
     #Mode.TEST,
     Mode.RUN,
     #Mode.LOOP,
@@ -10,6 +9,7 @@ MAIN_FLAGS = set([
     #Log.DRONE_DETAILS,
     #Log.SHOW_LEVEL,
     #Log.PRINT_APS,
+    #Size.SMALL,
     Log.INFO,
     Space.FILL,
     #Phase.PURGE,

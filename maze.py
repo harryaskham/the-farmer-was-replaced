@@ -81,16 +81,14 @@ def map_all_dirs(state):
         [spawns, map_workers]
     ])
 
-def map_maze_solo(state, dir=None, start=None, path=None, rev_path=None):
+def map_maze_solo(state, dir=None, start=None, path=None):
     state, c = xy(state)
     if start == None:
         start = c
     if path == None:
         path = []
-    if rev_path == None:
-        rev_path = []
     state, seen = add_seen(state, c)
-    state = add_all_paths(state, start, c, path, rev_path)
+    state = add_all_paths(state, start, c, path)
     if seen:
         return state
     ds = Dirs
@@ -104,11 +102,9 @@ def map_maze_solo(state, dir=None, start=None, path=None, rev_path=None):
         state, moved = moveM(state, dir)
         if moved:
             path_n = list(path)
-            rev_path_n = list(rev_path)
             path_n.append(dir)
-            rev_path_n.insert(0, opposite(dir))
             state = map_direction(state, dir)
-            state = map_maze_solo(state, None, start, path_n, rev_path_n)
+            state = map_maze_solo(state, None, start, path_n)
             state, _ = moveM(state, opposite(dir))
     return state
 
@@ -168,23 +164,21 @@ def add_one_path(state, a, b, path):
         state["maze"]["all_paths"][(a, b)] = path
     return state
 
-def add_path(state, a, b, path, rev_path):
+def add_path(state, a, b, path):
     state["maze"]["all_paths"][(a, a)] = []
     state["maze"]["all_paths"][(b, b)] = []
     add_one_path(state, a, b, path)
-    add_one_path(state, b, a, rev_path)
     return state
 
-def add_all_paths(state, start, end, path, rev_path):
-    #add_path(state, start, end, path, rev_path)
+def add_all_paths(state, start, end, path):
+    #add_path(state, start, end, path)
     s = start
     for i, dir in enumerate(path):
-        add_path(state, s, end, path[i:], rev_path[:i])
+        e = end
+        for j in range(len(path)-1, i-1, -1):
+            add_path(state, s, e, path[i:j+1])
+            state, e = pos_to(state, opposite(path[j]), e)
         state, s = pos_to(state, dir, s)
-    e = end
-    for i, dir in enumerate(rev_path):
-        add_path(state, start, e, path[:i], rev_path[i:])
-        state, e = pos_to(state, dir, e)
     return state
 
 def populate_paths(state, size, start=None):
@@ -200,7 +194,7 @@ def populate_paths(state, size, start=None):
         if seen:
             continue
 
-        state = add_all_paths(state, start, c, path, reverse(map(opposite, path)))
+        state = add_all_paths(state, start, c, path)
 
         for dir in Dirs:
             state, cn = pos_to(state, dir, c)
@@ -242,6 +236,8 @@ def get_path(state, t=None, c=None):
         return pure(state, [])
     if (c, t) in state["maze"]["all_paths"]:
         return pure(state, state["maze"]["all_paths"][(c, t)])
+    elif (t, c) in state["maze"]["all_paths"]:
+        return pure(state, reverse(map(opposite, state["maze"]["all_paths"][(t, c)])))
     else:
         start = state["maze"]["start"]
         state, path = get_path(state, start, c)
