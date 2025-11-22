@@ -42,12 +42,12 @@ def filler_maze_large(state):
         ]]]
 
     workers = []
-    size = 10
+    size = 32
     for x in range(size // 2, d, size):
         for y in range(size // 2, d, size):
             workers.append(worker((x, y)))
 
     return state.do_([
-        [spawns, workers[1:]],
+        [when, len(workers) > 1, [spawns, workers[1:]]],
         workers[0]
     ])

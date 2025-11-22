@@ -323,9 +323,11 @@ def grow_limit(state, size, limit):
     return state.do_([
         [whileM, [incr_maze, limit], [do, [
             [grow_maze, size],
-            [whenM, [everyN, 20, 100], [do, [
+            #[whenM, [everyN, 20], [do, [
+            [whenM, [soloM], [do, [
+                [wait_all],
                 [reset_seen],
-                [map_maze_solo]
+                [spawn, [map_maze_solo]]
             ]]],
             [bind, [bind, [State.get, "maze"], [flipM, lift([getattr]), "count"]], [info]]
         ]]],
