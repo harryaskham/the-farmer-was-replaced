@@ -18,7 +18,7 @@ def run(state):
         [operators_test.run],
         [Map_test.run],
         [pos_test.run],
-        [drones_test.run],
         [e2e_test.run],
         [do_test.run],
+        [drones_test.run],
     ])

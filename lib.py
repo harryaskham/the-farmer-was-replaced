@@ -15,6 +15,7 @@ from lists import *
 from locking import *
 from maybe import *
 from monad import *
+from monoid import *
 from operators import *
 from pos import *
 from status import *

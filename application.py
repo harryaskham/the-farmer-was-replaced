@@ -1,4 +1,6 @@
 import terminate
+import flags
+import Log
 
 def staps(state, xs):
     xs = list(xs)
@@ -6,7 +8,8 @@ def staps(state, xs):
     aps(xs)
 
 def aps(xs):
-    #quick_print(xs)
+    if Log.PRINT_APS in flags.MAIN_FLAGS:
+        quick_print(xs)
     if len(xs) == 0:
         return
     if len(xs) == 1:

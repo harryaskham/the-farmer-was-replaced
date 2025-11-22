@@ -2,6 +2,7 @@ from monad import *
 
 def start_excursion(state):
     state["excursions"].append([])
+    state["has_excursion"] = True
     return state
     
 def current_excursion(state):

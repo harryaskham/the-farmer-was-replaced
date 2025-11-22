@@ -15,7 +15,7 @@ def uncurry(f):
 def curry(uncurried):
     verbose_(("curry", uncurried))
     def curried(a=_, b=_, c=_, d=_, e=_, f=_, g=_, h=_, i=_, j=_, k=_, l=_, m=_, n=_, o=_, p=_, q=_, r=_, s=_, t=_, u=_, v=_, w=_, x=_, y=_, z=_):
-        verbose_(("curry fn", (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)))
+        verbose_(("curried", uncurried, (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)))
         return uncurried(provided_args([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]))
     return curried
 

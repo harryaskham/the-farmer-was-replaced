@@ -6,12 +6,9 @@ import State
 def sense_position(state):
     x = get_pos_x()
     y = get_pos_y()
-    return do_(state, [
-        [State.put, {
-            "x": x,
-            "y": y,
-        }]
-    ])
+    state["x"] = x
+    state["y"] = y
+    return state
 
 def sense(state, flags=[]):
     flags = set(flags)

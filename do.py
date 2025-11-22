@@ -1,33 +1,34 @@
 from compile import *
-from compile import _1
 import monad
 from monad import *
 from operators import *
 from Type import *
-import State
 import List
+import _
 
+Run = Method("Run")
+Compile = Method("Compile")
 DoBlock = Type.new(
     "DoBlock",
     [Field("statements", [], list)],
     {
-        "RunDo": Lambda(
-            [liftA2, [lift(monad.run_do)], _1, Call(Self, "CompileDo")]
+        "Run": Defun("self", "state",
+            (do, (
+                _.bind("do_statement", (_.lift(Compile), _.get("self"))),
+                (_.lift(monad.run_do), _.get("state"), _.get("do_statement"))))
         ),
-        "CompileDo": Lambda(
-            [liftA2, [lift([cons])],
-                [pure, monad.do],
-                [fmap, [List.singleton], GetAttr(Self, "statements")]
-            ])
+        "Compile": Defun("self",
+            _.fmap(
+                pipe(List.singleton, partial(cons, monad.do)),
+                (_.lift(getattr), _.get("self"), "statements"))
+        )
     },
     {},
     True)
-RunDo = Method("RunDo")
-CompileDo = Method("CompileDo")
 
 def DoTest(state, testF, do_block, v):
     info(state, ("DoTest do_block:", do_block))
-    ma = do_block.CompileDo()
+    ma = do_block.Compile()
     info(state, ("DoTest compiled:", ma))
     return testF(state, ma, v)
 

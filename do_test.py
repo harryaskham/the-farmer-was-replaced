@@ -8,6 +8,6 @@ import State
 def run(state):
     return state.do_([
         [Tests, __name__],
-        [Test_, Do((pure, 1)).CompileDo(), [do, [[pure, 1]]]],
+        [Test_, Do((pure, 1)).Compile(), [do, [[pure, 1]]]],
         [DoTest, Test, Do((pure, 1)), 1],
     ])

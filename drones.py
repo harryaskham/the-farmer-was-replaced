@@ -4,6 +4,8 @@ from excursion import *
 from move import *
 from Type import new
 from State import *
+import _
+from do import *
 
 def can_spawn(state, limit=None):
     if limit == None:
@@ -37,7 +39,11 @@ def mk_spawn_inner(child_state, f):
     return spawn_inner
 
 def spawn(state, f, limit=None, flags=DEFAULT_FLAGS):
-    return spawns(state, [f], limit, flags)
+    state, callback = spawns(state, [f], limit, flags)
+    def cb1(state):
+        state, rs = callback(state)
+        return pure(state, rs[0])
+    return pure(state, cb1)
 
 def replicate(state, f, n, limit=None, flags=DEFAULT_FLAGS):
     fs = []
@@ -47,6 +53,7 @@ def replicate(state, f, n, limit=None, flags=DEFAULT_FLAGS):
 
 def spawns(state, fs, limit=None, flags=DEFAULT_FLAGS):
     flags = set(flags)
+    child_ids = []
     states = {}
     handles = {}
     spawn_fs = {}
@@ -56,6 +63,7 @@ def spawns(state, fs, limit=None, flags=DEFAULT_FLAGS):
         state = debug(state, ("Spawning with flags", flags, "program", f))
 
         state, child_id = get_next_id(state)
+        child_ids.append(child_id)
         if Spawn.CLONE in flags:
             child_state = dict(state)
             child_state["id"] = child_id
@@ -114,7 +122,15 @@ def spawns(state, fs, limit=None, flags=DEFAULT_FLAGS):
             wait_secs(1)
 
     #return wait_all(state, True)
-    return pure(state, True)
+    def callback(state):
+        rs = []
+        for child_id in child_ids:
+            state, (_, r) = state.do([
+                [wait_for_child, child_id, True]
+            ])
+            rs.append(r)
+        return pure(state, rs)
+    return pure(state, callback)
 
 def wait_for_child(state, child_id, recursive=True):
     if child_id == state["id"]:
@@ -168,6 +184,7 @@ def wait_for_child(state, child_id, recursive=True):
         (recursive and (handle["status"] == MERGED_CHILDREN))
         or (not recursive and (handle["status"] == MERGED_SELF))
     ):
+        state["child_handles"].pop(child_id)
         return pure(state, (child_state, r))
 
     return fatal(state, ("Unhandled handle status in wait_for_child", handle["status"], child_id))
@@ -231,3 +248,31 @@ def become(state, child_state, f):
     state["child_returns"][child_id] = r
     state["child_handles"][child_id] = Handle(FINISHED, child_id)
     return state
+
+def dmap(state, f, xs, n_workers=None):
+    def worker(chunk):
+        def w(state):
+            state = info(state, ("Worker mapping", f, "over chunk", chunk))
+            return state.do([
+                [mapM, f, chunk]
+            ])
+        return [w]
+
+    if n_workers == None:
+        n_workers = min(max_drones() - num_drones(), len(xs))
+    chunk_len = len(xs) // n_workers
+    state = info(state, ("Mapping", f, "over", len(xs), "items with", n_workers, "workers with chunk length", chunk_len))
+
+    workers = []
+    for i in range(n_workers):
+        workers.append(worker(xs[i*chunk_len : (i+1)*chunk_len]))
+    leftover = n_workers*chunk_len < len(xs)
+    if leftover:
+        workers.append(worker(xs[n_workers*chunk_len :]))
+
+    go = Do(
+        _.bind("cb", (spawns, workers)),
+        _.bind("results", _.get("cb")),
+        (_.lift(mconcat), _.get("results")))
+
+    return go.Run(state)

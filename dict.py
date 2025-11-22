@@ -15,6 +15,9 @@ def merge_all(xss, keys=None, copy=False):
     for ys in xss[1:]:
         xs = merge(xs, ys, keys, copy)
     return xs
+
+def update(xs, ys):
+    return merge(xs, ys, None, False)
     
 def copy(xs):
     return merge(xs, {}, None, True)

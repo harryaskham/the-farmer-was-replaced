@@ -4,6 +4,7 @@ from compile import *
 from test import *
 from drones import *
 import State
+import _
 
 def memory_test(x, y):
     return [do, [
@@ -13,6 +14,19 @@ def memory_test(x, y):
         [wait_all],
         [get_at, (x, y), "entity_type"]
     ]]
+
+fib_memo = {}
+def fib(state, n):
+    if n in fib_memo:
+        return pure(state, fib_memo[n])
+    state = info(state, (state["id"], "computing fib", n))
+    state, x = state.do([
+        (cond, n <= 1,
+            (pure, 1),
+            (liftA2, [plusM], (fib, n - 1), (fib, n - 2)))
+    ])
+    fib_memo[n] = x
+    return pure(state, x)
 
 def run(state):
     return state.do_([
@@ -38,5 +52,9 @@ def run(state):
                 ]
             ]],
             (E.Tree, E.Tree)
-        ]
+         ],
+         [Test, [dmap, [fib], range(6)], [1, 1, 2, 3, 5, 8]],
+         [Test,
+             [dmap, [fib], range(20)],
+             [1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765]],
     ])

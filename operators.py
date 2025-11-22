@@ -4,6 +4,7 @@ from compile import _
 from trace import *
 from Type import uncurry, curry, new, field
 import Type
+import _
 
 def lift1(state, f, a):
     return pure(state, f(a))
@@ -196,21 +197,15 @@ def CallU(ma_name_margs):
 
 Call = curry(CallU)
 
-def DefunU(names_statements):
-    statements = []
-    for i, name in enumerate(names_statements):
-        if Type.of(name) == String:
-            statements.append([bind, [Arg, i], [let, name]])
-        else:
-            for j in range(i, len(names_statements)):
-                statements.append(names_statements[j])
-            break
-    p = LambdaU(statements)
-    return p
+def DefunU(names_body):
+    names, body = _.split_names(names_body)
+    for i, name in enumerate(names):
+        body = cons(_.let(name, _._(i)), body)
+    return LambdaU(body)
 Defun = curry(DefunU)
 
-def DefunMU(names_statements):
-    p = DefunU(names_statements)
+def DefunMU(names_body):
+    p = DefunU(names_body)
     return lift([p])
 DefunM = curry(DefunMU)
 
@@ -221,10 +216,13 @@ def LambdaU(statements):
             if arg == _:
                 break
             args.append(arg)
+        body = list(statements)
+        for i, arg in enumerate(args):
+            body = cons((push_binding, i, arg), body)
+        body = cons((push_args, args), body)
+        body = cons((push_bindings,), body)
         state = shim_state()
-        state["args"].append(args)
-        state["bindings"].append({})
-        state, out = state.do(statements)
+        state, out = state.do(body)
         return out
     return p
 Lambda = curry(LambdaU)

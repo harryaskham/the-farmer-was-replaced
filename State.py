@@ -35,6 +35,8 @@ def __State__(self, flags=MAIN_FLAGS):
     self["error"] = None
     self["args"] = []
     self["bindings"] = []
+    self["do_bindings"] = {}
+    self["current_do_bindings"] = []
     self["stack"] = []
     self["test_module_name"] = None
     self["test_results"] = {}
@@ -49,6 +51,7 @@ def __State__(self, flags=MAIN_FLAGS):
     self["wh"] = get_world_size()
     self["grid"] = {}
     self["excursions"] = []
+    self["has_excursion"] = False
 
     self["apple"] = None
     self["tail"] = []
@@ -88,6 +91,12 @@ def State__fork(self, id):
     child_state["next_id"] = 1
 
     child_state["maze"] = self["maze"]
+    child_state["do_bindings"] = self["do_bindings"]
+    child_state["current_do_bindings"] = self["current_do_bindings"]
+
+    child_state["args"] = self["args"]
+    child_state["bindings"] = self["bindings"]
+    child_state["ret"] = self["ret"]
 
     return child_state
 

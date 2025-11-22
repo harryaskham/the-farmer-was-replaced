@@ -18,14 +18,20 @@ CCW = {
 
 Rots = [CW, CCW]
 
-MOVE_FLAGS = [
+MOVE_FLAGS = set([
     Movement.FAST,
     Movement.UNBOUNDED,
-]
+])
 
 def moveM(state, d, flags=MOVE_FLAGS):
-    flags = set(flags)
+    if Movement.FAST in flags:
+        if state["has_excursion"] != None:
+            state = warn(state, "FAST movement during excursion")
+        moved = move(d)
+        state = sense_position(state)
+        return pure(state, moved)
 
+    flags = set(flags)
     state, prev = xy(state)
     if Movement.UNBOUNDED in flags:
         moved = move(d)
@@ -34,11 +40,6 @@ def moveM(state, d, flags=MOVE_FLAGS):
 
     if moved and Movement.REWIND_EXCURSION not in flags:
         state = maybe_update_excursion(state, d)
-
-    if Movement.FAST in flags:
-        if moved:
-            state = sense_position(state)
-        return pure(state, moved)
 
     return do(state, [
         [sense, flags],
@@ -97,12 +98,15 @@ def end_excursion(state, flags=MOVE_FLAGS):
     flags = with(flags, Movement.REWIND_EXCURSION)
 
     excursion = state["excursions"].pop()
-    if excursion in [None, []]:
-        return state
-
-    while excursion != []:
+    while excursion not in [None, []]:
         d = excursion.pop()
-        state, _ = moveM(state, opposite(d), flags)
+        state, moved = moveM(state, opposite(d), flags)
+        if not moved:
+            state = fatal(state, "Couldn't rewind excursion")
+
+    if state["excursions"] == []:
+        state["has_excursion"] = False
+
     return state
 
 def move_toward(state, c, flags=MOVE_FLAGS):
