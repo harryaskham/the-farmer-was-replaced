@@ -1,5 +1,6 @@
 from farmlib import *
 from filler_utils import *
+import State
 
 def filler_maze(state):
     state, d = wh(state)
@@ -28,42 +29,25 @@ def filler_maze_large(state):
         state, e = et(state)
         return pure(state, e in [E.Hedge, E.Treasure])
 
-    def map_to_dir(dir):
-        return [do, [
-            [bind, [xy], [add_seen]],
-            [whenM, [moveM, dir], [do, [
-                [map_direction, dir],
-                [map_maze_solo]
-            ]]]
-        ]]
-
-    def worker(start):
-        return [do, [
-            #[maze_move_to, start],
-            [move_to, start],
-            [wait_secsM, 30],
-            [map_maze_solo],
-            [whileM, [in_maze], [grow_maze, d, False]]
-        ]]
-
-    workers = []
-    size = 5
-    for x in range(size // 2, d - size // 2, size):
-        for y in range(size // 2, d - size // 2, size):
-            workers.append(worker((x, y)))
-
-    state = state.do_([
-        [forever, [do, [
-            [move_to, (d//2, d//2)],
+    def worker(c):
+        return [forever, [do, [
+            [move_to, c],
             [reset_maze],
-            [mk_maze, d],
-            [spawns, workers[:31]],
+            [wait_secsM, 10],
+            [mk_maze, size],
             [map_maze_solo],
-            #[populate_paths, d],
-            #[spawns, workers[:31]],
-            [grow_limit, d, 300],
+            [grow_limit, size, 300],
             [sense],
             [finish_maze, d],
-            [wait_all]
         ]]]
+
+    workers = []
+    size = 8
+    for x in range(size // 2, d, size):
+        for y in range(size // 2, d, size):
+            workers.append(worker((x, y)))
+
+    return state.do_([
+        [spawns, workers[1:]],
+        workers[0]
     ])

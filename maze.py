@@ -38,6 +38,8 @@ def mk_maze(state, size=None, force=True):
         [sense]
     ])
     state["maze"]["seen"] = set()
+    state, c = xy(state)
+    state["maze"]["start"] = c
     return state
 
 def map_dir(dir, drone_limit=None):
@@ -65,25 +67,49 @@ def map_maze(state, drone_limit=None):
         [map_dirs, drone_limit],
     ])
 
-def map_maze_solo(state, start=None, seen=None):
-    if seen == None:
-        state["maze"]["seen"] = set()
-        seen = state["maze"]["seen"]
+def map_to_dir(dir):
+    def f(state):
+        return state.do([
+            [map_maze_solo, dir]
+        ])
+    return [f]
+map_workers = map(map_to_dir, Dirs)
+
+def map_all_dirs(state):
+    state["maze"]["seen"] = set()
+    return state.do_([
+        [spawns, map_workers]
+    ])
+
+def map_maze_solo(state, dir=None, start=None, path=None, rev_path=None):
     state, c = xy(state)
     if start == None:
         start = c
+    if path == None:
+        path = []
+    if rev_path == None:
+        rev_path = []
     state, seen = add_seen(state, c)
-    if not seen:
-        for dir in Dirs:
-            state, n = pos_to(state, dir)
-            state, seen = is_seen(state, n)
-            if seen and n != start:
-                continue
-            state, moved = moveM(state, dir)
-            if moved:
-                state = map_direction(state, dir)
-                state = map_maze_solo(state, start, seen)
-                state, _ = moveM(state, opposite(dir))
+    state = add_all_paths(state, start, c, path, rev_path)
+    if seen:
+        return state
+    ds = Dirs
+    if dir != None:
+        ds = [dir]
+    for dir in ds:
+        state, n = pos_to(state, dir)
+        state, seen = is_seen(state, n)
+        if seen:
+            continue
+        state, moved = moveM(state, dir)
+        if moved:
+            path_n = list(path)
+            rev_path_n = list(rev_path)
+            path_n.append(dir)
+            rev_path_n.insert(0, opposite(dir))
+            #state = map_direction(state, dir)
+            state = map_maze_solo(state, None, start, path_n, rev_path_n)
+            state, _ = moveM(state, opposite(dir))
     return state
 
 def default_get_target(state):
@@ -134,6 +160,17 @@ def pathM(state, c=None, get_target=default_get_target, path=None):
             q.append((cn, path_n, seen))
     return pure(state, None)
 
+def add_all_paths(state, start, c, path, rev_path):
+    #s = start
+    state["maze"]["all_paths"][(c, c)] = []
+    state["maze"]["all_paths"][(start, c)] = list(path)
+    state["maze"]["all_paths"][(c, start)] = reverse(map(opposite, path))
+    #for i, dir in enumerate(path):
+    #    state["maze"]["all_paths"][(s, c)] = list(path[i:])
+    #    state["maze"]["all_paths"][(c, s)] = reverse(map(opposite, path[i:]))
+    #    state, s = pos_to(state, dir, s)
+    return state
+
 def populate_paths(state, size, start=None):
     state["maze"]["seen"] = set()
     if start == None:
@@ -147,13 +184,7 @@ def populate_paths(state, size, start=None):
         if seen:
             continue
 
-        s = start
-        for i, dir in enumerate(path):
-            if (s, c) not in state["maze"]["all_paths"]:
-                state["maze"]["all_paths"][(s, c)] = path[i:]
-            if (c, s) not in state["maze"]["all_paths"]:
-                state["maze"]["all_paths"][(c, s)] = reverse(map(opposite, path[i:]))
-            state, s = pos_to(state, dir, s)
+        state = add_all_paths(state, start, c, path, reverse(map(opposite, path)))
 
         for dir in Dirs:
             state, cn = pos_to(state, dir, c)
@@ -178,7 +209,7 @@ def populate_all_paths(state, size):
     state = info(state, state["maze"])
     return state
 
-def get_path(state, t=None):
+def get_path(state, t=None, c=None):
     while t == None:
         state = sense(state)
         t = state["maze"]["treasure"]
@@ -186,14 +217,26 @@ def get_path(state, t=None):
             break
         wait_secs(state["delay"])
 
-    state, c = xy(state)
+    if c == None:
+        state, c = xy(state)
+
+    state = info(state, ("Getting path from", c, "to", t))
+
     if c == t:
         return pure(state, [])
     if (c, t) in state["maze"]["all_paths"]:
         return pure(state, state["maze"]["all_paths"][(c, t)])
     else:
-        state = warn(state, "Computing path on the fly from", c, "to", t)
-        return pathM(state, c, mk_target(t))
+        start = state["maze"]["start"]
+        state, path = get_path(state, start, c)
+        state, rest = get_path(state, t, start)
+        path = list(path)
+        for dir in rest:
+            path.append(dir)
+        return pure(state, path)
+
+        #state = warn(state, ("Computing path on the fly from", c, "to", t))
+        #return pathM(state, c, mk_target(t))
         #return fatal(state, ("No path stored from", c, "to", t))
 
 def maze_move_to(state, c):
@@ -204,6 +247,19 @@ def fast_follow(state, path):
     for dir in path:
         move(dir)
     return sense_position(state)
+
+def abortive_follow(state, path, ):
+    state = sense(state)
+    t = state["maze"]["treasure"]
+    success = True
+    for dir in path:
+        state, moved = state.do([
+            [delay_lock, [same_treasure, t], [moveM, dir], 0]
+        ])
+        if not moved:
+            success = False
+            break
+    return pure(state, success)
 
 def lock_treasure(state):
     state = sense(state)
@@ -222,24 +278,36 @@ def delay_path(state):
 def grow_maze(state, size, harvest=False):
     state = sense(state)
     t = state["maze"]["treasure"]
-    state, path = delay_path(state)
+    #state, path = delay_path(state)
+    state, path = get_path(state)
     return state.do_([
-        [delay_lock, [same_treasure, t],
-            [do, [
-                [fast_follow, path],
+        #[delay_lock, [same_treasure, t], [do, [
+            [fast_follow, path],
+            #[delay_lock, [same_treasure, t], [do, [
                 [cond, harvest,
                     [harvestM],
-                    [use_substance, size]
-                ]
-            ]],
-            0.1
-        ]
+                    [use_substance, size]]
+                #]], 0]
+                #]], 0]
     ])
+
+def soloM(state):
+    return pure(state, num_drones() == 1)
+
+def every20(state):
+    return pure(state, state["maze"]["count"] % 20 == 0)
+
+def reset_seen(state):
+    state["maze"]["seen"] = set()
 
 def grow_limit(state, size, limit):
     return state.do_([
         [whileM, [incr_maze, limit], [do, [
             [grow_maze, size],
+            [whenM, [every20], [do, [
+                [reset_seen],
+                [map_maze_solo]
+            ]]],
             [bind, [bind, [State.get, "maze"], [flipM, lift([getattr]), "count"]], [info]]
         ]]],
     ])
@@ -253,10 +321,7 @@ def maze(state, size, limit, drone_limit=max_drones()):
     return state.do_([
         [reset_maze],
         [mk_maze, size],
-        #[map_maze, drone_limit],
         [map_maze_solo],
-        [wait_all],
-        [populate_all_paths, size],
         [grow_limit, size, limit],
         [finish_maze, size]
     ])

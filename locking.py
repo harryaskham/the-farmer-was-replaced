@@ -2,13 +2,17 @@ from debug import *
 from monad import *
 from time import *
 
-def delay_lock(state, conditionM, actionM, multiplier=1.0):
-    return state.do([
-        [whenM, conditionM, [do, [
-            [wait_secsM, state["delay"] * multiplier],
-            [whenM, conditionM, actionM]
-        ]]]
-    ])
+def delay_lock(state, conditionM, actionM, delay=None):
+    if delay == None:
+        delay = state["delay"]
+    state, c = state.do([conditionM])
+    if c:
+        if delay > 0:
+            state = state.do_([[wait_secsM, delay]])
+        state, c = state.do([conditionM])
+        if c:
+            state = state.do_([actionM])
+    return pure(state, c)
 
 def lines(state, level, msgs):
     state = Lock(state, "locking.lines")

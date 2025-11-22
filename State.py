@@ -60,7 +60,8 @@ def __State__(self, flags=MAIN_FLAGS):
         "map": set(),
         "count": 0,
         "treasure": None,
-        "all_paths": {}
+        "all_paths": {},
+        "start": None
     }
 
     debug_(("self", self))
@@ -211,6 +212,7 @@ def incr_maze(state, limit):
 def reset_maze(state):
     state = Lock(state, "maze_count")
     state["maze"]["count"] = 0
+    state["maze"]["start"] = None
     state["maze"]["seen"] = set()
     state["maze"]["map"] = set()
     state["maze"]["all_paths"] = dict()
