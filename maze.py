@@ -294,8 +294,11 @@ def grow_maze(state, size, harvest=False):
 def soloM(state):
     return pure(state, num_drones() == 1)
 
-def every20(state):
-    return pure(state, state["maze"]["count"] % 20 == 0)
+def everyN(state, n, max=None):
+    if max == None:
+        max = 300
+    count = state["maze"]["count"]
+    return pure(state, count < max and count % n == 0)
 
 def reset_seen(state):
     state["maze"]["seen"] = set()
@@ -304,7 +307,7 @@ def grow_limit(state, size, limit):
     return state.do_([
         [whileM, [incr_maze, limit], [do, [
             [grow_maze, size],
-            [whenM, [every20], [do, [
+            [whenM, [everyN, 20, 100], [do, [
                 [reset_seen],
                 [map_maze_solo]
             ]]],
