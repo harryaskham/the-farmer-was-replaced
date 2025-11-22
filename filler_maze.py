@@ -21,7 +21,7 @@ def filler_maze(state):
         tasks[0]
     ])
 
-def filler_maze_large(state):
+def filler_maze_large(state, repeats=20, size=5):
     state, d = wh(state)
 
     def in_maze(state):
@@ -36,14 +36,12 @@ def filler_maze_large(state):
             [wait_secsM, 10],
             [mk_maze, size],
             [map_maze_solo],
-            [grow_limit, size, 300],
+            [grow_limit, size, repeats],
             [sense],
             [finish_maze, d],
         ]]]
 
     workers = []
-    #size = d
-    size = 5
     for x in range(size // 2, d, size):
         for y in range(size // 2, d, size):
             workers.append(worker((x, y)))
