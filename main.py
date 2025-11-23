@@ -47,6 +47,7 @@ def main(state=None, flags=MAIN_FLAGS):
             [when, Phase.PUMPKIN in flags, [filler_pumpkin]],
             [when, Phase.CROPS in flags, [filler_crops]],
             [when, Phase.CARROTS in flags, [filler_crop, E.Carrot]],
+            [when, Phase.WOOD in flags, [filler_wood]],
             [when, Phase.CACTUS in flags, [filler_cactus]],
             [when, Phase.COMPANIONS in flags, [filler_companions]],
             [when, Phase.MAZE in flags, [filler_maze_large]],

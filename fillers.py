@@ -4,6 +4,7 @@ from filler_companions import *
 from filler_energy import *
 from filler_pumpkin import *
 from filler_maze import *
+from filler_wood import *
 from filler_utils import *
 
 def filler_crops(state):

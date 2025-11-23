@@ -106,28 +106,41 @@ def fill_rowsM(state, f, handler, n=None):
                 ])
         return fill_rows(state, f, h, n)
 
-OSCILLATE_FLAGS = [Spawn.FORK, Spawn.BECOME, Movement.LOOP]
+OSCILLATE_FLAGS = [Spawn.FORK, Movement.LOOP]
 
 def oscillate(state, ltr, rtl, flags=OSCILLATE_FLAGS):
     state, d = wh(state)
     flags = set(flags)
-    ltr_flags = without(flags, Movement.LOOP)
-    rtl_flags = toggle(ltr_flags, Movement.REVERSE)
 
+    def repeat_dir(state, f, dir, n):
+        for i in range(n):
+            state = state.do_([
+                f,
+                [moveM, dir]
+            ])
+        return state
     def p(y):
-        b = row_box(d, y)
-        inner = [do, [
-            [box_do, b, ltr, ltr_flags],
-            [box_do, b, rtl, rtl_flags]
-        ]]
-        if Movement.LOOP in flags:
-            return [forever, inner]
-        else:
-            return inner
+        def go(state):
+            inner = [do, [
+                [repeat_dir, ltr, East, d-1],
+                [repeat_dir, rtl, West, d-1],
+            ]]
+            if Movement.LOOP in flags:
+                return state.do([
+                    [move_to, (0, y)],
+                    [forever, inner]
+                ])
+            else:
+                return state.do([
+                    move_to, (0, y),
+                    inner
+                ])
+        return [go]
 
+    workers = []
     for y in range(d-1, 0, -1):
-        state = spawn_(state, p(y), flags)
-        if Spawn.SERIAL in flags:
-            state, _ = wait_all(state)
-
-    return do(state, [p(0)])
+        workers.append(p(y))
+    return state.do([
+        [spawns, workers[1:]],
+        p(0)
+    ])
